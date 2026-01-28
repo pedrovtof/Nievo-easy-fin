@@ -4,11 +4,10 @@ hidden: false
 ---
 
 <Cards>
-  <Card title="Quick Start" href="#" icon="fa-duotone fa-rocket-launch">Learn about our product</Card>
+  <Card title="Quick Start" href="https://nievo-easyfin.readme.io/docs/intro" icon="fa-duotone fa-rocket-launch">Learn about Nievo Easy Fin</Card>
 
   <Card title="API Reference" href="#" icon="fa-duotone fa-code-simple">Explore endpoints and build your integration</Card>
 
-  <Card title="Build with AI" href="#" icon="fa-duotone fa-sparkles">Use LLM features to automate your workflow</Card>
 </Cards>
 
 <br />
@@ -18,9 +17,6 @@ hidden: false
 <Cards>
   <Card isNew kind="tile" title="v2.0 Migration" href="#" icon="fa-duotone fa-magnifying-glass">Everything you need to upgrade</Card>
 
-  <Card kind="tile" title="Webhooks" href="#" icon="fa-duotone fa-bullhorn">Real-time events are now available</Card>
-
-  <Card kind="tile" title="Android SDK" href="#" icon="fa-duotone fa-robot">Our native Android library is out of beta</Card>
 </Cards>
 
 <br />
