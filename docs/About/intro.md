@@ -1,22 +1,18 @@
-## Easy Fin
+# Easy Fin
 
-## EFN
-
-## Easy Fin by Nievo
-
-### Objetivo
+## Objetivo
 
 Serviço de controle de orçamento pessoal.
 
-### Problemática
+## Problemática
 
 O aumento expressivo das casas de aposta (30 bilhões por mês de acordo com Banco Central) e perda contínua do Real frente ao Dólar (2,43 em 2005 para 4,95 em 2024, mais de 100% de desvalorização em 2025), confirmam o fato que a população Brasileira precisa de meios para gestão de orçamento.
 
-### Público alvo
+## Público alvo
 
 Famílias de baixa ou média renda com interesse em gestão financeira.
 
-### Solução
+## Solução
 
 Plataforma web PaaS, a plataforma deverá permitir registros de metas, demonstrativo da evolução ao longo do período, armazenar gastos do mês com relação às categorias como Mercado, Jogos, Cuidados pessoais entre outros com intenção de identificar padrões de gastos.
 
@@ -160,7 +156,7 @@ flowchart TD
     end
 
     subgraph VM["VM"]
-      java["Java API"]
+      dotnet["Dotnet C#"]
     end
   end
 
@@ -177,7 +173,7 @@ flowchart TD
     kong-- HTTP --> dbMemory
     kong-- HTTP --> python
     kong-- HTTP --> node
-    kong-- HTTP --> java
+    kong-- HTTP --> dotnet
     Backend -- JDBC --> Database
     python -- HTTP --> dbData
 ```
@@ -211,7 +207,7 @@ flowchart TD
         kong --> auth["Auth"]
   end
  subgraph Backend["Backend"]
-        vmB["Servidor dedicado"] --> java["Java"]
+        vmB["Servidor dedicado"] --> dotnet["Dotnet"]
         cluster["Cluster dedicado"] --> K8S
   end
 
@@ -255,9 +251,11 @@ Database --> Cicd
 
 ### Diagrama de fluxos
 
+Modelos de fluxo ainda não criados
+
 #### Modelo de desing
 
-Modelo criado no Figma, slides de telas se encontra na pasta
+Modelo ainda não criado
 
 ### Concorrentes
 
