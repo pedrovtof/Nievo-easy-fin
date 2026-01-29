@@ -1,0 +1,16 @@
+services:
+  mkdoc:
+    image: squidfunk/mkdocs-material:9
+    restart: always
+    container_name: bms-app-navya-docs
+    hostname: bms.app.navya.docs.com
+    volumes:
+      - ./config/:/docs 
+    networks:
+      - docs
+    ports:
+      - "8030:8000"
+
+networks:
+  docs:
+    driver: bridge

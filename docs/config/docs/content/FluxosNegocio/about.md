@@ -1,12 +1,9 @@
-# Easy Fin
+# Sobre
+
 
 ## Objetivo
 
 Serviço de controle de orçamento pessoal.
-
-## Problemática
-
-O aumento expressivo das casas de aposta (30 bilhões por mês de acordo com Banco Central) e perda contínua do Real frente ao Dólar (2,43 em 2005 para 4,95 em 2024, mais de 100% de desvalorização em 2025), confirmam o fato que a população Brasileira precisa de meios para gestão de orçamento.
 
 ## Público alvo
 
