@@ -4,7 +4,8 @@ site_url: https://nievo.com.br/easy-fin/docs
 nav:
   - Home: index.md
   - Arquitetura do Sistema: ./content/ArquiteturaSistema/intro.md
-  - Fluxos de Negócio: ./content/FluxosNegocio/intro.md
+  - Fluxos de Negócio:
+    - Introdução: ./content/FluxosNegocio/intro.md
     - Sobre: ./content/FluxosNegocio/about.md
   - APIs e Integrações: ./content/ApiIntegracoes/intro.md
   - Procedimentos Operacionais: ./content/ProcedimentosOperacionais/intro.md
