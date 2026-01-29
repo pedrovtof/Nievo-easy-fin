@@ -1,0 +1,41 @@
+
+site_name: Navya Docs
+site_url: https://nievo.com.br/easy-fin/docs
+nav:
+  - Home: index.md
+  - Arquitetura do Sistema: ./content/ArquiteturaSistema/intro.md
+  - Fluxos de Negócio: ./content/FluxosNegocio/intro.md
+    - Sobre: ./content/FluxosNegocio/about.md
+  - APIs e Integrações: ./content/ApiIntegracoes/intro.md
+  - Procedimentos Operacionais: ./content/ProcedimentosOperacionais/intro.md
+  - Boas Práticas: ./content/BoasPraticas/intro.md
+  - Atualizações e Histórico: ./content/AtualizacoesHistorico/intro.md
+
+theme:
+  name: material
+  logo: images/nievo-logo-arredondado.png
+  favicon: images/favicon.ico
+  palette:
+    - scheme: slate       # modo escuro
+      primary: '#0092d1'  # azul mais moderno e agradável
+      accent: '#ff8800'   # laranja suave e visível
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - scheme: default     # modo claro
+      primary: '#0077b6'  # azul consistente, mais limpo no branco
+      accent: '#ff7f00'   # mantém identidade
+      toggle:
+        icon: material/white-balance-sunny
+        name: Switch to dark mode
+  font:
+    text: Roboto
+    code: Fira Code
+  features:
+    - navigation.expand
+    - navigation.top
+    - navigation.tabs
+    - search.suggest
+    - content.code.copy
+extra_css:
+  - styles/custom.css
