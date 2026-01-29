@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings &amp; Preferences - BudgetManager</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2d3e48",
+                        "primary-hover": "#1f2b33",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#171a1b",
+                        "ice": "#EDF2F7",
+                        "ice-dark": "#1e2327",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom toggle switch styling */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #2d3e48;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #2d3e48;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-primary dark:text-white overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 bg-white dark:bg-[#1e2327] border-r border-gray-200 dark:border-gray-800 flex flex-col h-full overflow-y-auto">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight">BudgetManager</h1>
+<p class="text-gray-500 text-xs font-medium">Family Finance</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">pie_chart</span>
+<span class="text-sm font-medium">Budget</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+<span class="text-sm font-medium">Transactions</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 text-primary dark:text-white dark:bg-primary/20 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] fill-1">settings</span>
+<span class="text-sm font-bold">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">help</span>
+<span class="text-sm font-medium">Help</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-gray-200 dark:border-gray-800">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden relative">
+<!-- Abstract avatar gradient -->
+<div class="absolute inset-0 bg-gradient-to-tr from-blue-400 to-emerald-400" data-alt="User profile avatar placeholder gradient"></div>
+</div>
+<div>
+<p class="text-sm font-bold text-primary dark:text-white">Alex Morgan</p>
+<p class="text-xs text-gray-500">Free Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 h-full overflow-y-auto bg-white dark:bg-background-dark relative">
+<div class="max-w-[1000px] mx-auto px-6 py-8 md:px-12 md:py-12">
+<!-- Page Heading -->
+<div class="flex flex-col gap-2 mb-10">
+<h1 class="text-3xl md:text-4xl font-black text-primary dark:text-white tracking-tight">Settings &amp; Preferences</h1>
+<p class="text-gray-500 dark:text-gray-400 text-lg">Manage your profile, security, and application settings.</p>
+</div>
+<!-- Sections Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Profile & Security -->
+<div class="lg:col-span-7 flex flex-col gap-8">
+<!-- Profile Information -->
+<section class="bg-ice dark:bg-ice-dark rounded-xl p-6 md:p-8">
+<div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+<span class="material-symbols-outlined text-primary dark:text-gray-300">person</span>
+<h2 class="text-xl font-bold text-primary dark:text-white">Profile Information</h2>
+</div>
+<div class="flex flex-col gap-5">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-primary dark:text-gray-300">Full Name</span>
+<input class="w-full h-12 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-primary dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="text" value="Alex Morgan"/>
+</label>
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-primary dark:text-gray-300">Email Address</span>
+<input class="w-full h-12 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-primary dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="email" value="alex.morgan@example.com"/>
+</label>
+</div>
+<label class="flex flex-col gap-2">
+<span class="text-sm font-semibold text-primary dark:text-gray-300">Default Currency</span>
+<div class="relative">
+<select class="w-full h-12 px-4 appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-primary dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+<option selected="" value="USD">USD - United States Dollar</option>
+<option value="EUR">EUR - Euro</option>
+<option value="GBP">GBP - British Pound</option>
+<option value="CAD">CAD - Canadian Dollar</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+<p class="text-xs text-gray-500 mt-1">This will be the default currency for your budget reports.</p>
+</label>
+</div>
+</section>
+<!-- Security -->
+<section class="bg-ice dark:bg-ice-dark rounded-xl p-6 md:p-8">
+<div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+<span class="material-symbols-outlined text-primary dark:text-gray-300">lock</span>
+<h2 class="text-xl font-bold text-primary dark:text-white">Security</h2>
+</div>
+<div class="flex flex-col gap-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<p class="text-sm font-bold text-primary dark:text-white">Password</p>
+<p class="text-xs text-gray-500">Last changed 3 months ago</p>
+</div>
+<button class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-primary dark:text-white">
+                                        Change Password
+                                    </button>
+</div>
+<div class="h-px bg-gray-200 dark:bg-gray-700"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="max-w-md">
+<p class="text-sm font-bold text-primary dark:text-white">Two-Factor Authentication (2FA)</p>
+<p class="text-xs text-gray-500 mt-1">Add an extra layer of security to your account by requiring a code when logging in.</p>
+</div>
+<!-- Toggle -->
+<label class="flex items-center cursor-pointer relative" for="2fa-toggle">
+<input class="sr-only peer" id="2fa-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Connected Accounts -->
+<section class="bg-ice dark:bg-ice-dark rounded-xl p-6 md:p-8">
+<div class="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-gray-300">account_balance</span>
+<h2 class="text-xl font-bold text-primary dark:text-white">Connected Accounts</h2>
+</div>
+<button class="text-primary dark:text-white hover:bg-black/5 dark:hover:bg-white/10 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Connected Bank Item 1 -->
+<div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                                            CH
+                                        </div>
+<div>
+<p class="text-sm font-bold text-primary dark:text-white">Chase Checking</p>
+<p class="text-xs text-gray-500">**** 4589 • Updated 2 mins ago</p>
+</div>
+</div>
+<button class="text-xs font-semibold text-red-600 hover:text-red-700 px-3 py-1.5 rounded bg-red-50 hover:bg-red-100 transition-colors">
+                                        Disconnect
+                                    </button>
+</div>
+<!-- Connected Bank Item 2 -->
+<div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xs">
+                                            WF
+                                        </div>
+<div>
+<p class="text-sm font-bold text-primary dark:text-white">Wells Fargo Savings</p>
+<p class="text-xs text-gray-500">**** 9921 • Updated 1 hour ago</p>
+</div>
+</div>
+<button class="text-xs font-semibold text-red-600 hover:text-red-700 px-3 py-1.5 rounded bg-red-50 hover:bg-red-100 transition-colors">
+                                        Disconnect
+                                    </button>
+</div>
+<button class="w-full py-3 mt-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-500 hover:text-primary dark:hover:text-white hover:border-primary dark:hover:border-gray-400 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                                    Connect New Institution
+                                </button>
+</div>
+</section>
+</div>
+<!-- Right Column: Preferences & Actions -->
+<div class="lg:col-span-5 flex flex-col gap-8">
+<!-- Preferences -->
+<section class="bg-ice dark:bg-ice-dark rounded-xl p-6 md:p-8 h-fit">
+<div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+<span class="material-symbols-outlined text-primary dark:text-gray-300">tune</span>
+<h2 class="text-xl font-bold text-primary dark:text-white">Preferences</h2>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Dark Mode -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+<span class="material-symbols-outlined text-primary dark:text-white text-[20px]">dark_mode</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary dark:text-white">Dark Mode</p>
+<p class="text-xs text-gray-500">Adjust the appearance</p>
+</div>
+</div>
+<label class="flex items-center cursor-pointer relative" for="dark-toggle">
+<input class="sr-only peer" id="dark-toggle" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="h-px bg-gray-200 dark:bg-gray-700"></div>
+<!-- Notifications -->
+<div>
+<p class="text-sm font-bold text-primary dark:text-white mb-4">Notifications</p>
+<div class="flex flex-col gap-3">
+<label class="flex items-start gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[16px] text-white opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium text-primary dark:text-gray-300 group-hover:text-primary transition-colors">Weekly Spending Digest</p>
+<p class="text-xs text-gray-500">Receive a weekly summary of your expenses via email.</p>
+</div>
+</label>
+<label class="flex items-start gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input checked="" class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[16px] text-white opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium text-primary dark:text-gray-300 group-hover:text-primary transition-colors">Unusual Activity Alerts</p>
+<p class="text-xs text-gray-500">Get notified immediately when we detect suspicious transactions.</p>
+</div>
+</label>
+<label class="flex items-start gap-3 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 checked:bg-primary checked:border-primary transition-all" type="checkbox"/>
+<span class="material-symbols-outlined absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[16px] text-white opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium text-primary dark:text-gray-300 group-hover:text-primary transition-colors">Budget Limit Warnings</p>
+<p class="text-xs text-gray-500">Alerts when you approach 90% of a category budget.</p>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Buttons (Sticky/Floating effect via margin) -->
+<div class="bg-white dark:bg-[#1e2327] rounded-xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex flex-col gap-3">
+<button class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-6 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                                    Save Changes
+                                </button>
+<button class="w-full bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 font-bold py-3.5 px-6 rounded-lg transition-colors">
+                                    Cancel
+                                </button>
+</div>
+</div>
+<!-- Help Card -->
+<div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-900/30">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">contact_support</span>
+<div>
+<p class="text-sm font-bold text-blue-900 dark:text-blue-100">Need help with settings?</p>
+<p class="text-xs text-blue-700 dark:text-blue-300 mt-1 mb-3">Our support team is available 24/7 to assist you with your account configuration.</p>
+<a class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline" href="#">Visit Help Center →</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="h-20"></div> <!-- Spacer for scrolling -->
+</div>
+</main>
+</div>
+</body></html>

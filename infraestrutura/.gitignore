@@ -1,0 +1,6 @@
+log/*
+data/*
+*.log
+*.sql
+*.sql.gz
+*.sql.bak
