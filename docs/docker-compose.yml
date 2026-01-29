@@ -2,10 +2,10 @@ services:
   mkdoc:
     image: squidfunk/mkdocs-material:9
     restart: always
-    container_name: bms-app-navya-docs
-    hostname: bms.app.navya.docs.com
+    container_name: nievo-easy-fin-docs
+    hostname: nievo-easy-fin.docs.com
     volumes:
-      - ./config/:/docs 
+      - ./config/:/docs
     networks:
       - docs
     ports:

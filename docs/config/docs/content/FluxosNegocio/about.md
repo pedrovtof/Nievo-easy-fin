@@ -1,6 +1,5 @@
 # Sobre
 
-
 ## Objetivo
 
 Serviço de controle de orçamento pessoal.
@@ -41,11 +40,11 @@ Plataforma web PaaS, a plataforma deverá permitir registros de metas, demonstra
 
 ##### Serviço Core
 
-![alt text](./images/caso_uso_core.png)
+![alt text](../../images/caso_uso_core.png)
 
 ##### Serviço Data
 
-![alt text](./images/caso_uso_data.png)
+![alt text](../../images/caso_uso_data.png)
 
 ### Diagrama classes
 
@@ -135,7 +134,6 @@ sequenceDiagram
     DataService-->>Frontend: Retorna dados previstos
     Frontend-->>Usuário: Exibe gráfico e informações
 ```
-
 
 ### Diagrama componentes
 
