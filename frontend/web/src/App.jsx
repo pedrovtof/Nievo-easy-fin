@@ -8,25 +8,32 @@ import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
 
+import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
+
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+    <ThemeProvider>
+      <LanguageProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Protected Routes (Wrapped in Layout) */}
-        <Route path="/" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/dashboard" element={<Navigate to="/" replace />} />
-        <Route path="/transactions" element={<Layout><Transactions /></Layout>} />
-        <Route path="/budget" element={<Layout><Budget /></Layout>} />
-        <Route path="/settings" element={<Layout><Settings /></Layout>} />
+            {/* Protected Routes (Wrapped in Layout) */}
+            <Route path="/" element={<Layout><Dashboard /></Layout>} />
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
+            <Route path="/transactions" element={<Layout><Transactions /></Layout>} />
+            <Route path="/budget" element={<Layout><Budget /></Layout>} />
+            <Route path="/settings" element={<Layout><Settings /></Layout>} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 
