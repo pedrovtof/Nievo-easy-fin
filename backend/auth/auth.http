@@ -1,0 +1,17 @@
+@auth_HostAddress = http://localhost:5090
+
+GET {{auth_HostAddress}}/healthcheck
+Accept: application/json
+
+###
+
+POST {{auth_HostAddress}}/login 
+Content-Type: application/json
+
+{
+    "email": "[EMAIL_ADDRESS]",
+    "password": "[PASSWORD]"
+}
+
+###
+

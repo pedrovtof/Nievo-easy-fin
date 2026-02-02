@@ -1,0 +1,146 @@
+services:
+
+  zookeeper:
+    image: zookeeper:${ZOOKEEPER_VERSION}
+    restart: always
+    container_name: zookeeper
+    ports:
+      - "${ZOOKEEPER_PORT}:${ZOOKEEPER_PORT}"
+    networks:
+      - cluster_clickhouse
+
+  clickhouse_nodea:
+    image: clickhouse/clickhouse-server:${CLICKHOUSE_VERSION}
+    restart: always
+    container_name: clickhouse_nodea
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_USER_PASSWORD}
+    ports:
+      - "8123:${CLICKHOUSE_PORT_HTTP_NATIVE}"
+      - "9000:${CLICKHOUSE_PORT_NATIVE}"
+    volumes:
+      - ./clickhouse/node_a/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/node_a/users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse/node_a/data:/var/lib/clickhouse
+    depends_on:
+      - zookeeper
+    networks:
+      - cluster_clickhouse
+
+  clickhouse_nodeb:
+    image: clickhouse/clickhouse-server:${CLICKHOUSE_VERSION}
+    restart: always
+    container_name: clickhouse_nodeb
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_USER_PASSWORD}
+    ports:
+      - "8124:${CLICKHOUSE_PORT_HTTP_NATIVE}"
+      - "9001:${CLICKHOUSE_PORT_NATIVE}"
+    volumes:
+      - ./clickhouse/node_b/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/node_b/users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse/node_b/data:/var/lib/clickhouse
+    depends_on:
+      - zookeeper
+    networks:
+      - cluster_clickhouse
+
+  postgres_nodea:
+    image: postgres:${POSTGRES_VERSION}
+    restart: always
+    container_name: postgres_nodea
+    environment:
+      POSTGRES_USER: ${POSTGRES_DEFAULT_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_DEFAULT_USER_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DEFAULT_DB}
+    volumes:
+      - ./postgres/node_a/data:/var/lib/postgresql/data
+      - ./postgres/node_a/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres/node_a/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    ports:
+      - "5432:${POSTGRES_DEFAULT_PORT}"
+    command: [ "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf", "-c", "hba_file=/etc/postgresql/pg_hba.conf" ]
+    networks:
+      - cluster_postgres
+
+  postgres_nodeb:
+    image: postgres:${POSTGRES_VERSION}
+    container_name: postgres_nodeb
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_DEFAULT_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_DEFAULT_USER_PASSWORD}
+    depends_on:
+      - postgres_nodea
+    ports:
+      - "5433:${POSTGRES_DEFAULT_PORT}"
+    volumes:
+      - ./postgres/node_b/data:/var/lib/postgresql/data
+      - ./postgres/replica-init:/docker-entrypoint-initdb.d
+      - ./postgres/node_a/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - cluster_postgres
+
+  redis_main:
+    image: redis:${REDIS_VERSION}
+    restart: always
+    ports:
+      - ${REDIS_DEFAULT_PORT}:${REDIS_DEFAULT_PORT}
+    container_name: redish
+    volumes:
+      - ./redish/data:/data
+    networks:
+      - tools_network
+
+  kong:
+    image: kong/kong-gateway:${KONG_VERSION}
+    container_name: kong-cp
+    restart: on-failure
+    networks:
+      - tools_network
+    environment:
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+      KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002, 0.0.0.0:8445 ssl
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+      KONG_PASSWORD: ${KONG_PASSWORD}
+      KONG_DATABASE: off
+      #KONG_DATABASE: postgres
+      #KONG_PG_HOST: ${POSTGRES_TOOLS_KONG_HOST}
+      #KONG_PG_DATABASE: ${POSTGRES_TOOLS_KONG_DB}
+      #KONG_PG_USER: ${POSTGRES_TOOLS_KONG_USER}
+      #KONG_PG_PASSWORD: ${POSTGRES_TOOLS_KONG_PASSWORD}
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    #depends_on:
+    #  - kong-migrations
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+      - "8002:8002"
+      - "8445:8445"
+    volumes:
+      - ./tools/kong/data:/data
+      - ./tools/kong/kong.yml:/usr/local/kong/declarative/kong.yml
+
+networks:
+  cluster_clickhouse:
+    driver: bridge
+  cluster_postgres:
+    driver: bridge
+  tools_network:
+    driver: bridge
+
+volumes:
+  clickhouse_nodea:
+  clickhouse_nodeb:
+  postgres_nodeb:
+  postgres_nodea:
+  redis_main:
+  kong_main:

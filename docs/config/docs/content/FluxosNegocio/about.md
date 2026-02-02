@@ -36,7 +36,7 @@ Plataforma web PaaS, a plataforma deverá permitir registros de metas, demonstra
 
 ##### Serviço Login
 
-![alt text](./images/caso_uso_login.png)
+![alt text](../../images/caso_uso_login.png)
 
 ##### Serviço Core
 
@@ -238,11 +238,11 @@ Database --> Cicd
 
 ##### Database Core
 
-![Database Core](./images/db_diagram_core.png)
+![Database Core](../../images/db_diagram_core.png)
 
 ##### Database Signup
 
-![Database Signup](./images/db_diagram_signup.png)
+![Database Signup](../../images/db_diagram_signup.png)
 
 ### Diagrama de fluxos
 

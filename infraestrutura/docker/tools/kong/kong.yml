@@ -1,0 +1,90 @@
+_format_version: "3.0"
+
+services:
+  - name: auth-service
+    url: http://127.0.0.1:8081
+    routes:
+      - name: route-auth-service
+        paths:
+          - /api/auth
+        strip_path: true
+        plugins:
+              - name: jwt
+                enabled: true
+                config:
+                  key_claim_name: kid
+                  claims_to_verify:
+                    - exp
+  
+  - name: core-service
+    url: http://127.0.0.1:8082
+    routes:
+      - name: route-core-service
+        paths:
+          - /api/core
+        strip_path: true
+  
+  - name: data-service
+    url: http://127.0.0.1:8083
+    routes:
+      - name: route-data-service
+        paths:
+          - /api/data
+        strip_path: true
+
+plugins:
+
+  - name: rate-limiting
+    enabled: true
+    protocols:
+      - http
+      - https
+    config:
+      error_code: 429
+      error_message: API rate limit exceeded in Kong
+      fault_tolerant: true
+      hide_client_headers: false
+      limit_by: ip
+      minute: 280
+      hour: 1500
+      second: 5
+      policy: redis
+      redis_database: 1
+      redis_host: redish
+      redis_port: 6379
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      sync_rate: -1
+  
+  - name: cors
+    enabled: true
+    instance_name: cors-req
+    protocols:
+      - http
+      - https
+    config:
+      credentials: false
+      max_age: 7200
+      methods:
+        - GET
+        - PUT
+        - POST
+        - DELETE
+      origins:
+        - "*"
+      headers:
+        - Authorization
+        - Content-Type
+      preflight_continue: false
+      private_network: true
+
+consumers:
+  - username: consumer-auth-server-jwt
+
+jwt_secrets:
+  - consumer: consumer-auth-server-jwt
+    key: "login-api-key"
+    secret: "slug-toke-here-for-jwt"
+    algorithm: HS256
+
