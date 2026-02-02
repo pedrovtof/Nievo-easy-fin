@@ -1,0 +1,9 @@
+/tools/kong/data/*
+
+/postgres/node_a/data/*
+/postgres/node_b/data/*
+
+/clickhouse/node_a/data/*
+/clickhouse/node_b/data/*
+
+/redish/data/*
