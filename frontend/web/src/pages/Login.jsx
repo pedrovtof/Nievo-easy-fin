@@ -72,7 +72,7 @@ export default function Login() {
                     <div className="mt-8 text-center">
                         <p className="text-slate-500 dark:text-slate-400 text-sm">
                             Don't have an account?
-                            <a className="text-primary font-bold hover:text-primary/80 transition-colors ml-1" href="#">Create an account</a>
+                            <Link className="text-primary font-bold hover:text-primary/80 transition-colors ml-1" to="/cadastro">Create an account</Link>
                         </p>
                     </div>
                 </div>

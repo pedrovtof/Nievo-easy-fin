@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/NievoEasyfin.Application/">
+    <Project Path="NievoEasyfin.Application/application.csproj" />
+  </Folder>
+  <Folder Name="/NievoEasyfin.Auth/">
+    <Project Path="NievoEasyfin.Auth/auth.csproj" />
+  </Folder>
+  <Folder Name="/NievoEasyfin.Core/">
+    <Project Path="NievoEasyfin.Core/core.csproj" />
+  </Folder>
+</Solution>

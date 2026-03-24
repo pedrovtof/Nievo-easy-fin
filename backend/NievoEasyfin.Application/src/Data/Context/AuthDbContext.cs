@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using auth.Data;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+using NievoEasyfin.Application.Data.Entities;
 
-namespace auth.Data.Context
+namespace NievoEasyfin.Application.Data.Context
 {
-
     public abstract class AuthDbContext : DbContext
     {
         /// <summary>
@@ -26,13 +20,13 @@ namespace auth.Data.Context
 
 
         private IConfiguration _configuration;
-        protected abstract string KeyNameConnection {get;}
+        protected abstract string KeyNameConnection { get; }
         public DbSet<UserData> Users { get; set; }
         public DbSet<UserStatusData> UserStatuses { get; set; }
         public DbSet<UserTypeData> UserTypes { get; set; }
         public DbSet<UserPasswordHistoryData> UserPasswordHistories { get; set; }
         public DbSet<TokenConfig> TokenConfig { get; set; }
- 
+
         protected AuthDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -40,16 +34,14 @@ namespace auth.Data.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
             if (optionsBuilder.IsConfigured)
             {
                 return;
             }
 
-            //var typeDatabase = _configuration["TypeDatabase"] ?? "";
             var connectionString = _configuration.GetConnectionString(KeyNameConnection);
 
-            if(string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrEmpty(connectionString))
             {
                 throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid connection string variable KeyNameConnection is Null or Empty");
             }
@@ -67,8 +59,6 @@ namespace auth.Data.Context
             }
 
             return;
-
         }
-
     }
 }

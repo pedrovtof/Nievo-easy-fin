@@ -7,6 +7,7 @@ import Budget from './pages/Budget';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Register />} />
+        <Route path="/register" element={<Navigate to="/cadastro" replace />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes (Wrapped in Layout) */}

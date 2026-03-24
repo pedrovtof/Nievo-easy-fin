@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NievoEasyfin.Application.Data.Context;
+using Microsoft.Extensions.Configuration;
 
-namespace auth.Data.Context
+namespace NievoEasyfin.Application.Data.Context.Database
 {
     public class AuthReplica : AuthDbContext
     {
@@ -13,13 +11,13 @@ namespace auth.Data.Context
         /// This context create connection only for RR node, were we can use READ_ONLY
         /// <returns>Connectio to Auth database PGSQL in READ_REPLICA node</returns>
         /// <summary>
-        
+
         protected override string KeyNameConnection => "auth_pgsql_replica";
 
-        public AuthReplica(DbContextOptions<AuthReplica> options, IConfiguration configuration) 
+        public AuthReplica(DbContextOptions<AuthReplica> options, IConfiguration configuration)
             : base(options, configuration)
         {
-            
+
         }
     }
 }

@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace auth.Data
+namespace NievoEasyfin.Application.Data.Entities
 {
-    [Table("user_status", Schema = "user_details")]
-    public class UserStatusData
+    [Table("user_type", Schema = "user_details")]
+    public class UserTypeData
     {
         [Key]
         [Column("id", TypeName = "SERIAL")]
@@ -26,11 +22,7 @@ namespace auth.Data
         [Column("updated_at", TypeName = "TIMESTAMP")]
         public DateTime? UpdatedAt { get; set; }
 
-        [Column("active", TypeName = "BOOLEAN")]
-        public bool? Active { get; set; }
     }
-
-
 
 
 }

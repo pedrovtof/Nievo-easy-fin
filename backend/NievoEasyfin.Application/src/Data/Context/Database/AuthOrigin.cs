@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NievoEasyfin.Application.Data.Context;
+using Microsoft.Extensions.Configuration;
 
-namespace auth.Data.Context
+namespace NievoEasyfin.Application.Data.Context.Database
 {
 
     public class AuthOrigin : AuthDbContext
@@ -14,14 +12,13 @@ namespace auth.Data.Context
         /// This context create connection only for ORIGIN, were we can use CRUD.
         /// <returns>Connectio to Auth database PGSQL in main node</returns>
         /// </summary>
-        
+
         protected override string KeyNameConnection => "auth_pgsql_origin";
 
-        public AuthOrigin(DbContextOptions<AuthOrigin> options, IConfiguration configuration) 
+        public AuthOrigin(DbContextOptions<AuthOrigin> options, IConfiguration configuration)
             : base(options, configuration)
         {
-            
-        }
 
+        }
     }
 }

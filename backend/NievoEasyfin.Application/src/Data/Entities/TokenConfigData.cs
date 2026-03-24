@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace auth.Data
+namespace NievoEasyfin.Application.Data.Entities
 {
     [Table("token_config", Schema = "token_config")]
     public class TokenConfig

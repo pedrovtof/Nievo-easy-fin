@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using auth.Data.Context;
+using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 
-namespace auth.Controllers
+namespace NievoEasyfin.Auth.Controllers
 {
     /// <summary>
     /// Class created for validate status from the server
@@ -17,9 +11,8 @@ namespace auth.Controllers
     [Route("[controller]")]
     public class HealthCheckController : ControllerBase
     {
-        
-        private readonly AuthOrigin _AuthMainNodeDatabase;
-        private readonly AuthReplica _AuthReplicaNodeDatabase;
+        private static AuthOrigin _AuthMainNodeDatabase;
+        private static AuthReplica _AuthReplicaNodeDatabase;
 
         public HealthCheckController(AuthOrigin AuthMainNodeDatabase, AuthReplica AuthReplicaNodeDatabase)
         {
@@ -34,7 +27,6 @@ namespace auth.Controllers
         [HttpGet("check")]
         public IActionResult HealthCheck()
         {
-            
             var _response = new { message = "Alive" };
             return Ok(_response);
         }
@@ -43,44 +35,28 @@ namespace auth.Controllers
         /// Class created for validate status server postgres Main Node it is alive
         /// </summary>
         /// <response code = "200">Return Query check message and a dataframe with random number search in Database</response>
-        [HttpGet("database/pgsql/main/node")]
-        public async Task<IActionResult> HealthCheckDatabasePgsqlMainNode()
+        [HttpGet("database/pgsql/main-node")]
+        public async Task<IActionResult> HealthCheckDatabasePgsqlMainNodeAsync()
         {
-            Random rnd = new Random();
-            int randomValue = rnd.Next(1,10);
-            randomValue = Math.Abs(randomValue);
+            string query = "select 10";
 
-            string query = "select {0};";
+            var dataframe = await _AuthMainNodeDatabase.Database.ExecuteSqlRawAsync(query);
 
-            var dataframe = await _AuthMainNodeDatabase.Database
-                .ExecuteSqlRawAsync(query, randomValue);
-
-
-            var _response = new {message="Query check", rows=dataframe};
-
-            return Ok(_response);
+            return Ok(dataframe);
         }
 
         /// <summary>
         /// Class created for validate status server postgres Replica Node it is alive
         /// </summary>
         /// <response code = "200">Return Query check message and a dataframe with random number search in Database</response>
-        [HttpGet("database/pgsql/replica/node")]
-        public async Task<IActionResult> HealthCheckDatabasePgsqlReplicaNode()
+        [HttpGet("database/pgsql/replica-node")]
+        public async Task<IActionResult> HealthCheckDatabasePgsqlReplicaNodeAsync()
         {
-            Random rnd = new Random();
-            int randomValue = rnd.Next(1,10);
-            randomValue = Math.Abs(randomValue);
+            string query = "select 10";
 
-            string query = "select {0};";
+            var dataframe = await _AuthReplicaNodeDatabase.Database.ExecuteSqlRawAsync(query);
 
-            var dataframe = await _AuthReplicaNodeDatabase.Database
-                .ExecuteSqlRawAsync(query, randomValue);
-
-            var _response = new {message="Query check", rows=dataframe};
-
-            return Ok(_response);
-
+            return Ok(dataframe);
         }
     }
 }
