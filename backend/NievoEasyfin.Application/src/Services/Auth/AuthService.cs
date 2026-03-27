@@ -23,12 +23,10 @@ namespace NievoEasyfin.Application.Services.Auth
         public async Task<IActionResult> PostUserAsync(PostUserRequest request)
         {
             var validationResult = await new PostUserValidator().ValidateAsync(request);
-            ResponseApi response = new ResponseApi();
-
             if (!validationResult.IsValid)
             {
-                response.ErrorResponse(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
-                return BadRequest(response);
+                ResponseApiError error = new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
+                return BadRequest(error);
             }
 
             object valuesToBeReturn = new
@@ -38,9 +36,7 @@ namespace NievoEasyfin.Application.Services.Auth
                 Email = request.Email
             };
 
-            response.SuccessResponse(valuesToBeReturn);
-
-            return Ok(response);
+            return Ok(new ResponseApiSucess(valuesToBeReturn));
         }
     }
 }
