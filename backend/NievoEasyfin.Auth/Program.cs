@@ -1,7 +1,11 @@
 
 using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Services.Base.Users;
+using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Services.Auth;
+
+
 using NievoEasyfin.Application.Interfaces.Request;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +23,8 @@ builder.Services.AddDbContext<AuthOrigin>();
 builder.Services.AddDbContext<AuthReplica>();
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AuthenticatorService>();
+builder.Services.AddScoped<UsersService>();
 
 var app = builder.Build();
 

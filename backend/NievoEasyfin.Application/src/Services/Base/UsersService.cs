@@ -6,15 +6,15 @@ using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace NievoEasyfin.Application.Services.Auth
+namespace NievoEasyfin.Application.Services.Base.Users
 {
-    public class AuthService : ControllerBase
+    public class UsersService : Controller
     {
         private static AuthOrigin _AuthMainNodeDatabase;
 
         private static AuthReplica _AuthReplicaNodeDatabase;
 
-        public AuthService(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
+        public UsersService(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
         {
             _AuthMainNodeDatabase = authMainNodeDatabase;
             _AuthReplicaNodeDatabase = authReplicaNodeDatabase;

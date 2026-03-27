@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces;
 using NievoEasyfin.Application.Interfaces.Request;
-using NievoEasyfin.Application.Services.Auth;
+using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Interfaces.Response;
 
 namespace NievoEasyfin.Auth.Controllers
@@ -10,19 +10,16 @@ namespace NievoEasyfin.Auth.Controllers
     [Route("api/v1/[controller]")]
     public class UsersController : Controller
     {
-        private static AuthService _authService;
+        private static UsersService _usersService;
 
-        public UsersController(AuthService authService)
+        public UsersController(UsersService users)
         {
-            _authService = authService;
+            _usersService = users;
         }
 
         /// <summary>
         /// Endpoints para registrar usuários
         /// </summary>
-        /// <param name="Name">Nome</param>
-        /// <param name="Password">Senha</param>
-        /// <param name="Email">Email</param>
         /// <remarks>
         /// Sample request:
         ///
@@ -32,8 +29,8 @@ namespace NievoEasyfin.Auth.Controllers
         ///        "Password": "password",
         ///        "Email": "John.Doe@example.com"
         ///     }
-        ///
         /// </remarks>
+        /// <param name="request">Dados do usuário para registro (Nome, Senha, Email)</param>
         /// <response code="201">Usuário criado com sucesso</response>
         /// <response code="400">Requisição inválida</response>
         /// <response code="409">Usuário já cadastrado</response>
@@ -43,6 +40,6 @@ namespace NievoEasyfin.Auth.Controllers
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> PostUserAsync([FromBody] PostUserRequest request)
-            => await _authService.PostUserAsync(request);
+            => await _usersService.PostUserAsync(request);
     }
 }

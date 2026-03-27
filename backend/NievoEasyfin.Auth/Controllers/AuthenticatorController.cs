@@ -22,8 +22,6 @@ namespace NievoEasyfin.Auth.Controllers
         /// </summary>
         /// <returns>Retorno de Token JWT</returns>
         [HttpPost("login")]
-        [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         public IActionResult PostLoginAsync()
         {
             return Ok("login");
