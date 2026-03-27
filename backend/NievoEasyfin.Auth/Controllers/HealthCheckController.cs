@@ -8,7 +8,7 @@ namespace NievoEasyfin.Auth.Controllers
     /// Class created for validate status from the server
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class HealthCheckController : ControllerBase
     {
         private static AuthOrigin _AuthMainNodeDatabase;
