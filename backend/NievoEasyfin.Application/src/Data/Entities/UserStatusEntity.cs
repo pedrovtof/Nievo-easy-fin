@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NievoEasyfin.Application.Data.Entities
 {
-    [Table("user_type", Schema = "user_details")]
-    public class UserTypeData
+    [Table("user_status", Schema = "user_details")]
+    public class UserStatusEntity
     {
         [Key]
         [Column("id", TypeName = "SERIAL")]
@@ -22,7 +22,11 @@ namespace NievoEasyfin.Application.Data.Entities
         [Column("updated_at", TypeName = "TIMESTAMP")]
         public DateTime? UpdatedAt { get; set; }
 
+        [Column("active", TypeName = "BOOLEAN")]
+        public bool? Active { get; set; }
     }
+
+
 
 
 }

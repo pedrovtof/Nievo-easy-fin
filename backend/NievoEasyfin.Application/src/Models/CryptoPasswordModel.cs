@@ -3,7 +3,7 @@ using System.Text;
 
 namespace NievoEasyfin.Application.Models
 {
-    public class CryptoPassword
+    public class CryptoPasswordModel
     {
         private static int Iterations = int.Parse(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_ITERATIONS"));
 
@@ -28,9 +28,9 @@ namespace NievoEasyfin.Application.Models
         /// <param name="password">password from request</param>
         /// <returns>Hash string</returns>
         /// <exception cref="ArgumentException">Invalid input</exception>
-        public string HashPassword(string password)
+        public async Task<string> HashPasswordAsync(string password)
         {
-            if(string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(password))
                 throw new ArgumentException("[NievoEasyFin.Application][CryptoPasswordHelper][HashPassword] Value password cannot be null or empty");
 
             var hash = Rfc2898DeriveBytes.Pbkdf2(Encoding.UTF8.GetBytes(password), Salt, Iterations, AlgorithmHash, KeySize);
@@ -44,11 +44,11 @@ namespace NievoEasyfin.Application.Models
         /// <param name="password">Input from request</param>
         /// <param name="hash">value in database</param>
         /// <returns>True/False</returns>
-        public bool HashValidate(string password, string hash)
+        public async Task<bool> HashValidateAsync(string password, string hash)
         {
             var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(password, Salt, Iterations, AlgorithmHash, KeySize);
 
-            return  CryptographicOperations.FixedTimeEquals(hashToCompare, Convert.FromHexString(hash));
+            return CryptographicOperations.FixedTimeEquals(hashToCompare, Convert.FromHexString(hash));
         }
     }
 }

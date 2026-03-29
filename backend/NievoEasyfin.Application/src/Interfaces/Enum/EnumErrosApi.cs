@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace NievoEasyfin.Application.Interfaces.Enum
 {
     /// <summary>
@@ -39,6 +41,12 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         /// Email must not be empty
         /// </summary>
         POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL,
+
+        /// <summary>
+        /// Email already exists
+        /// </summary>
+        [Description("Email already exists in the system")]
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS,
 
         /// <summary>
         /// Email has invalid value

@@ -1,27 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces.Request;
-using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
-using NievoEasyfin.Application.Models;
-
+using NievoEasyfin.Application.Services.Auth;
 namespace NievoEasyfin.Application.Services.Base.Users
 {
     public class UsersService : Controller
     {
-        private static AuthOrigin _AuthMainNodeDatabase;
-
-        private static AuthReplica _AuthReplicaNodeDatabase;
-
-        private static CryptoPassword _CryptoPassword;
-
-        public UsersService(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase, CryptoPassword cryptoPassword)
+        private static AuthService _AuthService;
+        public UsersService(AuthService authService)
         {
-            _AuthMainNodeDatabase = authMainNodeDatabase;
-            _AuthReplicaNodeDatabase = authReplicaNodeDatabase;
-            _CryptoPassword = cryptoPassword;
+            _AuthService = authService;
         }
 
+        /// <summary>
+        /// Method service for create user
+        /// </summary>
+        /// <param name="request">request PostCreateUserRequest</param>
+        /// <returns>ResponseApiSucess/ResponseApiError</returns>
         public async Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request)
         {
             var validationResult = await new PostCreateUserValidator().ValidateAsync(request);
@@ -31,19 +28,19 @@ namespace NievoEasyfin.Application.Services.Base.Users
                 return BadRequest(error);
             }
 
-            string hash = _CryptoPassword.HashPassword(request.Password);
+            string hash = await _AuthService.ConvertRequestPasswordToStringAsync(request.Password);
 
-            // TODO: Configurar entidade
-            // TODO: Se não existir usuário registrar
+            var userEmail = await _AuthService.GetUserByEmailAsync(request.Email);
+            if (userEmail != null)
+            {
+                // TODO: validar erro
+                ResponseApiError error = new ResponseApiError(new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS.ToString() });
+                return BadRequest(error);
+            }
 
-            return StatusCode(
-                201,
-                new ResponseApiSucess(new
-                {
-                    Name = request.Name,
-                    Email = request.Email
-                })
-            );
+            var user = await _AuthService.CreateUserAsync(request.Name, hash, request.Email);
+
+            return StatusCode(201, new ResponseApiSucess(user));
         }
     }
 }

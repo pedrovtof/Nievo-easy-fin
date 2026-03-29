@@ -21,11 +21,10 @@ namespace NievoEasyfin.Application.Data.Context
 
         private IConfiguration _configuration;
         protected abstract string KeyNameConnection { get; }
-        public DbSet<UserData> Users { get; set; }
-        public DbSet<UserStatusData> UserStatuses { get; set; }
-        public DbSet<UserTypeData> UserTypes { get; set; }
-        public DbSet<UserPasswordHistoryData> UserPasswordHistories { get; set; }
-        public DbSet<TokenConfig> TokenConfig { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<UserStatusEntity> UserStatuses { get; set; }
+        public DbSet<UserTypeEntity> UserTypes { get; set; }
+        public DbSet<TokenConfigEntity> TokenConfig { get; set; }
 
         protected AuthDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
         {

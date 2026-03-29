@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NievoEasyfin.Application.Data.Entities
 {
     [Table("token_config", Schema = "token_config")]
-    public class TokenConfig
+    public class TokenConfigEntity
     {
 
         [Key]
