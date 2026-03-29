@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Data.Context.Database;
-using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
-using Microsoft.AspNetCore.Http.HttpResults;
+using NievoEasyfin.Application.Models;
 
 namespace NievoEasyfin.Application.Services.Base.Users
 {
@@ -14,29 +13,37 @@ namespace NievoEasyfin.Application.Services.Base.Users
 
         private static AuthReplica _AuthReplicaNodeDatabase;
 
-        public UsersService(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
+        private static CryptoPassword _CryptoPassword;
+
+        public UsersService(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase, CryptoPassword cryptoPassword)
         {
             _AuthMainNodeDatabase = authMainNodeDatabase;
             _AuthReplicaNodeDatabase = authReplicaNodeDatabase;
+            _CryptoPassword = cryptoPassword;
         }
 
-        public async Task<IActionResult> PostUserAsync(PostUserRequest request)
+        public async Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request)
         {
-            var validationResult = await new PostUserValidator().ValidateAsync(request);
+            var validationResult = await new PostCreateUserValidator().ValidateAsync(request);
             if (!validationResult.IsValid)
             {
                 ResponseApiError error = new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
                 return BadRequest(error);
             }
 
-            object valuesToBeReturn = new
-            {
-                Name = request.Name,
-                Password = request.Password,
-                Email = request.Email
-            };
+            string hash = _CryptoPassword.HashPassword(request.Password);
 
-            return Ok(new ResponseApiSucess(valuesToBeReturn));
+            // TODO: Configurar entidade
+            // TODO: Se não existir usuário registrar
+
+            return StatusCode(
+                201,
+                new ResponseApiSucess(new
+                {
+                    Name = request.Name,
+                    Email = request.Email
+                })
+            );
         }
     }
 }
