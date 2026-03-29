@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using NievoEasyfin.Application.Data.Context;
 using Microsoft.Extensions.Configuration;
 
 namespace NievoEasyfin.Application.Data.Context.Database

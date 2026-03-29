@@ -1,20 +1,18 @@
-using Microsoft.AspNetCore.Mvc;
-using FluentValidation.Results;
-using NievoEasyfin.Application.Interfaces.Enum;
-
 namespace NievoEasyfin.Application.Interfaces.Response
 {
+    /// <summary>
+    /// Class template for API response with sucess
+    /// </summary>
     public class ResponseApiSucess
     {
         public bool Success { get; set; } = true;
 
-        public object? Data { get; set; }
+        public object Data { get; set; } = new { };
 
-        public ResponseApiSucess()
-        {
-
-        }
-
+        /// <summary>
+        /// Method to create the template
+        /// </summary>
+        /// <param name="data">any {}</param>
         public ResponseApiSucess(object data)
         {
             Data = data;

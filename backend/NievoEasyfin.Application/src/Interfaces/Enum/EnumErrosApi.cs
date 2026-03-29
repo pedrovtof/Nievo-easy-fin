@@ -1,35 +1,55 @@
-using System.ComponentModel;
-
 namespace NievoEasyfin.Application.Interfaces.Enum
 {
     /// <summary>
-    /// Enum para armazenar os erros da API.
+    /// Enum for API erros.
+    /// The message by default is PT-BR.
     /// ENDPOINT + SERVICE + STATUS_CODE + ERROR_MESSAGE
     /// </summary>
     public enum EnumErrosApi
     {
-        /// <summary>
-        /// Campo nome possuí valores invalidos.
-        /// </summary>
-        [Description("Campo nome possuí valores invalidos.")]
-        POSTUSERASYNC_AUTHSERVICE_400_INVALID_NAME_INPUT,
+
+        #region #PostCreateUserAsync
 
         /// <summary>
-        /// Campo senha possuí valores invalidos.
+        /// Name must not be empty
         /// </summary>
-        [Description("Campo senha possuí valores invalidos.")]
-        POSTUSERASYNC_AUTHSERVICE_400_INVALID_PASSWORD_INPUT,
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_NAME_EMPTY_NULL,
 
         /// <summary>
-        /// Campo email possuí valores invalidos.
+        /// The name must be between 2 and 100 letters
         /// </summary>
-        [Description("Campo email possuí valores invalidos.")]
-        POSTUSERASYNC_AUTHSERVICE_400_INVALID_EMAIL_INPUT,
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_NAME_WITH_WRONG_LENGHT,
 
         /// <summary>
-        /// Usuário já está cadastrado.
+        /// Password must not be empty
         /// </summary>
-        [Description("Usuário já está cadastrado.")]
-        POSTUSERASYNC_AUTHSERVICE_409_USER_ALREADY_EXISTS
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL,
+
+        /// <summary>
+        /// The password must be between 6 and 12 letters
+        /// </summary>
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_PASSWORD_WITH_WRONG_LENGHT,
+
+        /// <summary>
+        /// Password must have at least one uppercase letter, one lowercase letter, one number and one special character
+        /// </summary>
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_PASSWORD_WRONG_FORMAT,
+
+        /// <summary>
+        /// Email must not be empty
+        /// </summary>
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL,
+
+        /// <summary>
+        /// Email has invalid value
+        /// </summary>
+        POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID,
+
+        /// <summary>
+        /// User already exist
+        /// </summary>
+        POSTCREATEUSERASYNC_AUTHSERVICE_409_USER_ALREADY_EXISTS
+
+        #endregion PostCreateUserAsync
     }
 }

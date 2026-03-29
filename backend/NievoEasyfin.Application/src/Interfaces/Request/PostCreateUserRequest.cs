@@ -2,22 +2,25 @@ using System.Text.Json.Serialization;
 
 namespace NievoEasyfin.Application.Interfaces.Request
 {
-    public class PostUserRequest
+    /// <summary>
+    /// This class is a template for PostCreateUser
+    /// </summary>
+    public class PostCreateUserRequest
     {
         /// <summary>
-        /// Nome do usuário
+        /// User name
         /// </summary>
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
         /// <summary>
-        /// Senha do usuário
+        /// User password
         /// </summary>
         [JsonPropertyName("password")]
         public string Password { get; set; }
 
         /// <summary>
-        /// Email do usuário
+        /// User Email
         /// </summary>
         [JsonPropertyName("email")]
         public string Email { get; set; }
