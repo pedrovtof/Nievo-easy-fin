@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyfin.Application.Interfaces;
-using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Services.Auth;
-using NievoEasyfin.Application.Interfaces.Response;
 
 namespace NievoEasyfin.Auth.Controllers
 {

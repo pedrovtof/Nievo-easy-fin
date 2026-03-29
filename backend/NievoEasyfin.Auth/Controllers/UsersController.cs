@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyfin.Application.Interfaces;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Interfaces.Response;
@@ -18,16 +17,16 @@ namespace NievoEasyfin.Auth.Controllers
         }
 
         /// <summary>
-        /// Endpoints para registrar usuários
+        /// Endpoints to create user
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
         ///     POST /api/v1/Users
         ///     {
-        ///        "Name": "John Doe",
-        ///        "Password": "password",
-        ///        "Email": "John.Doe@example.com"
+        ///        "name": "Joe Black",
+        ///        "password": "1Meet-Death",
+        ///        "email": "Joe.Black@example.com"
         ///     }
         /// </remarks>
         /// <param name="request">Dados do usuário para registro (Nome, Senha, Email)</param>
@@ -39,7 +38,7 @@ namespace NievoEasyfin.Auth.Controllers
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> PostUserAsync([FromBody] PostUserRequest request)
-            => await _usersService.PostUserAsync(request);
+        public async Task<IActionResult> PostCreateUserAsync([FromBody] PostCreateUserRequest request)
+            => await _usersService.PostCreateUserAsync(request);
     }
 }
