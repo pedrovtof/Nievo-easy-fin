@@ -1,0 +1,44 @@
+using System.Reflection;
+using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Services.Base.Users;
+using NievoEasyfin.Application.Services.Base.Authenticator;
+using NievoEasyfin.Application.Services.Auth;
+using NievoEasyfin.Application.Models;
+
+namespace NievoEasyfin.Auth
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration) {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services) {
+        
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(c =>
+        {
+            var xmlFileAuth = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPathAuth = Path.Combine(AppContext.BaseDirectory, xmlFileAuth);
+            c.IncludeXmlComments(xmlPathAuth);
+        });
+
+        services.AddDbContext<AuthOrigin>();
+        services.AddDbContext<AuthReplica>();
+        services.AddScoped<CryptoPassword>();
+        services.AddScoped<AuthService>();
+        services.AddScoped<AuthenticatorService>();
+        services.AddScoped<UsersService>();
+        }
+
+        // Use this method to configure the HTTP request pipeline.
+        public void Configure(WebApplication app, IWebHostEnvironment env) {
+            app.MapControllers();
+            app.Run();
+        }
+    }
+}
