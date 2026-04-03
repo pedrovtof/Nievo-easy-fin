@@ -25,6 +25,7 @@ namespace NievoEasyfin.Application.Data.Context
         public DbSet<UserStatusEntity> UserStatuses { get; set; }
         public DbSet<UserTypeEntity> UserTypes { get; set; }
         public DbSet<TokenConfigEntity> TokenConfig { get; set; }
+        public DbSet<SsoProviderEntity> SsoProvider { get; set; }
 
         protected AuthDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
         {

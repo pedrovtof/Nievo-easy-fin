@@ -4,6 +4,7 @@ using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
+using FluentValidation;
 
 namespace NievoEasyfin.Auth
 {
@@ -12,6 +13,7 @@ namespace NievoEasyfin.Auth
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop;
         }
 
         public IConfiguration Configuration { get; }
@@ -19,6 +21,15 @@ namespace NievoEasyfin.Auth
         // Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             services.AddControllers();
             services.AddEndpointsApiExplorer();
@@ -29,19 +40,19 @@ namespace NievoEasyfin.Auth
                 c.IncludeXmlComments(xmlPathAuth);
             });
 
-
             services.AddDbContext<AuthOrigin>();
             services.AddDbContext<AuthReplica>();
+            services.AddScoped<SsoProviderModel>();
             services.AddScoped<UserModel>();
             services.AddScoped<CryptoPasswordModel>();
             services.AddScoped<AuthService>();
-            services.AddScoped<AuthenticatorService>();
             services.AddScoped<UsersService>();
         }
 
         // Use this method to configure the HTTP request pipeline.
         public void Configure(WebApplication app, IWebHostEnvironment env)
         {
+            app.UseCors();
             app.MapControllers();
             app.Run();
         }

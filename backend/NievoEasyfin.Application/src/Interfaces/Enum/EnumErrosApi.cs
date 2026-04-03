@@ -56,8 +56,34 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         /// <summary>
         /// User already exist
         /// </summary>
-        POSTCREATEUSERASYNC_AUTHSERVICE_409_USER_ALREADY_EXISTS
+        POSTCREATEUSERASYNC_AUTHSERVICE_409_USER_ALREADY_EXISTS,
 
         #endregion PostCreateUserAsync
+
+        #region #PostCreateUserSsoAsync
+
+        /// <summary>
+        /// Provider name is null or empty
+        /// </summary>
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NULL_OR_EMPTY,
+
+        /// <summary>
+        /// Provider do not exists
+        /// </summary>
+        [Description("This provider is unknown")]
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED,
+
+        /// <summary>
+        /// Provider name is null or empty
+        /// </summary>
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY,
+
+
+        /// <summary>
+        /// Provider id is not valid
+        /// </summary>
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_INVALID
+
+        #endregion #PostCreateUserSsoAsync
     }
 }

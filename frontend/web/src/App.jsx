@@ -15,13 +15,11 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
-        <Route path="/cadastro" element={<Register />} />
-        <Route path="/register" element={<Navigate to="/cadastro" replace />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes (Wrapped in Layout) */}
         <Route path="/" element={<Layout><Dashboard /></Layout>} />
-        <Route path="/dashboard" element={<Navigate to="/" replace />} />
         <Route path="/transactions" element={<Layout><Transactions /></Layout>} />
         <Route path="/budget" element={<Layout><Budget /></Layout>} />
         <Route path="/settings" element={<Layout><Settings /></Layout>} />
