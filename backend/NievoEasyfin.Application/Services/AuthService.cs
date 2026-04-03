@@ -4,22 +4,27 @@ using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Data.Views;
 using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Models;
+using NievoEasyfin.Application.Interfaces.Response;
+using NievoEasyfin.Application.Helper;
 
 namespace NievoEasyfin.Application.Services.Auth
 {
     public class AuthService
     {
-        private static CryptoPasswordModel _CryptoPassword;
+        private static CryptoPasswordModel _cryptoPassword;
+
+        private static ProviderHelper _providerHelper;
 
         private static UserModel _userModel;
 
         private static SsoProviderModel _ssoProvider;
 
-        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider)
+        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider, ProviderHelper providerHelper)
         {
-            _CryptoPassword = cryptoPassword;
+            _cryptoPassword = cryptoPassword;
             _userModel = userModel;
             _ssoProvider = ssoProvider;
+            _providerHelper = providerHelper;
         }
 
         /// <summary>
@@ -28,7 +33,7 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <param name="password">request password</param>
         /// <returns>Hash password</returns>
         public async Task<string> ConvertRequestPasswordToStringAsync(string password)
-            => await _CryptoPassword.HashPasswordAsync(password);
+            => await _cryptoPassword.HashPasswordAsync(password);
 
         /// <summary>
         /// Create user entity
@@ -48,7 +53,15 @@ namespace NievoEasyfin.Application.Services.Auth
         public async Task<UserEntity> GetUserByEmailAsync(string email)
             => await _userModel.GetUserByEmailAsync(email);
 
+        /// <summary>
+        ///  Search provider by name
+        /// </summary>
+        /// <param name="provider">name of the provider</param>
+        /// <returns>SsoProviderEntity</returns>
         public async Task<SsoProviderEntity> GetProviderByNameAsync(string provider)
             => await _ssoProvider.GetProviderByNameAsync(provider);
+
+        public async Task<ResponseProvider> ProviderValidateAsync(SsoProviderEntity provider, string token)
+            => await _providerHelper.ValidateProviderAsync(provider, token);
     }
 }

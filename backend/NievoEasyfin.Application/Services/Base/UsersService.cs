@@ -4,6 +4,7 @@ using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Services.Auth;
+using NievoEasyfin.Application.Helper;
 namespace NievoEasyfin.Application.Services.Base.Users
 {
     public class UsersService : Controller
@@ -59,8 +60,15 @@ namespace NievoEasyfin.Application.Services.Base.Users
                     new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() }
                 ));
 
+            var validateProvider = await _AuthService.ProviderValidateAsync(provider, request.ProviderAccessToken);
+            if (validateProvider.Error != null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
+                ));
 
-            // TODO: Validar provider se existe
+
+            // TODO: valida o token
+            // TODO: Validar o usuario
             // TODO: Registrar o usuário na tabela de usuário
             // TODO: Registrar o usuário na tabela de user-provider
 

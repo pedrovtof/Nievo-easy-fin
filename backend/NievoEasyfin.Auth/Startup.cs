@@ -5,6 +5,7 @@ using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
 using FluentValidation;
+using NievoEasyfin.Application.Helper;
 
 namespace NievoEasyfin.Auth
 {
@@ -44,6 +45,7 @@ namespace NievoEasyfin.Auth
             services.AddDbContext<AuthReplica>();
             services.AddScoped<SsoProviderModel>();
             services.AddScoped<UserModel>();
+            services.AddScoped<ProviderHelper>();
             services.AddScoped<CryptoPasswordModel>();
             services.AddScoped<AuthService>();
             services.AddScoped<UsersService>();

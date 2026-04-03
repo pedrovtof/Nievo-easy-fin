@@ -74,6 +74,12 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED,
 
         /// <summary>
+        /// Provider do not exists
+        /// </summary>
+        [Description("Invalid provider response")]
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE,
+
+        /// <summary>
         /// Provider name is null or empty
         /// </summary>
         POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY,
