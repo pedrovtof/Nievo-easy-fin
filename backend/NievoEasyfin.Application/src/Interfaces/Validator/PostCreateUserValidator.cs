@@ -1,6 +1,6 @@
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
-using NievoEasyfin.Application.src.Helper;
+using NievoEasyfin.Application.Helper;
 using FluentValidation;
 
 namespace NievoEasyfin.Application.Interfaces.Validator
@@ -12,7 +12,7 @@ namespace NievoEasyfin.Application.Interfaces.Validator
     {
         private static PasswordValidatorHelper _passwordValidatorHelper = new PasswordValidatorHelper();
         /// <summary>
-        /// Method for validate resquest in PostCreateUser
+        /// Constructor for validate resquest in PostCreateUser
         /// </summary>
         public PostCreateUserValidator()
         {
@@ -35,7 +35,6 @@ namespace NievoEasyfin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL.ToString())
                 .EmailAddress()
                     .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID.ToString());
-
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace NievoEasyfin.Application.src.Helper
+namespace NievoEasyfin.Application.Helper
 {
     public class PasswordValidatorHelper
     {
@@ -8,7 +8,7 @@ namespace NievoEasyfin.Application.src.Helper
 
         public PasswordValidatorHelper()
         {
-            
+
         }
 
         /// <summary>

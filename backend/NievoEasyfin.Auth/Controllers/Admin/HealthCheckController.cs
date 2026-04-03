@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace NievoEasyfin.Auth.Controllers
+namespace NievoEasyfin.Auth.Controllers.Admin
 {
     /// <summary>
     /// Class created for validate status from the server
     /// </summary>
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/admin/[controller]")]
     public class HealthCheckController : ControllerBase
     {
         private static AuthOrigin _AuthMainNodeDatabase;

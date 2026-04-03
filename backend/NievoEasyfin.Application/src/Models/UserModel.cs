@@ -58,6 +58,6 @@ namespace NievoEasyfin.Application.Models
         }
 
         public async Task<UserEntity> GetUserByEmailAsync(string email)
-            => await _AuthMainNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
+            => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
     }
 }
