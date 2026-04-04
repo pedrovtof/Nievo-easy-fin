@@ -7,7 +7,7 @@ namespace NievoEasyfin.Application.Interfaces.Response
     {
         public bool Success { get; set; } = true;
 
-        public object Data { get; set; } = new { };
+        public object? Data { get; set; } = new { };
 
         /// <summary>
         /// Method to create the template

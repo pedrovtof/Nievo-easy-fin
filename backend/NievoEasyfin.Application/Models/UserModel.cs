@@ -9,7 +9,6 @@ namespace NievoEasyfin.Application.Models
 {
     public class UserModel : UserEntity
     {
-
         private static AuthOrigin _AuthMainNodeDatabase;
 
         private static AuthReplica? _AuthReplicaNodeDatabase;
@@ -29,7 +28,7 @@ namespace NievoEasyfin.Application.Models
         /// <param name="statusId">User status Id</param>
         /// <param name="phone">User phone</param>
         /// <returns>UserView</returns>
-        public async Task<UserView> CreateUserAsync(string name, string password, string email, int statusId = 1, int? phone = null)
+        public async Task<UserEntity> CreateUserAsync(string name, string password, string email, int statusId = 1, int? phone = null)
         {
 
             UserEntity user = new UserEntity()
@@ -46,15 +45,35 @@ namespace NievoEasyfin.Application.Models
             await _AuthMainNodeDatabase.Users.AddAsync(user);
             await _AuthMainNodeDatabase.SaveChangesAsync();
 
-            return new UserView()
+            return user;
+        }
+
+        /// <summary>
+        /// Method to create user-SSO
+        /// </summary>
+        /// <param name="name">user from name</param>
+        /// <param name="email">user from email</param>
+        /// <param name="sub">user from sub</param>
+        /// <param name="statusId">User status Id</param>
+        /// <param name="phone">User phone</param>
+        /// <returns></returns>
+        public async Task<UserEntity> CreateUserSsoAsync(string name, string email, string sub, int statusId = 1, int? phone = null)
+        {
+            UserEntity user = new UserEntity()
             {
-                Name = user.Name,
-                Email = user.Email,
-                StatusId = $"{user.StatusId}",
-                Phone = user.Phone,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
+                Name = name,
+                Email = email,
+                Phone = phone,
+                Password = null,
+                StatusId = statusId,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
+
+            await _AuthMainNodeDatabase.Users.AddAsync(user);
+            await _AuthMainNodeDatabase.SaveChangesAsync();
+
+            return user;
         }
 
         public async Task<UserEntity> GetUserByEmailAsync(string email)

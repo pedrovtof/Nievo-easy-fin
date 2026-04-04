@@ -4,7 +4,7 @@ namespace NievoEasyfin.Application.Interfaces.Enum
 {
     /// <summary>
     /// Enum for API erros.
-    /// The message by default is PT-BR.
+    /// The message by default is ENGLISH-EUA.
     /// ENDPOINT + SERVICE + STATUS_CODE + ERROR_MESSAGE
     /// </summary>
     public enum EnumErrosApi
@@ -56,7 +56,8 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         /// <summary>
         /// User already exist
         /// </summary>
-        POSTCREATEUSERASYNC_AUTHSERVICE_409_USER_ALREADY_EXISTS,
+        [Description("User created with sucess")]
+        POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED,
 
         #endregion PostCreateUserAsync
 
@@ -88,7 +89,19 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         /// <summary>
         /// Provider id is not valid
         /// </summary>
-        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_INVALID
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_INVALID,
+
+        /// <summary>
+        /// User already exist
+        /// </summary>
+        [Description("User alerady exists")]
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS,
+
+        /// <summary>
+        /// User already exist
+        /// </summary>
+        [Description("User created with sucess")]
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED,
 
         #endregion #PostCreateUserSsoAsync
     }

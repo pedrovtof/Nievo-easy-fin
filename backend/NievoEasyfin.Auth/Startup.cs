@@ -45,6 +45,8 @@ namespace NievoEasyfin.Auth
             services.AddDbContext<AuthReplica>();
             services.AddScoped<SsoProviderModel>();
             services.AddScoped<UserModel>();
+            services.AddScoped<UserProviderSsoModel>();
+            services.AddScoped<UserProviderSsoModel>();
             services.AddScoped<CryptoPasswordModel>();
             services.AddScoped<AuthService>();
             services.AddScoped<UsersService>();

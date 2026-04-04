@@ -38,7 +38,7 @@ namespace NievoEasyfin.Application.Services.Base.Users
 
             var user = await _AuthService.CreateUserAsync(request.Name, hash, request.Email);
 
-            return StatusCode(201, new ResponseApiSucess(user));
+            return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
         }
 
         /// <summary>
@@ -60,19 +60,28 @@ namespace NievoEasyfin.Application.Services.Base.Users
                     new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() }
                 ));
 
-            var validateProvider = await _AuthService.ProviderValidateAsync(provider, request.ProviderAccessToken);
+            var validateProvider = await _AuthService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
             if (validateProvider.Error != null)
                 return BadRequest(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
                 ));
 
+            var userSub = await _AuthService.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
+            if (userSub == null)
+            {
+                var user = await _AuthService.GetUserByEmailAsync(validateProvider.Email);
+                if (user == null)
+                {
+                    user = await _AuthService.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
+                }
 
-            // TODO: valida o token
-            // TODO: Validar o usuario
-            // TODO: Registrar o usuário na tabela de usuário
-            // TODO: Registrar o usuário na tabela de user-provider
-
-            return StatusCode(201, new ResponseApiSucess(request));
+                var userProviderSso = await _AuthService.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
+                return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
+            }
+            else
+            {
+                return StatusCode(200, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
+            }
         }
     }
 }

@@ -16,11 +16,14 @@ namespace NievoEasyfin.Application.Services.Auth
 
         private static SsoProviderModel _ssoProvider;
 
-        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider)
+        private static UserProviderSsoModel _userProviderSsoModel;
+
+        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider, UserProviderSsoModel userProviderSsoModel)
         {
             _cryptoPassword = cryptoPassword;
             _userModel = userModel;
             _ssoProvider = ssoProvider;
+            _userProviderSsoModel = userProviderSsoModel;
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <param name="password">request.password</param>
         /// <param name="email">request.email</param>
         /// <returns>userView</returns>
-        public async Task<UserView> CreateUserAsync(string name, string password, string email)
+        public async Task<UserEntity> CreateUserAsync(string name, string password, string email)
             => await _userModel.CreateUserAsync(name, password, email);
 
         /// <summary>
@@ -50,8 +53,13 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <param name="email">provider.response.password</param>
         /// <param name="sub">provider.response.email</param>
         /// <returns>userView</returns>
-        public async Task<UserView> CreateUserSsoAsync(string name, string email, string sub)
+        public async Task<UserEntity> CreateUserSsoAsync(string name, string email, string sub)
             => await _userModel.CreateUserSsoAsync(name, email, sub);
+
+        public async Task<UserProviderSsoEntity> CreateUserProviderSsoEntityAsync(int provider, int user, string sub)
+        {
+            return await _userProviderSsoModel.CreateUserProviderSsoEntityAsync(provider, user, sub);
+        }
 
         /// <summary>
         /// Search user by email
@@ -61,8 +69,14 @@ namespace NievoEasyfin.Application.Services.Auth
         public async Task<UserEntity> GetUserByEmailAsync(string email)
             => await _userModel.GetUserByEmailAsync(email);
 
-        public async Task<UserEntity> GetUserBySubId(string sub)
-            => null;
+        /// <summary>
+        /// Search user-provider by sub and provider
+        /// </summary>
+        /// <param name="sub">Unique id</param>
+        /// <param name="provider">provider Id</param>
+        /// <returns></returns>
+        public async Task<UserProviderSsoEntity> GetUserProviderSsoBySubAndProviderAsync(string sub, int provider)
+            => await _userProviderSsoModel.GetUserProviderSsoBySubAndProviderAsync(sub, provider);
 
         /// <summary>
         ///  Search provider by name
