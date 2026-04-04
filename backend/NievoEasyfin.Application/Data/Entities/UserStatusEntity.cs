@@ -25,8 +25,4 @@ namespace NievoEasyfin.Application.Data.Entities
         [Column("active", TypeName = "BOOLEAN")]
         public bool? Active { get; set; }
     }
-
-
-
-
 }

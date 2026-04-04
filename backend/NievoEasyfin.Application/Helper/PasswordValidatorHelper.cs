@@ -2,6 +2,9 @@ using System.Text.RegularExpressions;
 
 namespace NievoEasyfin.Application.Helper
 {
+    /// <summary>
+    /// Class to help validate the password
+    /// </summary>
     public class PasswordValidatorHelper
     {
         private static Regex RegexRules = new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,12}$");

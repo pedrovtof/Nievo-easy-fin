@@ -1,6 +1,5 @@
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
-using NievoEasyfin.Application.Helper;
 using FluentValidation;
 
 namespace NievoEasyfin.Application.Interfaces.Validator

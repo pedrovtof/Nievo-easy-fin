@@ -4,12 +4,12 @@ using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Services.Auth;
-using NievoEasyfin.Application.Helper;
 namespace NievoEasyfin.Application.Services.Base.Users
 {
     public class UsersService : Controller
     {
         private static AuthService _AuthService;
+
         public UsersService(AuthService authService)
         {
             _AuthService = authService;
@@ -71,17 +71,13 @@ namespace NievoEasyfin.Application.Services.Base.Users
             {
                 var user = await _AuthService.GetUserByEmailAsync(validateProvider.Email);
                 if (user == null)
-                {
                     user = await _AuthService.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
-                }
 
                 var userProviderSso = await _AuthService.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
                 return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
             }
             else
-            {
                 return StatusCode(200, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
-            }
         }
     }
 }

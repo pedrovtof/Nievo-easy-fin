@@ -3,6 +3,9 @@ using System.Text;
 
 namespace NievoEasyfin.Application.Models
 {
+    /// <summary>
+    /// Class model for Crypto password
+    /// </summary>
     public class CryptoPasswordModel
     {
         private static int Iterations = int.Parse(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_ITERATIONS"));

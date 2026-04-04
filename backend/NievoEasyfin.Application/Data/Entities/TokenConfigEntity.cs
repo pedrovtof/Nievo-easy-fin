@@ -6,7 +6,6 @@ namespace NievoEasyfin.Application.Data.Entities
     [Table("token_config", Schema = "token_config")]
     public class TokenConfigEntity
     {
-
         [Key]
         [Column("id", TypeName = "SERIAL")]
         public int Id { get; set; }
@@ -19,7 +18,5 @@ namespace NievoEasyfin.Application.Data.Entities
 
         [Column("updated_at", TypeName = "TIMESTAMP")]
         public DateTime? UpdatedAt { get; set; }
-
-
     }
 }

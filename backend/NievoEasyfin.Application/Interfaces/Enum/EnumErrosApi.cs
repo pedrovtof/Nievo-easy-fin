@@ -9,7 +9,6 @@ namespace NievoEasyfin.Application.Interfaces.Enum
     /// </summary>
     public enum EnumErrosApi
     {
-
         #region #PostCreateUserAsync
 
         /// <summary>
@@ -84,7 +83,6 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         /// Provider name is null or empty
         /// </summary>
         POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY,
-
 
         /// <summary>
         /// Provider id is not valid

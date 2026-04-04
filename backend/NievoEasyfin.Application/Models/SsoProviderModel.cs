@@ -1,20 +1,15 @@
 using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Data.Context.Database;
-using Sprache;
-using NievoEasyfin.Application.Data.Views;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection.Metadata;
-using NievoEasyfin.Application.Data.Entities;
-using NievoEasyfin.Application.Models;
-using Newtonsoft.Json.Linq;
 using NievoEasyfin.Application.Interfaces.Response;
 using System.Text.Json;
 
 namespace NievoEasyfin.Application.Models
 {
+    /// <summary>
+    /// Class model to validate the provider response
+    /// </summary>
     public class SsoProviderModel : SsoProviderEntity
     {
         private static AuthOrigin _AuthMainNodeDatabase;

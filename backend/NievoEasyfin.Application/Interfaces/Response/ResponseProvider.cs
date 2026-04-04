@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace NievoEasyfin.Application.Interfaces.Response
 {
+    /// <summary>
+    /// Class template for response from provider SSO
+    /// </summary>
     public class ResponseProvider
     {
         /// <summary>

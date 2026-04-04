@@ -21,8 +21,5 @@ namespace NievoEasyfin.Application.Data.Entities
 
         [Column("updated_at", TypeName = "TIMESTAMP")]
         public DateTime? UpdatedAt { get; set; }
-
     }
-
-
 }

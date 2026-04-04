@@ -1,13 +1,12 @@
-using Microsoft.AspNetCore.Identity;
-using NievoEasyfin.Application.Data.Context.Database;
 using NievoEasyfin.Application.Models;
-using NievoEasyfin.Application.Data.Views;
 using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Interfaces.Response;
-using NievoEasyfin.Application.Helper;
 
 namespace NievoEasyfin.Application.Services.Auth
 {
+    /// <summary>
+    /// General class to support services
+    /// </summary>
     public class AuthService
     {
         private static CryptoPasswordModel _cryptoPassword;

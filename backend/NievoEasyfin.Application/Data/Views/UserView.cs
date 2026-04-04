@@ -1,11 +1,7 @@
-using NievoEasyfin.Application.Data.Entities;
-using NievoEasyfin.Application.Models;
-
 namespace NievoEasyfin.Application.Data.Views
 {
     public class UserView
     {
-
         public string? Name { get; set; }
 
         public string? Email { get; set; }

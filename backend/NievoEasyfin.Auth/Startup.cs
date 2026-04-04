@@ -1,11 +1,9 @@
 using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
 using NievoEasyfin.Application.Services.Base.Users;
-using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
 using FluentValidation;
-using NievoEasyfin.Application.Helper;
 
 namespace NievoEasyfin.Auth
 {
