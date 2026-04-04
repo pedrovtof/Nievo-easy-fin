@@ -5,7 +5,7 @@
   <Folder Name="/NievoEasyfin.Auth/">
     <Project Path="NievoEasyfin.Auth/auth.csproj" />
   </Folder>
-  <Folder Name="/NievoEasyfin.Core/">
-    <Project Path="NievoEasyfin.Core/core.csproj" />
+  <Folder Name="/NievoEasyfin.Test/">
+    <Project Path="NievoEasyfin.Tests/test.csproj" />
   </Folder>
 </Solution>

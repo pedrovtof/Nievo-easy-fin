@@ -1,26 +1,16 @@
-
-using NievoEasyfin.Application.Data.Context.Database;
-using NievoEasyfin.Application.Services.Auth;
+using NievoEasyfin.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.TraversePath().Load();
+var startup = new Startup(builder.Configuration);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AuthOrigin>();
-builder.Services.AddDbContext<AuthReplica>();
-
-builder.Services.AddScoped<AuthService>();
+startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.MapControllers();
-
-app.Run();
+startup.Configure(app, builder.Environment);

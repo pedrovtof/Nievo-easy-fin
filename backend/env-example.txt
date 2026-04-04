@@ -1,0 +1,5 @@
+# Only change with you have a good reason
+PASSWORD_CRYPTO_ITERATIONS=""
+PASSWORD_CRYPTO_KEYSIZE= ""
+# GENERATE USING THE MODEL CLASS FOR CRYPTOPASSWORD BY Convert.ToHexString(GenerateSalt()) with debug
+PASSWORD_CRYPTO_SALT = "" 

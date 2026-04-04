@@ -4,12 +4,10 @@ import { Link, useLocation } from 'react-router-dom';
 export default function Sidebar() {
     const location = useLocation();
     const navItems = [
-        { icon: 'dashboard', label: 'Dashboard', path: '/dashboard' },
+        { icon: 'dashboard', label: 'Dashboard', path: '/' },
         { icon: 'receipt_long', label: 'Transactions', path: '/transactions' },
         { icon: 'donut_large', label: 'Budget', path: '/budget' },
-        { icon: 'savings', label: 'Goals', path: '/budget' }, // Mapping goals to budget for now as they share a screen in design
         { icon: 'settings', label: 'Settings', path: '/settings' },
-        { icon: 'insights', label: 'Reports', path: '/reports' },
     ];
 
     return (
@@ -44,24 +42,6 @@ export default function Sidebar() {
                     );
                 })}
             </nav>
-
-            <div className="p-4 border-t border-gray-200">
-                <div className="bg-card-light rounded-xl p-4 flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-center bg-cover rounded-full size-10 shadow-sm bg-gray-200">
-                            {/* Placeholder avatar if image fails to load or just use a color */}
-                            <span className="material-symbols-outlined text-gray-400 p-2">person</span>
-                        </div>
-                        <div className="flex flex-col overflow-hidden">
-                            <p className="text-primary text-sm font-bold truncate">Alex Morgan</p>
-                            <p className="text-gray-500 text-xs truncate">alex@example.com</p>
-                        </div>
-                    </div>
-                    <button className="w-full py-2 px-3 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
-                        Settings
-                    </button>
-                </div>
-            </div>
         </aside>
     );
 }

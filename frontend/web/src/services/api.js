@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const API_CONFIG = {
-    BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api', // Default, easy to change
-    TIMEOUT: 10000,
+    BASE_URL: import.meta.env.VITE_BASE_URL_API || 'http://localhost:5090/api/',
+    TIMEOUT: import.meta.env.VITE_TIMEOUT_API || 10000,
 };
 
 const api = axios.create({
@@ -56,3 +56,19 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+/**
+ * Cria um novo usuário com email e senha.
+ * @param {{ name: string, email: string, password: string }} userData
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const createUser = (userData) => api.post('v1/Users/singup', userData);
+
+/**
+ * Cria um novo usuário via SSO (ex: Google).
+ * @param {{ provider_name: string, provider_access_token: string }} ssoData
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const createUserSSO = (ssoData) => api.post('v1/Users/singup-sso', ssoData);
