@@ -3,7 +3,6 @@ using NievoEasyfin.Application.Data.Context.Database;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Data.Views;
 using NievoEasyfin.Application.Data.Entities;
-using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Helper;
 
@@ -13,18 +12,15 @@ namespace NievoEasyfin.Application.Services.Auth
     {
         private static CryptoPasswordModel _cryptoPassword;
 
-        private static ProviderHelper _providerHelper;
-
         private static UserModel _userModel;
 
         private static SsoProviderModel _ssoProvider;
 
-        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider, ProviderHelper providerHelper)
+        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider)
         {
             _cryptoPassword = cryptoPassword;
             _userModel = userModel;
             _ssoProvider = ssoProvider;
-            _providerHelper = providerHelper;
         }
 
         /// <summary>
@@ -34,6 +30,8 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <returns>Hash password</returns>
         public async Task<string> ConvertRequestPasswordToStringAsync(string password)
             => await _cryptoPassword.HashPasswordAsync(password);
+
+        #region User
 
         /// <summary>
         /// Create user entity
@@ -46,12 +44,25 @@ namespace NievoEasyfin.Application.Services.Auth
             => await _userModel.CreateUserAsync(name, password, email);
 
         /// <summary>
+        /// Create user entity
+        /// </summary>
+        /// <param name="name">provider.response.name</param>
+        /// <param name="email">provider.response.password</param>
+        /// <param name="sub">provider.response.email</param>
+        /// <returns>userView</returns>
+        public async Task<UserView> CreateUserSsoAsync(string name, string email, string sub)
+            => await _userModel.CreateUserSsoAsync(name, email, sub);
+
+        /// <summary>
         /// Search user by email
         /// </summary>
         /// <param name="email">email</param>
         /// <returns>UserEntity</returns>
         public async Task<UserEntity> GetUserByEmailAsync(string email)
             => await _userModel.GetUserByEmailAsync(email);
+
+        public async Task<UserEntity> GetUserBySubId(string sub)
+            => null;
 
         /// <summary>
         ///  Search provider by name
@@ -61,7 +72,15 @@ namespace NievoEasyfin.Application.Services.Auth
         public async Task<SsoProviderEntity> GetProviderByNameAsync(string provider)
             => await _ssoProvider.GetProviderByNameAsync(provider);
 
-        public async Task<ResponseProvider> ProviderValidateAsync(SsoProviderEntity provider, string token)
-            => await _providerHelper.ValidateProviderAsync(provider, token);
+        /// <summary>
+        /// Method to validate the type of provider from sso
+        /// </summary>
+        /// <param name="provider">SsoProviderEntity</param>
+        /// <param name="token">response string token from api sso</param>
+        /// <returns></returns>
+        public async Task<ResponseProvider> ProviderValidateAsync(string provider, string token)
+            => await _ssoProvider.ValidateProviderAsync(provider, token);
+
+        #endregion User
     }
 }
