@@ -60,8 +60,15 @@ export default api;
 // ─── Users ───────────────────────────────────────────────────────────────────
 
 /**
- * Cria um novo usuário via OAuth do Google.
- * @param {{ email: string, name: string, picture: string, sub: string }} userData
+ * Cria um novo usuário com email e senha.
+ * @param {{ name: string, email: string, password: string }} userData
  * @returns {Promise<import('axios').AxiosResponse>}
  */
-export const createUser = (userData) => api.post('v1/Users/', userData);
+export const createUser = (userData) => api.post('v1/Users/singup', userData);
+
+/**
+ * Cria um novo usuário via SSO (ex: Google).
+ * @param {{ provider_name: string, provider_access_token: string }} ssoData
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const createUserSSO = (ssoData) => api.post('v1/Users/singup-sso', ssoData);

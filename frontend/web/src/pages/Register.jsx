@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
-import { createUser } from '../services/api';
+import { createUser, createUserSSO } from '../services/api';
 
 const Register = () => {
+    const navigate = useNavigate();
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [isFormLoading, setIsFormLoading] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
@@ -17,35 +18,19 @@ const Register = () => {
     const handleGoogleSignup = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
-                // Log do JWT retornado pelo Google
-                console.log('[Google OAuth] tokenResponse completo:', tokenResponse);
-                console.log('[Google OAuth] JWT (id_token):', tokenResponse.id_token ?? 'id_token não disponível neste fluxo');
-
-                // Fetch user profile from Google using the access token
-                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+                const createRes = await createUserSSO({
+                    provider_name: 'google',
+                    provider_access_token: tokenResponse.access_token,
                 });
 
-                const userInfo = await res.json();
-
-                const { email, name, picture, sub } = userInfo;
-
-                // Send user data to the backend
-                const createRes = await createUser({
-                    name,
-                    email,
-                    password: null,
-                    picture,
-                    sub,
-                });
-
-                if (createRes.status >= 200 && createRes.status < 300) {
-                    console.log('[Register] User created successfully:', createRes.data);
+                if (createRes.status === 200 || createRes.status === 201) {
+                    console.log('[Register] SSO user created successfully:', createRes.data);
+                    navigate('/login');
                 } else {
-                    console.error('[Register] Failed to create user:', createRes.status, createRes.data);
+                    console.error('[Register] Failed to create SSO user:', createRes.status, createRes.data);
                 }
             } catch (err) {
-                console.error('[Google OAuth] Failed to fetch user info or create user:', err);
+                console.error('[Google OAuth] Failed to create SSO user:', err);
             } finally {
                 setIsGoogleLoading(false);
             }
@@ -82,16 +67,11 @@ const Register = () => {
 
         try {
             setIsFormLoading(true);
-            const createRes = await createUser({
-                name,
-                email,
-                password,
-                picture: null,
-                sub: null,
-            });
+            const createRes = await createUser({ name, email, password });
 
-            if (createRes.status >= 200 && createRes.status < 300) {
+            if (createRes.status === 200 || createRes.status === 201) {
                 console.log('[Register] User created successfully:', createRes.data);
+                navigate('/login');
             } else {
                 console.error('[Register] Failed to create user:', createRes.status, createRes.data);
                 setFormError('Failed to create account. Please try again.');
