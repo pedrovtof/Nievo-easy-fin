@@ -44,16 +44,16 @@ namespace NievoEasyfin.Application.Interfaces.Response
         public string? Email { get; set; }
 
         /// <summary>
-        /// Email is verified
-        /// </summary>
-        [JsonPropertyName("email_verified")]
-        public bool? EmailVerified { get; set; }
-
-        /// <summary>
         /// Has some error the request
         /// </summary>
         [JsonPropertyName("error")]
         public string? Error { get; set; }
+
+        /// <summary>
+        /// Project Id from GCP
+        /// </summary>
+        [JsonPropertyName("aud")]
+        public string? Aud { get; set; }
 
         public void WithError(string error)
         {

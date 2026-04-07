@@ -8,11 +8,11 @@ namespace NievoEasyfin.Application.Models
     /// </summary>
     public class CryptoPasswordModel
     {
-        private static int Iterations = int.Parse(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_ITERATIONS"));
+        private static readonly int Iterations = DotNetEnv.Env.GetInt("PASSWORD_CRYPTO_ITERATIONS");
 
-        private static int KeySize = int.Parse(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_KEYSIZE"));
+        private static readonly int KeySize = DotNetEnv.Env.GetInt("PASSWORD_CRYPTO_KEYSIZE");
 
-        private static byte[] Salt = Convert.FromHexString(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_SALT"));
+        private static readonly byte[] Salt = Convert.FromHexString(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_SALT"));
 
         private static HashAlgorithmName AlgorithmHash = HashAlgorithmName.SHA512;
 
