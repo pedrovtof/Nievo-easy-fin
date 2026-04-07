@@ -16,7 +16,11 @@ namespace NievoEasyfin.Application.Models
 
         private static AuthReplica? _AuthReplicaNodeDatabase;
 
-        private const string GOOGLE_API = "https://www.googleapis.com/oauth2/v3/userinfo";
+        private static readonly string GOOGLE_API_USER_INFO = DotNetEnv.Env.GetString("GOOGLE_API_USER_INFO");
+
+        private static readonly string GOOGLE_API_TOKEN_INFO = DotNetEnv.Env.GetString("GOOGLE_API_TOKEN_INFO");
+
+        private static readonly string GOOGLE_ID_CLIENT = DotNetEnv.Env.GetString("GOOGLE_ID_CLIENT");
 
         public SsoProviderModel(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
         {
@@ -71,11 +75,19 @@ namespace NievoEasyfin.Application.Models
         /// <returns>response from api</returns>
         private async Task<ResponseProvider> ProviderGoogleAsync(string provider, string token)
         {
-            using var client = new HttpClient();
+            var client = new HttpClient();
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await client.GetAsync(GOOGLE_API);
+            var validateProjectFromGoogle = await ProviderGoogleAsync(client, token);
+            if (!validateProjectFromGoogle)
+            {
+                var error = new ResponseProvider();
+                error.WithError("Invalid project from google or invalid token");
+                return error;
+            }
+
+            var response = await client.GetAsync(GOOGLE_API_USER_INFO);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -87,6 +99,26 @@ namespace NievoEasyfin.Application.Models
             var responseContent = await response.Content.ReadAsStringAsync();
 
             return JsonSerializer.Deserialize<ResponseProvider>(responseContent);
+        }
+
+        /// <summary>
+        /// Validate the project from GCP
+        /// </summary>
+        /// <param name="client">Http Client</param>
+        /// <param name="token">Token sub gcp</param>
+        /// <returns>true or false</returns>
+        private async Task<bool> ProviderGoogleAsync(HttpClient client, string token)
+        {
+            var response = await client.GetAsync(GOOGLE_API_TOKEN_INFO);
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var responseData = JsonSerializer.Deserialize<ResponseProvider>(await response.Content.ReadAsStringAsync());
+
+            if (responseData.Aud != GOOGLE_ID_CLIENT)
+                return false;
+
+            return true;
         }
 
         /// <summary>
