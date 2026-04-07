@@ -83,7 +83,7 @@ namespace NievoEasyfin.Application.Models
             if (!validateProjectFromGoogle)
             {
                 var error = new ResponseProvider();
-                error.WithError("Invalid project from google");
+                error.WithError("Invalid project from google or invalid token");
                 return error;
             }
 
