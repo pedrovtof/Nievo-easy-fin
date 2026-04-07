@@ -9,7 +9,7 @@ namespace NievoEasyfin.Application.Interfaces.Enum
     /// </summary>
     public enum EnumErrosApi
     {
-        #region #PostCreateUserAsync
+        #region CreateUserAsync
 
         /// <summary>
         /// Name must not be empty
@@ -58,9 +58,9 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         [Description("User created with sucess")]
         POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED,
 
-        #endregion PostCreateUserAsync
+        #endregion CreateUserAsync
 
-        #region #PostCreateUserSsoAsync
+        #region CreateUserSsoAsync
 
         /// <summary>
         /// Provider name is null or empty
@@ -101,6 +101,20 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         [Description("User created with sucess")]
         POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED,
 
-        #endregion #PostCreateUserSsoAsync
+        #endregion CreateUserSsoAsync
+
+        #region LoginUserRequest
+
+        /// <summary>
+        /// Email is empty or null
+        /// </summary>
+        POSTLOGINUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL,
+
+        /// <summary>
+        /// Password is empty or null
+        /// </summary>
+        POSTLOGINUSERASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL,
+
+        #endregion LoginUserRequest
     }
 }
