@@ -1,12 +1,12 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace NievoEasyfin.Application.Models
+namespace NievoEasyfin.Application.Services.Security
 {
     /// <summary>
     /// Class model for Crypto password
     /// </summary>
-    public class CryptoPasswordModel
+    public class CryptoPasswordService
     {
         private static readonly int Iterations = DotNetEnv.Env.GetInt("PASSWORD_CRYPTO_ITERATIONS");
 
@@ -15,6 +15,14 @@ namespace NievoEasyfin.Application.Models
         private static readonly byte[] Salt = Convert.FromHexString(DotNetEnv.Env.GetString("PASSWORD_CRYPTO_SALT"));
 
         private static HashAlgorithmName AlgorithmHash = HashAlgorithmName.SHA512;
+
+        /// <summary>
+        /// Service constructor
+        /// </summary>
+        public CryptoPasswordService()
+        {
+
+        }
 
         /// <summary>
         /// Method to create salt
@@ -49,6 +57,9 @@ namespace NievoEasyfin.Application.Models
         /// <returns>True/False</returns>
         public async Task<bool> HashValidateAsync(string password, string hash)
         {
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(hash))
+                return false;
+
             var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(password, Salt, Iterations, AlgorithmHash, KeySize);
 
             return CryptographicOperations.FixedTimeEquals(hashToCompare, Convert.FromHexString(hash));

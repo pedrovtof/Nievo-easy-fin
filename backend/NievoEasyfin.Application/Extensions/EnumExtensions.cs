@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace NievoEasyfin.Application.Interfaces.Enum
+namespace NievoEasyfin.Application.Extensions.Enum
 {
     public static class EnumExtensions
     {
