@@ -5,15 +5,13 @@ using System.Net.Http.Headers;
 using NievoEasyfin.Application.Interfaces.Response;
 using System.Text.Json;
 
-namespace NievoEasyfin.Application.Models
+namespace NievoEasyfin.Application.Infrastructure.Auth
 {
     /// <summary>
     /// Class model to validate the provider response
     /// </summary>
-    public class SsoProviderModel : SsoProviderEntity
+    public class SSoProviderAuth : SsoProviderEntity
     {
-        private static AuthOrigin _AuthMainNodeDatabase;
-
         private static AuthReplica? _AuthReplicaNodeDatabase;
 
         private static readonly string GOOGLE_API_USER_INFO = DotNetEnv.Env.GetString("GOOGLE_API_USER_INFO");
@@ -22,9 +20,8 @@ namespace NievoEasyfin.Application.Models
 
         private static readonly string GOOGLE_ID_CLIENT = DotNetEnv.Env.GetString("GOOGLE_ID_CLIENT");
 
-        public SsoProviderModel(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
+        public SSoProviderAuth(AuthReplica authReplicaNodeDatabase)
         {
-            _AuthMainNodeDatabase = authMainNodeDatabase;
             _AuthReplicaNodeDatabase = authReplicaNodeDatabase;
         }
 
@@ -67,6 +64,8 @@ namespace NievoEasyfin.Application.Models
             return result;
         }
 
+        #region Google
+
         /// <summary>
         /// Method to validate token in google
         /// </summary>
@@ -75,7 +74,7 @@ namespace NievoEasyfin.Application.Models
         /// <returns>response from api</returns>
         private async Task<ResponseProvider> ProviderGoogleAsync(string provider, string token)
         {
-            var client = new HttpClient();
+            using var client = new HttpClient();
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -121,6 +120,10 @@ namespace NievoEasyfin.Application.Models
             return true;
         }
 
+        #endregion Google
+
+        #region GitHub
+
         /// <summary>
         /// Method to validate token in github
         /// </summary>
@@ -132,5 +135,7 @@ namespace NievoEasyfin.Application.Models
         {
             throw new NotImplementedException("Method not yeat implemented");
         }
+
+        #endregion GitHub
     }
 }

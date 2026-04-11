@@ -2,7 +2,6 @@ using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace NievoEasyfin.Application.Models
 {
     /// <summary>

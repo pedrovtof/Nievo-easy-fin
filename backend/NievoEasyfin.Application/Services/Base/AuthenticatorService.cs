@@ -1,18 +1,54 @@
+using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Extensions.Enum;
+using NievoEasyfin.Application.Interfaces.Enum;
+using NievoEasyfin.Application.Interfaces.Request;
+using NievoEasyfin.Application.Interfaces.Response;
+using NievoEasyfin.Application.Interfaces.Validator;
+using NievoEasyfin.Application.Services.Auth;
 
 namespace NievoEasyfin.Application.Services.Base.Authenticator
 {
     public class AuthenticatorService : Controller
     {
-        private static AuthOrigin _AuthMainNodeDatabase;
+        private static AuthService _authService;
 
-        private static AuthReplica _AuthReplicaNodeDatabase;
-
-        public AuthenticatorService(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
+        public AuthenticatorService(AuthService authService)
         {
-            _AuthMainNodeDatabase = authMainNodeDatabase;
-            _AuthReplicaNodeDatabase = authReplicaNodeDatabase;
+            _authService = authService;
+        }
+
+        /// <summary>
+        /// Method service to login
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> PostLoginUserAsync(PostLoginUserRequest request)
+        {
+            var validatorResult = await new PostLoginUserValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var user = await _authService.GetUserByEmailAsync(request.Email);
+            if (user == null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var passwordValid = await _authService.ValidateHashPasswordAsync(request.Password, user.Password);
+            if (!passwordValid)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_400_WRONG_PASSWORD.GetDescription() }
+                ));
+
+            var generateToken = await _authService.GenerateTokenJwtAsync(user.Email);
+
+            return Ok(new ResponseApiSucess(
+                new { Token = generateToken }
+            ));
         }
     }
 }

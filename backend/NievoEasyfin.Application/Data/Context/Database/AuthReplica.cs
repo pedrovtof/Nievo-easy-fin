@@ -6,8 +6,8 @@ namespace NievoEasyfin.Application.Data.Context.Database
     /// <summary>
     /// Class for connect on RR node PGSQL database for AUTH
     /// This context create connection only for RR node, were we can use READ_ONLY
+    /// </summary>
     /// <returns>Connectio to Auth database PGSQL in READ_REPLICA node</returns>
-    /// <summary>
     public class AuthReplica : AuthDbContext
     {
         protected override string KeyNameConnection => "auth_pgsql_replica";
