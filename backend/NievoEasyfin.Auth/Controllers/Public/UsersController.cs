@@ -6,7 +6,7 @@ using NievoEasyfin.Application.Interfaces.Response;
 namespace NievoEasyfin.Auth.Controllers.Public
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/public/v1/[controller]")]
     public class UsersController : Controller
     {
         private static UsersService _usersService;
@@ -22,7 +22,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /api/v1/Users/singup
+        ///     POST v1/Users/singup
         ///     {
         ///        "name": "Joe Black",
         ///        "password": "1Meet-Death",
@@ -37,7 +37,6 @@ namespace NievoEasyfin.Auth.Controllers.Public
         [HttpPost("singup")]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> PostCreateUserAsync([FromBody] PostCreateUserRequest request)
             => await _usersService.PostCreateUserAsync(request);
 
@@ -47,7 +46,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// <remarks>
         /// Sample request:
         /// 
-        ///     POST /api/v1/Users/singup/sso
+        ///     POST v1/Users/singup/sso
         ///     {
         ///        "provider_name": "google",
         ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj..."
@@ -56,6 +55,9 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("singup-sso")]
+        [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostCreateUserSsoAsync([FromBody] PostCreateUserSsoRequest request)
             => await _usersService.PostCreateUserSsoAsync(request);
     }

@@ -1,7 +1,8 @@
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Interfaces.Response;
-
+using NievoEasyfin.Application.Infrastructure.Auth;
+using NievoEasyfin.Application.Services.Security;
 namespace NievoEasyfin.Application.Services.Auth
 {
     /// <summary>
@@ -9,21 +10,23 @@ namespace NievoEasyfin.Application.Services.Auth
     /// </summary>
     public class AuthService
     {
-        private static CryptoPasswordModel _cryptoPassword;
+        private static CryptoPasswordService _cryptoPasswordService;
 
         private static UserModel _userModel;
 
-        private static SsoProviderModel _ssoProvider;
+        private static SSoProviderAuth _ssoProviderAuth;
 
         private static UserProviderSsoModel _userProviderSsoModel;
 
-        public AuthService(CryptoPasswordModel cryptoPassword, UserModel userModel, SsoProviderModel ssoProvider, UserProviderSsoModel userProviderSsoModel)
+        public AuthService(CryptoPasswordService cryptoPasswordService, UserModel userModel, SSoProviderAuth ssoProviderAuth, UserProviderSsoModel userProviderSsoModel)
         {
-            _cryptoPassword = cryptoPassword;
+            _cryptoPasswordService = cryptoPasswordService;
             _userModel = userModel;
-            _ssoProvider = ssoProvider;
+            _ssoProviderAuth = ssoProviderAuth;
             _userProviderSsoModel = userProviderSsoModel;
         }
+
+        #region Crypto
 
         /// <summary>
         /// Method to convert password into hashPass
@@ -31,7 +34,18 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <param name="password">request password</param>
         /// <returns>Hash password</returns>
         public async Task<string> ConvertRequestPasswordToStringAsync(string password)
-            => await _cryptoPassword.HashPasswordAsync(password);
+            => await _cryptoPasswordService.HashPasswordAsync(password);
+
+        /// <summary>
+        /// Method to validate if the password is correct
+        /// </summary>
+        /// <param name="password">password from request</param>
+        /// <param name="hash">hash from database</param>
+        /// <returns>true/false</returns>
+        public async Task<bool> ValidateHashPasswordAsync(string password, string hash)
+            => await _cryptoPasswordService.HashValidateAsync(password, hash);
+
+        #endregion Crypto
 
         #region User
 
@@ -68,6 +82,10 @@ namespace NievoEasyfin.Application.Services.Auth
         public async Task<UserEntity> GetUserByEmailAsync(string email)
             => await _userModel.GetUserByEmailAsync(email);
 
+        #endregion User
+
+        #region Provider
+
         /// <summary>
         /// Search user-provider by sub and provider
         /// </summary>
@@ -83,7 +101,7 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <param name="provider">name of the provider</param>
         /// <returns>SsoProviderEntity</returns>
         public async Task<SsoProviderEntity> GetProviderByNameAsync(string provider)
-            => await _ssoProvider.GetProviderByNameAsync(provider);
+            => await _ssoProviderAuth.GetProviderByNameAsync(provider);
 
         /// <summary>
         /// Method to validate the type of provider from sso
@@ -92,8 +110,8 @@ namespace NievoEasyfin.Application.Services.Auth
         /// <param name="token">response string token from api sso</param>
         /// <returns></returns>
         public async Task<ResponseProvider> ProviderValidateAsync(string provider, string token)
-            => await _ssoProvider.ValidateProviderAsync(provider, token);
+            => await _ssoProviderAuth.ValidateProviderAsync(provider, token);
 
-        #endregion User
+        #endregion Provider
     }
 }
