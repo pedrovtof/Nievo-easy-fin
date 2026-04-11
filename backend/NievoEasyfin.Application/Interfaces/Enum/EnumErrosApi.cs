@@ -115,6 +115,18 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         /// </summary>
         POSTLOGINUSERASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL,
 
+        /// <summary>
+        /// User not found
+        /// </summary>
+        [Description("The user may not have an account or the password is incorrect")]
+        POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
+
+        /// <summary>
+        /// User not found
+        /// </summary>
+        [Description("The user may not have an account or the password is incorrect")]
+        POSTLOGINUSERASYNC_AUTHSERVICE_400_WRONG_PASSWORD,
+
         #endregion LoginUserRequest
     }
 }

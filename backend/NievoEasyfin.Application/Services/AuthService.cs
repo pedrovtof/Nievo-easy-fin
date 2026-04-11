@@ -18,12 +18,21 @@ namespace NievoEasyfin.Application.Services.Auth
 
         private static UserProviderSsoModel _userProviderSsoModel;
 
-        public AuthService(CryptoPasswordService cryptoPasswordService, UserModel userModel, SSoProviderAuth ssoProviderAuth, UserProviderSsoModel userProviderSsoModel)
+        private static JsonWebTokenService _jsonWebTokenService;
+
+        public AuthService(
+            CryptoPasswordService cryptoPasswordService,
+            UserModel userModel,
+            SSoProviderAuth ssoProviderAuth,
+            UserProviderSsoModel userProviderSsoModel,
+            JsonWebTokenService jsonWebTokenService
+        )
         {
             _cryptoPasswordService = cryptoPasswordService;
             _userModel = userModel;
             _ssoProviderAuth = ssoProviderAuth;
             _userProviderSsoModel = userProviderSsoModel;
+            _jsonWebTokenService = jsonWebTokenService;
         }
 
         #region Crypto
@@ -113,5 +122,17 @@ namespace NievoEasyfin.Application.Services.Auth
             => await _ssoProviderAuth.ValidateProviderAsync(provider, token);
 
         #endregion Provider
+
+        #region Token
+
+        /// <summary>
+        /// Method to generate token JWT
+        /// </summary>
+        /// <param name="email">User email from database</param>
+        /// <returns>token JWT</returns>
+        public async Task<string> GenerateTokenJwtAsync(string email)
+            => await _jsonWebTokenService.GenerateTokenAsync(email);
+
+        #endregion Token
     }
 }

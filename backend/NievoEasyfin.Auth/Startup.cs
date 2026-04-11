@@ -7,6 +7,7 @@ using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Services.Security;
 using FluentValidation;
+using NievoEasyfin.Application.Configuration;
 
 namespace NievoEasyfin.Auth
 {
@@ -52,7 +53,11 @@ namespace NievoEasyfin.Auth
             services.AddDbContext<AuthOrigin>();
             services.AddDbContext<AuthReplica>();
 
+            Console.WriteLine("Creating Transient services");
+            services.AddTransient<JsonWebTokenConfiguration>();
+
             Console.WriteLine("Creating context services");
+            services.AddScoped<JsonWebTokenService>();
             services.AddScoped<SSoProviderAuth>();
             services.AddScoped<UserModel>();
             services.AddScoped<UserProviderSsoModel>();
