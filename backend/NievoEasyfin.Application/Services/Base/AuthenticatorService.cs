@@ -1,6 +1,4 @@
-using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyfin.Application.Data.Context.Database;
 using NievoEasyfin.Application.Extensions.Enum;
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;

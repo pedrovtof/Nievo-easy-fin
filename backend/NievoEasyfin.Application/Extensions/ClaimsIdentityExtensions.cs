@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace NievoEasyfin.Application.Extensions.Claims
 {

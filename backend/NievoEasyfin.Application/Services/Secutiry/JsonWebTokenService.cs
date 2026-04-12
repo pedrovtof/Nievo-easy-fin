@@ -1,7 +1,5 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using NievoEasyfin.Application.Data.Views;
 using NievoEasyfin.Application.Configuration;
 using System.Security.Claims;
 using NievoEasyfin.Application.Extensions.Claims;

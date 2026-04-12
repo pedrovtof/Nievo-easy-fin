@@ -2,7 +2,6 @@ using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using System.Reflection.Metadata;
 using Dapper;
 
 namespace NievoEasyfin.Application.Models
