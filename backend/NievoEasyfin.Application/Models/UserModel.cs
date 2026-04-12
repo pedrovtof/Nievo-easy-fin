@@ -1,6 +1,9 @@
 using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Reflection.Metadata;
+using Dapper;
 
 namespace NievoEasyfin.Application.Models
 {
@@ -76,7 +79,48 @@ namespace NievoEasyfin.Application.Models
             return user;
         }
 
+        /// <summary>
+        /// Method to get user by email
+        /// </summary>
+        /// <param name="email">string email</param>
+        /// <returns>UserEntity</returns>
         public async Task<UserEntity> GetUserByEmailAsync(string email)
             => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
+
+        /// <summary>
+        /// Method to get user by providerId and subId
+        /// </summary>
+        /// <param name="subId">string sub</param>
+        /// <param name="providerId">int provider.id</param>
+        /// <returns>UserEntity</returns>
+        public async Task<UserEntity> GetUserByProviderSubAndIdAsync(string subId, int providerId)
+        {
+            var query = new StringBuilder();
+            var parameters = new DynamicParameters();
+
+            query.Append("""
+                SELECT 
+                    u.id, "name", email, phone, status_id, u.created_at, u.updated_at, password
+                FROM
+                    user_details."user" u
+                INNER JOIN journey.user_provider_sso ups 
+                    on u.id  = ups.user_id 
+                WHERE 1=1
+                    and ups.sso_provider_id  = @providerId
+                    and ups.sub = @subId
+            """);
+
+            parameters.Add("providerId", providerId);
+            parameters.Add("subId", $"{subId}");
+
+            var connection = _AuthReplicaNodeDatabase.Database.GetDbConnection();
+
+            var dataFrame = await connection.QueryFirstAsync<UserEntity>(
+                query.ToString(),
+                parameters
+            );
+
+            return dataFrame;
+        }
     }
 }

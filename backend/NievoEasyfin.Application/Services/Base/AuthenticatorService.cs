@@ -22,8 +22,7 @@ namespace NievoEasyfin.Application.Services.Base.Authenticator
         /// <summary>
         /// Method service to login
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">request PostLoginUserRequest</param>
         public async Task<IActionResult> PostLoginUserAsync(PostLoginUserRequest request)
         {
             var validatorResult = await new PostLoginUserValidatorAsync().ValidateAsync(request);
@@ -49,6 +48,46 @@ namespace NievoEasyfin.Application.Services.Base.Authenticator
             return Ok(new ResponseApiSucess(
                 new { Token = generateToken }
             ));
+        }
+
+        /// <summary>
+        /// Method service to Login Sso 
+        /// </summary>
+        /// <param name="request">request PostLoginUserRequest</param>
+        public async Task<IActionResult> PostLoginUserSsoAsync(PostLogiPostLoginUserSsoRequest request)
+        {
+            var validatorResult = await new PostLoginUserSsoValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var provider = await _authService.GetProviderByNameAsync(request.Provider);
+            if (provider == null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() }
+                ));
+
+            var validateProvider = await _authService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
+            if (validateProvider.Error != null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
+                ));
+
+            var userSub = await _authService.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
+            if (userSub == null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED.GetDescription() }
+                ));
+
+            else
+            {
+                var user = await _authService.GetUserByProviderSubAndIdAsync(validateProvider.Sub, provider.Id);
+                var generateToken = await _authService.GenerateTokenJwtAsync(user.Email);
+                return Ok(new ResponseApiSucess(
+                    new { Token = generateToken }
+                ));
+            }
         }
     }
 }

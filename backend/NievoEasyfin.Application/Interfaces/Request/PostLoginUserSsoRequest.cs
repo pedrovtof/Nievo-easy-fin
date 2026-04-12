@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 namespace NievoEasyfin.Application.Interfaces.Request
 {
     /// <summary>
-    /// This class is a template for PostCreateUser
+    /// This class is a template for PostLoginUserSsoAsync
     /// </summary>
-    public class PostCreateUserSsoRequest
+    public class PostLogiPostLoginUserSsoRequest
     {
         /// <summary>
         /// Name of the provider (journey.sso_provider)

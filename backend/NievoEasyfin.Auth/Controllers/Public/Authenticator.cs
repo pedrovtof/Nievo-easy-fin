@@ -28,11 +28,30 @@ namespace NievoEasyfin.Auth.Controllers.Public
         ///     }
         /// </remarks>
         /// <param name="request">Data from user (Email, Password)</param>
-        /// <returns></returns>
         [HttpPost("singin")]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostLoginUserAsync([FromBody] PostLoginUserRequest request)
             => await _authenticatorService.PostLoginUserAsync(request);
+
+
+        /// <summary>
+        /// Endpoint for sso SingIn (login)
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST v1/Users/singup-sso
+        ///     {
+        ///        "provider_name": "google",
+        ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj..."
+        ///     }
+        /// </remarks>
+        /// <param name="request">request.provider_name and request.provider_access_token</param>
+        [HttpPost("singin-sso")]
+        [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PostLoginUserSsoAsync([FromBody] PostLogiPostLoginUserSsoRequest request)
+            => await _authenticatorService.PostLoginUserSsoAsync(request);
     }
 }
