@@ -52,8 +52,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj..."
         ///     }
         /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request">request.provider_name and request.provider_access_token</param>
         [HttpPost("singup-sso")]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]

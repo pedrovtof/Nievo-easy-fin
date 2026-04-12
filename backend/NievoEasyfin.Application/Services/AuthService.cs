@@ -113,6 +113,15 @@ namespace NievoEasyfin.Application.Services.Auth
             => await _ssoProviderAuth.GetProviderByNameAsync(provider);
 
         /// <summary>
+        /// Search User by providerSub and providerId
+        /// </summary>
+        /// <param name="subId">string SubId</param>
+        /// <param name="providerId">int ProviderId</param>
+        /// <returns>UserEntity</returns>
+        public async Task<UserEntity> GetUserByProviderSubAndIdAsync(string subId, int providerId)
+            => await _userModel.GetUserByProviderSubAndIdAsync(subId, providerId);
+
+        /// <summary>
         /// Method to validate the type of provider from sso
         /// </summary>
         /// <param name="provider">SsoProviderEntity</param>

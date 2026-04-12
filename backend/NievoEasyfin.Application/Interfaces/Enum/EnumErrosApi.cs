@@ -127,6 +127,34 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         [Description("The user may not have an account or the password is incorrect")]
         POSTLOGINUSERASYNC_AUTHSERVICE_400_WRONG_PASSWORD,
 
+        /// <summary>
+        /// Provider Sso do not exists
+        /// </summary>
+        [Description("The user may not have an account or the password is incorrect")]
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED,
+
+        /// <summary>
+        /// Provider do not exists
+        /// </summary>
+        [Description("This provider is unknown")]
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED,
+
+        /// <summary>
+        /// Provider do not exists
+        /// </summary>
+        [Description("Invalid provider response")]
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE,
+
+        /// <summary>
+        /// Provider name is null or empty
+        /// </summary>
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NULL_OR_EMPTY,
+
+        /// <summary>
+        /// Provider name is null or empty
+        /// </summary>
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY,
+
         #endregion LoginUserRequest
     }
 }
