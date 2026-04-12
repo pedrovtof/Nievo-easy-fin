@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Interfaces.Response;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NievoEasyfin.Auth.Controllers.Public
 {
@@ -29,6 +30,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// </remarks>
         /// <param name="request">Data from user (Email, Password)</param>
         [HttpPost("singin")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostLoginUserAsync([FromBody] PostLoginUserRequest request)
@@ -49,6 +51,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// </remarks>
         /// <param name="request">request.provider_name and request.provider_access_token</param>
         [HttpPost("singin-sso")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostLoginUserSsoAsync([FromBody] PostLogiPostLoginUserSsoRequest request)

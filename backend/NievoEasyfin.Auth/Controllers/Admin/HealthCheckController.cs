@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ namespace NievoEasyfin.Auth.Controllers.Admin
         /// </summary>
         /// <response code = "200">Return ALIVE message</response>
         [HttpGet("check")]
+        [Authorize]
         public IActionResult HealthCheck()
         {
             var _response = new { message = "Alive" };
@@ -36,6 +38,7 @@ namespace NievoEasyfin.Auth.Controllers.Admin
         /// </summary>
         /// <response code = "200">Return Query check message and a dataframe with random number search in Database</response>
         [HttpGet("database/pgsql/main-node")]
+        [Authorize]
         public async Task<IActionResult> HealthCheckDatabasePgsqlMainNodeAsync()
         {
             string query = "select 10";
@@ -50,6 +53,7 @@ namespace NievoEasyfin.Auth.Controllers.Admin
         /// </summary>
         /// <response code = "200">Return Query check message and a dataframe with random number search in Database</response>
         [HttpGet("database/pgsql/replica-node")]
+        [Authorize]
         public async Task<IActionResult> HealthCheckDatabasePgsqlReplicaNodeAsync()
         {
             string query = "select 10";

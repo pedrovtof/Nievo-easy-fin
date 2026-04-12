@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Interfaces.Response;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NievoEasyfin.Auth.Controllers.Public
 {
@@ -35,6 +36,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// <response code="409">User already exists</response>
         /// <returns>Sucess / Erro</returns>
         [HttpPost("singup")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostCreateUserAsync([FromBody] PostCreateUserRequest request)
@@ -54,6 +56,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// </remarks>
         /// <param name="request">request.provider_name and request.provider_access_token</param>
         [HttpPost("singup-sso")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]

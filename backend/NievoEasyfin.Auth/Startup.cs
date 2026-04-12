@@ -8,6 +8,10 @@ using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Services.Security;
 using FluentValidation;
 using NievoEasyfin.Application.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi;
 
 namespace NievoEasyfin.Auth
 {
@@ -40,14 +44,57 @@ namespace NievoEasyfin.Auth
             services.AddControllers();
             services.AddEndpointsApiExplorer();
 
-
             services.AddSwaggerGen(c =>
             {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "NievoEasyfin Auth API",
+                    Version = "v1"
+                });
+
                 var xmlFileAuth = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPathAuth = Path.Combine(AppContext.BaseDirectory, xmlFileAuth);
                 c.IncludeXmlComments(xmlPathAuth);
+
+                var bearerScheme = new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Informe o token JWT no formato: Bearer {token}"
+                };
+
+                c.AddSecurityDefinition("Bearer", bearerScheme);
+                c.AddSecurityRequirement(document => new Microsoft.OpenApi.OpenApiSecurityRequirement
+                {
+                    [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
+                });
             });
             Console.WriteLine("Configured Swagger with xml paths and endpoints");
+
+            Console.WriteLine("Configuring JWT authentication");
+            var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
+            var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                };
+            });
+
+            services.AddAuthorization();
 
             Console.WriteLine("Creating Database services");
             services.AddDbContext<AuthOrigin>();
@@ -71,8 +118,10 @@ namespace NievoEasyfin.Auth
         // Use this method to configure the HTTP request pipeline.
         public void Configure(WebApplication app, IWebHostEnvironment env)
         {
-            Console.WriteLine("Configuring the app to use Cors, MapControllers and make the app Run");
+            Console.WriteLine("Configuring the app to use Cors, Authentication, Authorization and MapControllers");
             app.UseCors();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
             app.Run();
         }

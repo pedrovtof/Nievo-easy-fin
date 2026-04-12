@@ -1,5 +1,4 @@
 using NievoEasyfin.Auth;
-using System;
 
 Console.WriteLine("Begin the Auth startup");
 
