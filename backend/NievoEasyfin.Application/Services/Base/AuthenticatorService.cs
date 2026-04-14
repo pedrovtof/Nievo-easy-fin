@@ -32,7 +32,10 @@ namespace NievoEasyfin.Application.Services.Base.Authenticator
             var user = await _authService.GetUserByEmailAsync(request.Email);
             if (user == null)
                 return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }
+                    new List<string>() {
+                        EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription(),
+                        EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_BLOCKED.GetDescription()
+                        }
                 ));
 
             var passwordValid = await _authService.ValidateHashPasswordAsync(request.Password, user.Password);
@@ -63,7 +66,10 @@ namespace NievoEasyfin.Application.Services.Base.Authenticator
             var provider = await _authService.GetProviderByNameAsync(request.Provider);
             if (provider == null)
                 return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() }
+                    new List<string>() {
+                        EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription(),
+                        EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE.GetDescription()
+                    }
                 ));
 
             var validateProvider = await _authService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
@@ -81,6 +87,11 @@ namespace NievoEasyfin.Application.Services.Base.Authenticator
             else
             {
                 var user = await _authService.GetUserByProviderSubAndIdAsync(validateProvider.Sub, provider.Id);
+                if (user == null)
+                    return BadRequest(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED.GetDescription() }
+                    ));
+
                 var generateToken = await _authService.GenerateTokenJwtAsync(user.Email);
                 return Ok(new ResponseApiSucess(
                     new { Token = generateToken }

@@ -74,6 +74,12 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED,
 
         /// <summary>
+        /// Provider inactive
+        /// </summary>
+        [Description("This provider may be inactive")]
+        POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE,
+
+        /// <summary>
         /// Provider do not exists
         /// </summary>
         [Description("Invalid provider response")]
@@ -122,7 +128,13 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
 
         /// <summary>
-        /// User not found
+        /// User blocked
+        /// </summary>
+        [Description("The user may be blocked")]
+        POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_BLOCKED,
+
+        /// <summary>
+        /// User with wrong password,
         /// </summary>
         [Description("The user may not have an account or the password is incorrect")]
         POSTLOGINUSERASYNC_AUTHSERVICE_400_WRONG_PASSWORD,
@@ -134,10 +146,22 @@ namespace NievoEasyfin.Application.Interfaces.Enum
         POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED,
 
         /// <summary>
+        /// User blocked
+        /// </summary>
+        [Description("The user may be blocked")]
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED,
+
+        /// <summary>
         /// Provider do not exists
         /// </summary>
         [Description("This provider is unknown")]
         POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED,
+
+        /// <summary>
+        /// Provider inactive
+        /// </summary>
+        [Description("This provider may be inactive")]
+        POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE,
 
         /// <summary>
         /// Provider do not exists

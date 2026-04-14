@@ -22,7 +22,7 @@ namespace NievoEasyfin.Auth.Controllers.Public
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST v1/Users/singup
+        ///     POST v1/Users/singin
         ///     {
         ///        "email": "Joe.Black@example.com",
         ///        "password": "1Meet-Death"
@@ -38,12 +38,12 @@ namespace NievoEasyfin.Auth.Controllers.Public
 
 
         /// <summary>
-        /// Endpoint for sso SingIn (login)
+        /// Endpoint for sso Singin (login)
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST v1/Users/singup-sso
+        ///     POST v1/Users/singin-sso
         ///     {
         ///        "provider_name": "google",
         ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj..."

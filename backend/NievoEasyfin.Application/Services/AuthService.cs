@@ -91,6 +91,14 @@ namespace NievoEasyfin.Application.Services.Auth
         public async Task<UserEntity> GetUserByEmailAsync(string email)
             => await _userModel.GetUserByEmailAsync(email);
 
+        /// <summary>
+        /// Search user by email and status
+        /// </summary>
+        /// <param name="email">email</param>
+        /// <returns>UserEntity</returns>
+        public async Task<UserEntity> GetUserByEmailWithAnyStatusAsync(string email)
+            => await _userModel.GetUserByEmailWithAnyStatusAsync(email);
+
         #endregion User
 
         #region Provider

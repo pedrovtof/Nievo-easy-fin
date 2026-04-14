@@ -82,9 +82,19 @@ namespace NievoEasyfin.Application.Models
         /// Method to get user by email
         /// </summary>
         /// <param name="email">string email</param>
+        /// <param name="statusId">status number</param>
         /// <returns>UserEntity</returns>
-        public async Task<UserEntity> GetUserByEmailAsync(string email)
+        public async Task<UserEntity> GetUserByEmailAsync(string email, int statusId = 1)
+            => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email && x.StatusId == statusId);
+
+        /// <summary>
+        /// Method to get user by email with any status
+        /// </summary>
+        /// <param name="email">string email</param>
+        /// <returns>UserEntity</returns>
+        public async Task<UserEntity> GetUserByEmailWithAnyStatusAsync(string email)
             => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
+
 
         /// <summary>
         /// Method to get user by providerId and subId
@@ -107,6 +117,7 @@ namespace NievoEasyfin.Application.Models
                 WHERE 1=1
                     and ups.sso_provider_id  = @providerId
                     and ups.sub = @subId
+                    and u.status_id = 1
             """);
 
             parameters.Add("providerId", providerId);

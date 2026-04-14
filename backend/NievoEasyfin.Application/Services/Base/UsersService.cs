@@ -31,7 +31,7 @@ namespace NievoEasyfin.Application.Services.Base.Users
 
             string hash = await _authService.ConvertRequestPasswordToStringAsync(request.Password);
 
-            var userEmail = await _authService.GetUserByEmailAsync(request.Email);
+            var userEmail = await _authService.GetUserByEmailWithAnyStatusAsync(request.Email);
             if (userEmail != null)
                 return BadRequest(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS.GetDescription() }
@@ -58,7 +58,10 @@ namespace NievoEasyfin.Application.Services.Base.Users
             var provider = await _authService.GetProviderByNameAsync(request.Provider);
             if (provider == null)
                 return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() }
+                    new List<string>() {
+                        EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription(),
+                        EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE.GetDescription()
+                    }
                 ));
 
             var validateProvider = await _authService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
@@ -70,7 +73,7 @@ namespace NievoEasyfin.Application.Services.Base.Users
             var userSub = await _authService.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
             if (userSub == null)
             {
-                var user = await _authService.GetUserByEmailAsync(validateProvider.Email);
+                var user = await _authService.GetUserByEmailWithAnyStatusAsync(validateProvider.Email);
                 if (user == null)
                     user = await _authService.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
 
@@ -78,7 +81,7 @@ namespace NievoEasyfin.Application.Services.Base.Users
                 return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
             }
             else
-                return StatusCode(200, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
+                return Ok(new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
         }
     }
 }

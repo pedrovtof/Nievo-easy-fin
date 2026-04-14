@@ -44,14 +44,5 @@ namespace NievoEasyfin.Application.Models
         /// <returns>UserProviderSsoEntity</returns>
         public async Task<UserProviderSsoEntity> GetUserProviderSsoBySubAndProviderAsync(string sub, int provider)
             => await _AuthReplicaNodeDatabase.UserProvider.FirstOrDefaultAsync<UserProviderSsoEntity>(x => x.Sub == sub && x.SsoProviderId == provider);
-
-        /// <summary>
-        ///  Search userProviderSso by Provider and User
-        /// </summary>
-        /// <param name="provider">provider Id</param>
-        /// <param name="user">User Id</param>
-        /// <returns>UserProviderSsoEntity</returns>
-        public async Task<UserProviderSsoEntity> GetUserProviderSsoByProviderAndUserAsync(int provider, int user)
-            => await _AuthReplicaNodeDatabase.UserProvider.FirstOrDefaultAsync<UserProviderSsoEntity>(x => x.SsoProviderId == provider && x.UserId == user);
     }
 }
