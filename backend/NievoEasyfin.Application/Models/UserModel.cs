@@ -11,9 +11,9 @@ namespace NievoEasyfin.Application.Models;
 /// </summary>
 public class UserModel : UserEntity
 {
-    private static AuthOrigin _AuthMainNodeDatabase;
+    private readonly AuthOrigin _AuthMainNodeDatabase;
 
-    private static AuthReplica? _AuthReplicaNodeDatabase;
+    private readonly AuthReplica? _AuthReplicaNodeDatabase;
 
     public UserModel(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
     {

@@ -9,9 +9,9 @@ namespace NievoEasyfin.Application.Models;
 /// </summary>
 public class UserProviderSsoModel : UserProviderSsoEntity
 {
-    private static AuthOrigin _AuthMainNodeDatabase;
+    private readonly AuthOrigin _AuthMainNodeDatabase;
 
-    private static AuthReplica? _AuthReplicaNodeDatabase;
+    private readonly AuthReplica? _AuthReplicaNodeDatabase;
 
     public UserProviderSsoModel(AuthOrigin authMainNodeDatabase, AuthReplica authReplicaNodeDatabase)
     {

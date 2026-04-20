@@ -10,7 +10,7 @@ namespace NievoEasyfin.Application.Services.Base.Authenticator;
 
 public class AuthenticatorService : Controller
 {
-    private static AuthService _authService;
+    private readonly AuthService _authService;
 
     public AuthenticatorService(AuthService authService)
     {

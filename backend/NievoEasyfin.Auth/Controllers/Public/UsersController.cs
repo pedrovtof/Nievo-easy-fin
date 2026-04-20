@@ -10,7 +10,7 @@ namespace NievoEasyfin.Auth.Controllers.Public;
 [Route("api/public/v1/[controller]")]
 public class UsersController : Controller
 {
-    private static UsersService _usersService;
+    private readonly UsersService _usersService;
 
     public UsersController(UsersService users)
     {

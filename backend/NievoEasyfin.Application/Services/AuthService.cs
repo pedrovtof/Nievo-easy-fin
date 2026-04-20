@@ -3,6 +3,8 @@ using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Services.Security;
+using NievoEasyfin.Application.Services.Cache;
+using NievoEasyfin.Application.Data.Cache.Views;
 namespace NievoEasyfin.Application.Services.Auth;
 
 /// <summary>
@@ -10,19 +12,22 @@ namespace NievoEasyfin.Application.Services.Auth;
 /// </summary>
 public class AuthService
 {
-    private static CryptoPasswordService _cryptoPasswordService;
+    private readonly CryptoPasswordService _cryptoPasswordService;
 
-    private static UserModel _userModel;
+    private readonly UserModel _userModel;
 
-    private static SSoProviderAuth _ssoProviderAuth;
+    private readonly AuthDbCacheService _authDbCacheService;
 
-    private static UserProviderSsoModel _userProviderSsoModel;
+    private readonly SSoProviderAuth _ssoProviderAuth;
 
-    private static JsonWebTokenService _jsonWebTokenService;
+    private readonly UserProviderSsoModel _userProviderSsoModel;
+
+    private readonly JsonWebTokenService _jsonWebTokenService;
 
     public AuthService(
         CryptoPasswordService cryptoPasswordService,
         UserModel userModel,
+        AuthDbCacheService authDbCacheService,
         SSoProviderAuth ssoProviderAuth,
         UserProviderSsoModel userProviderSsoModel,
         JsonWebTokenService jsonWebTokenService
@@ -30,6 +35,7 @@ public class AuthService
     {
         _cryptoPasswordService = cryptoPasswordService;
         _userModel = userModel;
+        _authDbCacheService = authDbCacheService;
         _ssoProviderAuth = ssoProviderAuth;
         _userProviderSsoModel = userProviderSsoModel;
         _jsonWebTokenService = jsonWebTokenService;
@@ -151,4 +157,15 @@ public class AuthService
         => await _jsonWebTokenService.GenerateTokenAsync(email);
 
     #endregion Token
+
+    #region ResetPassword
+
+    public async Task<TokenPasswordResetView?> GetTokenPasswordResetAttempAsync(int userId)
+        => await _authDbCacheService.GetTokenPasswordResetAttempAsync(userId);
+
+    public async Task<bool> CreateTokenPasswordResetAttempAsync(int userId, string email)
+        => await _authDbCacheService.CreateTokenPasswordResetAttempAsync(userId, email);
+
+    #endregion ResetPassword
+
 }

@@ -199,5 +199,8 @@ public enum EnumErrosApi
     [Description("Email not found, validate if you typed it correctly")]
     PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND,
 
+    [Description("The user may not have an account or may need to wait a bit longer for another token.")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE,
+
     #endregion ResetPasswordRequest
 }

@@ -20,7 +20,6 @@ public abstract class AuthDbContext : DbContext
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<UserStatusEntity> UserStatuses { get; set; }
     public DbSet<UserTypeEntity> UserTypes { get; set; }
-    public DbSet<TokenConfigEntity> TokenConfig { get; set; }
     public DbSet<SsoProviderEntity> SsoProvider { get; set; }
     public DbSet<UserProviderSsoEntity> UserProvider { get; set; }
 

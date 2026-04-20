@@ -12,8 +12,8 @@ namespace NievoEasyfin.Auth.Controllers.Admin;
 [Route("api/private/v1/[controller]")]
 public class HealthCheckController : ControllerBase
 {
-    private static AuthOrigin _AuthMainNodeDatabase;
-    private static AuthReplica _AuthReplicaNodeDatabase;
+    private readonly AuthOrigin _AuthMainNodeDatabase;
+    private readonly AuthReplica _AuthReplicaNodeDatabase;
 
     public HealthCheckController(AuthOrigin AuthMainNodeDatabase, AuthReplica AuthReplicaNodeDatabase)
     {

@@ -1,6 +1,6 @@
 using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
-using NievoEasyfin.Application.Data.Context.Cache;
+using NievoEasyfin.Application.Services.Cache;
 using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
@@ -74,17 +74,24 @@ public class Startup
         services.AddDbContext<AuthReplica>();
 
         Console.WriteLine("Creating Database Cache services");
-        services.AddSingleton<AuthDbCacheContext>();
+        services.AddSingleton<AuthDbCacheService>();
 
         Console.WriteLine("Creating Transient services");
         services.AddTransient<JsonWebTokenConfiguration>();
 
         Console.WriteLine("Creating context services");
+
+        // Others
         services.AddScoped<JsonWebTokenService>();
         services.AddScoped<SSoProviderAuth>();
+
+        // Model
+        services.AddScoped<AuthDbCacheService>();
         services.AddScoped<UserModel>();
         services.AddScoped<UserProviderSsoModel>();
         services.AddScoped<UserProviderSsoModel>();
+
+        // Service 
         services.AddScoped<CryptoPasswordService>();
         services.AddScoped<AuthenticatorService>();
         services.AddScoped<AuthService>();

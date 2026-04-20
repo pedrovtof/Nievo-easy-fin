@@ -12,7 +12,7 @@ namespace NievoEasyfin.Application.Services.Base.Users;
 
 public class UsersService : Controller
 {
-    private static AuthService _authService;
+    private readonly AuthService _authService;
 
     public UsersService(AuthService authService)
     {
@@ -106,15 +106,19 @@ public class UsersService : Controller
                     new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
             ));
 
-        // TODO: Criar model para Token password reset
         // TODO: Criar model para SMTP 
         // TODO: Adicionar SMTP na chamada para enviar email
-        // TODO: Registar configuraçoes do token na DB ou ENV
         // TODO: Adicionar teste no healtCheck
 
-        AuthDbCacheContext db = new AuthDbCacheContext();
-        var teste = await db.TesteConnectionCacheAsync();
-
-        return Ok();
+        var tokenResetPassword = await _authService.GetTokenPasswordResetAttempAsync(user.Id);
+        if (tokenResetPassword == null)
+        {
+            await _authService.CreateTokenPasswordResetAttempAsync(user.Id, user.Email);
+            return Ok();
+        }
+        else
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() }
+            ));
     }
 }
