@@ -6,6 +6,8 @@ using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Extensions.Enum;
 using NievoEasyfin.Application.Services.Auth;
 
+using NievoEasyfin.Application.Data.Context.Cache;
+
 namespace NievoEasyfin.Application.Services.Base.Users;
 
 public class UsersService : Controller
@@ -110,7 +112,8 @@ public class UsersService : Controller
         // TODO: Registar configuraçoes do token na DB ou ENV
         // TODO: Adicionar teste no healtCheck
 
-
+        AuthDbCacheContext db = new AuthDbCacheContext();
+        var teste = await db.TesteConnectionCacheAsync();
 
         return Ok();
     }

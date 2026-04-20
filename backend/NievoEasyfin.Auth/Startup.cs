@@ -1,5 +1,6 @@
 using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Data.Context.Cache;
 using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
@@ -44,6 +45,65 @@ public class Startup
         services.AddControllers();
         services.AddEndpointsApiExplorer();
 
+        ConfigureSwagger(services);
+
+        Console.WriteLine("Configuring JWT authentication");
+        var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
+        var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
+        });
+
+        services.AddAuthorization();
+
+        Console.WriteLine("Creating Database services");
+        services.AddDbContext<AuthOrigin>();
+        services.AddDbContext<AuthReplica>();
+
+        Console.WriteLine("Creating Database Cache services");
+        services.AddSingleton<AuthDbCacheContext>();
+
+        Console.WriteLine("Creating Transient services");
+        services.AddTransient<JsonWebTokenConfiguration>();
+
+        Console.WriteLine("Creating context services");
+        services.AddScoped<JsonWebTokenService>();
+        services.AddScoped<SSoProviderAuth>();
+        services.AddScoped<UserModel>();
+        services.AddScoped<UserProviderSsoModel>();
+        services.AddScoped<UserProviderSsoModel>();
+        services.AddScoped<CryptoPasswordService>();
+        services.AddScoped<AuthenticatorService>();
+        services.AddScoped<AuthService>();
+        services.AddScoped<UsersService>();
+    }
+
+    // Use this method to configure the HTTP request pipeline.
+    public void Configure(WebApplication app, IWebHostEnvironment env)
+    {
+        Console.WriteLine("Configuring the app to use Cors, Authentication, Authorization and MapControllers");
+        app.UseCors();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.Run();
+    }
+
+    public void ConfigureSwagger(IServiceCollection services)
+    {
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo
@@ -73,56 +133,5 @@ public class Startup
             });
         });
         Console.WriteLine("Configured Swagger with xml paths and endpoints");
-
-        Console.WriteLine("Configuring JWT authentication");
-        var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
-        var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
-
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.SaveToken = true;
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(5)
-            };
-        });
-
-        services.AddAuthorization();
-
-        Console.WriteLine("Creating Database services");
-        services.AddDbContext<AuthOrigin>();
-        services.AddDbContext<AuthReplica>();
-
-        Console.WriteLine("Creating Transient services");
-        services.AddTransient<JsonWebTokenConfiguration>();
-
-        Console.WriteLine("Creating context services");
-        services.AddScoped<JsonWebTokenService>();
-        services.AddScoped<SSoProviderAuth>();
-        services.AddScoped<UserModel>();
-        services.AddScoped<UserProviderSsoModel>();
-        services.AddScoped<UserProviderSsoModel>();
-        services.AddScoped<CryptoPasswordService>();
-        services.AddScoped<AuthenticatorService>();
-        services.AddScoped<AuthService>();
-        services.AddScoped<UsersService>();
-    }
-
-    // Use this method to configure the HTTP request pipeline.
-    public void Configure(WebApplication app, IWebHostEnvironment env)
-    {
-        Console.WriteLine("Configuring the app to use Cors, Authentication, Authorization and MapControllers");
-        app.UseCors();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.MapControllers();
-        app.Run();
     }
 }
