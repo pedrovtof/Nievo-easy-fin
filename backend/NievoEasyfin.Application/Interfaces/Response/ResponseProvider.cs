@@ -1,63 +1,62 @@
 using System.Text.Json.Serialization;
 
-namespace NievoEasyfin.Application.Interfaces.Response
+namespace NievoEasyfin.Application.Interfaces.Response;
+
+/// <summary>
+/// Class template for response from provider SSO
+/// </summary>
+public class ResponseProvider
 {
     /// <summary>
-    /// Class template for response from provider SSO
+    /// Unique Id
     /// </summary>
-    public class ResponseProvider
+    [JsonPropertyName("sub")]
+    public string? Sub { get; set; }
+
+    /// <summary>
+    /// Name of the user
+    /// </summary>
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// First name
+    /// </summary>
+    [JsonPropertyName("given_name")]
+    public string? GivenName { get; set; }
+
+    /// <summary>
+    /// Last name
+    /// </summary>
+    [JsonPropertyName("family_name")]
+    public string? FamilyName { get; set; }
+
+    /// <summary>
+    /// Url for picture
+    /// </summary>
+    [JsonPropertyName("picture")]
+    public string? Picture { get; set; }
+
+    /// <summary>
+    /// Email
+    /// </summary>
+    [JsonPropertyName("email")]
+    public string? Email { get; set; }
+
+    /// <summary>
+    /// Has some error the request
+    /// </summary>
+    [JsonPropertyName("error")]
+    public string? Error { get; set; }
+
+    /// <summary>
+    /// Project Id from GCP
+    /// </summary>
+    [JsonPropertyName("aud")]
+    public string? Aud { get; set; }
+
+    public void WithError(string error)
     {
-        /// <summary>
-        /// Unique Id
-        /// </summary>
-        [JsonPropertyName("sub")]
-        public string? Sub { get; set; }
-
-        /// <summary>
-        /// Name of the user
-        /// </summary>
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// First name
-        /// </summary>
-        [JsonPropertyName("given_name")]
-        public string? GivenName { get; set; }
-
-        /// <summary>
-        /// Last name
-        /// </summary>
-        [JsonPropertyName("family_name")]
-        public string? FamilyName { get; set; }
-
-        /// <summary>
-        /// Url for picture
-        /// </summary>
-        [JsonPropertyName("picture")]
-        public string? Picture { get; set; }
-
-        /// <summary>
-        /// Email
-        /// </summary>
-        [JsonPropertyName("email")]
-        public string? Email { get; set; }
-
-        /// <summary>
-        /// Has some error the request
-        /// </summary>
-        [JsonPropertyName("error")]
-        public string? Error { get; set; }
-
-        /// <summary>
-        /// Project Id from GCP
-        /// </summary>
-        [JsonPropertyName("aud")]
-        public string? Aud { get; set; }
-
-        public void WithError(string error)
-        {
-            Error = error;
-        }
+        Error = error;
     }
 }
