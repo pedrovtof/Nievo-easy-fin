@@ -22,7 +22,7 @@ public class AuthenticatorController : Controller
     /// <remarks>
     /// Sample request:
     ///
-    ///     POST v1/Users/singin
+    ///     POST v1/Authenticator/singin
     ///     {
     ///        "email": "Joe.Black@example.com",
     ///        "password": "1Meet-Death"
@@ -43,7 +43,7 @@ public class AuthenticatorController : Controller
     /// <remarks>
     /// Sample request:
     ///
-    ///     POST v1/Users/singin-sso
+    ///     POST v1/Authenticator/singin-sso
     ///     {
     ///        "provider_name": "google",
     ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj..."
@@ -56,4 +56,24 @@ public class AuthenticatorController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostLoginUserSsoAsync([FromBody] PostLogiPostLoginUserSsoRequest request)
         => await _authenticatorService.PostLoginUserSsoAsync(request);
+
+    /// <summary>
+    /// Endpoint to create token for reset password
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST v1/Authenticator/password-reset
+    ///     {
+    ///        "Email": "Joe.Black@example.com"
+    ///     }
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("password-reset")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostResetPasswordAsync([FromBody] PostResetPasswordRequest request)
+        => await _authenticatorService.PostResetPasswordAsync(request);
 }

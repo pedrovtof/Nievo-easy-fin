@@ -8,12 +8,12 @@ namespace NievoEasyfin.Application.Interfaces.Validator;
 /// <summary>
 /// Class template for abstractorValidator in PatchResetPassword
 /// </summary>
-public class PatchResetPasswordValidator : AbstractValidator<PatchResetPasswordRequest>
+public class PostResetPasswordValidator : AbstractValidator<PostResetPasswordRequest>
 {
     /// <summary>
     /// Constructor  to validate resquest PatchResetPassword
     /// </summary>
-    public PatchResetPasswordValidator()
+    public PostResetPasswordValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty()

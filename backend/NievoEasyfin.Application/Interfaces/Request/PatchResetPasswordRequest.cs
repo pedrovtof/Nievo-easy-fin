@@ -5,7 +5,7 @@ namespace NievoEasyfin.Application.Interfaces.Request;
 /// <summary>
 /// This class is a template for PatchResetPassword
 /// </summary>
-public class PatchResetPasswordRequest
+public class PostResetPasswordRequest
 {
     /// <summary>
     /// User email

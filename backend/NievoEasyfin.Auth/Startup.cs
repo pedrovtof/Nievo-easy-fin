@@ -2,7 +2,6 @@ using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
 using NievoEasyfin.Application.Services.Cache;
 using NievoEasyfin.Application.Services.Base.Users;
-using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Infrastructure.Auth;
@@ -94,7 +93,6 @@ public class Startup
         // Service 
         services.AddScoped<CryptoPasswordService>();
         services.AddScoped<AuthenticatorService>();
-        services.AddScoped<AuthService>();
         services.AddScoped<UsersService>();
     }
 

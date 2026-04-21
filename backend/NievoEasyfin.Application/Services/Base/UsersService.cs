@@ -4,19 +4,36 @@ using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Extensions.Enum;
-using NievoEasyfin.Application.Services.Auth;
 
 using NievoEasyfin.Application.Data.Context.Cache;
+using NievoEasyfin.Application.Services.Security;
+using NievoEasyfin.Application.Models;
+using NievoEasyfin.Application.Infrastructure.Auth;
 
 namespace NievoEasyfin.Application.Services.Base.Users;
 
 public class UsersService : Controller
 {
-    private readonly AuthService _authService;
+    private readonly CryptoPasswordService _cryptoPasswordService;
 
-    public UsersService(AuthService authService)
+    private readonly UserModel _userModel;
+
+    private readonly SSoProviderAuth _ssoProviderAuth;
+
+    private readonly UserProviderSsoModel _userProviderSsoModel;
+
+
+    public UsersService(
+        CryptoPasswordService cryptoPasswordService,
+        UserModel userModel,
+        UserProviderSsoModel userProviderSsoModel,
+        SSoProviderAuth ssoProviderAuth
+    )
     {
-        _authService = authService;
+        _cryptoPasswordService = cryptoPasswordService;
+        _userModel = userModel;
+        _userProviderSsoModel = userProviderSsoModel;
+        _ssoProviderAuth = ssoProviderAuth;
     }
 
     /// <summary>
@@ -32,15 +49,15 @@ public class UsersService : Controller
                 new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        string hash = await _authService.ConvertRequestPasswordToStringAsync(request.Password);
+        string hash = await _cryptoPasswordService.HashPasswordAsync(request.Password);
 
-        var userEmail = await _authService.GetUserByEmailWithAnyStatusAsync(request.Email);
+        var userEmail = await _userModel.GetUserByEmailWithAnyStatusAsync(request.Email);
         if (userEmail != null)
             return BadRequest(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS.GetDescription() }
             ));
 
-        var user = await _authService.CreateUserAsync(request.Name, hash, request.Email);
+        var user = await _userModel.CreateUserAsync(request.Name, hash, request.Email);
 
         return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
     }
@@ -58,7 +75,7 @@ public class UsersService : Controller
                 new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        var provider = await _authService.GetProviderByNameAsync(request.Provider);
+        var provider = await _ssoProviderAuth.GetProviderByNameAsync(request.Provider);
         if (provider == null)
             return BadRequest(new ResponseApiError(
                 new List<string>() {
@@ -67,58 +84,23 @@ public class UsersService : Controller
                 }
             ));
 
-        var validateProvider = await _authService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
+        var validateProvider = await _ssoProviderAuth.ValidateProviderAsync(provider.Name, request.ProviderAccessToken);
         if (validateProvider.Error != null)
             return BadRequest(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
             ));
 
-        var userSub = await _authService.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
+        var userSub = await _userProviderSsoModel.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
         if (userSub == null)
         {
-            var user = await _authService.GetUserByEmailWithAnyStatusAsync(validateProvider.Email);
+            var user = await _userModel.GetUserByEmailWithAnyStatusAsync(validateProvider.Email);
             if (user == null)
-                user = await _authService.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
+                user = await _userModel.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
 
-            var userProviderSso = await _authService.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
+            var userProviderSso = await _userProviderSsoModel.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
             return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
         }
         else
             return Ok(new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
-    }
-
-    /// <summary>
-    /// Method service for reset password
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    public async Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request)
-    {
-        var validationResult = await new PatchResetPasswordValidator().ValidateAsync(request);
-        if (!validationResult.IsValid)
-            return BadRequest(
-                new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
-            );
-
-        var user = await _authService.GetUserByEmailAsync(request.Email);
-        if (user == null)
-            return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
-            ));
-
-        // TODO: Criar model para SMTP 
-        // TODO: Adicionar SMTP na chamada para enviar email
-        // TODO: Adicionar teste no healtCheck
-
-        var tokenResetPassword = await _authService.GetTokenPasswordResetAttempAsync(user.Id);
-        if (tokenResetPassword == null)
-        {
-            await _authService.CreateTokenPasswordResetAttempAsync(user.Id, user.Email);
-            return Ok();
-        }
-        else
-            return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() }
-            ));
     }
 }

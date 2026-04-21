@@ -62,11 +62,4 @@ public class UsersController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostCreateUserSsoAsync([FromBody] PostCreateUserSsoRequest request)
         => await _usersService.PostCreateUserSsoAsync(request);
-
-    [HttpPatch("password-reset")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PatchResetPasswordAsync([FromBody] PatchResetPasswordRequest request)
-        => await _usersService.PatchResetPasswordAsync(request);
 }

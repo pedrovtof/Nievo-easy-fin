@@ -1,20 +1,46 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Extensions.Enum;
+using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Interfaces.Validator;
-using NievoEasyfin.Application.Services.Auth;
+using NievoEasyfin.Application.Models;
+using NievoEasyfin.Application.Services.Cache;
+using NievoEasyfin.Application.Services.Security;
 
 namespace NievoEasyfin.Application.Services.Base.Authenticator;
 
 public class AuthenticatorService : Controller
 {
-    private readonly AuthService _authService;
+    private readonly CryptoPasswordService _cryptoPasswordService;
 
-    public AuthenticatorService(AuthService authService)
+    private readonly UserModel _userModel;
+
+    private readonly AuthDbCacheService _authDbCacheService;
+
+    private readonly UserProviderSsoModel _userProviderSsoModel;
+
+    private readonly JsonWebTokenService _jsonWebTokenService;
+
+    private readonly SSoProviderAuth _ssoProviderAuth;
+
+
+    public AuthenticatorService(
+        CryptoPasswordService cryptoPasswordService,
+        AuthDbCacheService authDbCacheService,
+        UserModel userModel,
+        UserProviderSsoModel userProviderSsoModel,
+        JsonWebTokenService jsonWebTokenService,
+        SSoProviderAuth ssoProviderAuth
+    )
     {
-        _authService = authService;
+        _cryptoPasswordService = cryptoPasswordService;
+        _authDbCacheService = authDbCacheService;
+        _userModel = userModel;
+        _userProviderSsoModel = userProviderSsoModel;
+        _jsonWebTokenService = jsonWebTokenService;
+        _ssoProviderAuth = ssoProviderAuth;
     }
 
     /// <summary>
@@ -29,7 +55,7 @@ public class AuthenticatorService : Controller
                 new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        var user = await _authService.GetUserByEmailAsync(request.Email);
+        var user = await _userModel.GetUserByEmailAsync(request.Email);
         if (user == null)
             return BadRequest(new ResponseApiError(
                 new List<string>() {
@@ -38,13 +64,13 @@ public class AuthenticatorService : Controller
                     }
             ));
 
-        var passwordValid = await _authService.ValidateHashPasswordAsync(request.Password, user.Password);
+        var passwordValid = await _cryptoPasswordService.HashValidateAsync(request.Password, user.Password);
         if (!passwordValid)
             return BadRequest(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_400_WRONG_PASSWORD.GetDescription() }
             ));
 
-        var generateToken = await _authService.GenerateTokenJwtAsync(user.Email);
+        var generateToken = await _jsonWebTokenService.GenerateTokenAsync(user.Email);
 
         return Ok(new ResponseApiSucess(
             new { Token = generateToken }
@@ -63,7 +89,7 @@ public class AuthenticatorService : Controller
                 new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        var provider = await _authService.GetProviderByNameAsync(request.Provider);
+        var provider = await _ssoProviderAuth.GetProviderByNameAsync(request.Provider);
         if (provider == null)
             return BadRequest(new ResponseApiError(
                 new List<string>() {
@@ -72,13 +98,13 @@ public class AuthenticatorService : Controller
                 }
             ));
 
-        var validateProvider = await _authService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
+        var validateProvider = await _ssoProviderAuth.ValidateProviderAsync(provider.Name, request.ProviderAccessToken);
         if (validateProvider.Error != null)
             return BadRequest(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
             ));
 
-        var userSub = await _authService.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
+        var userSub = await _userProviderSsoModel.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
         if (userSub == null)
             return BadRequest(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED.GetDescription() }
@@ -86,16 +112,51 @@ public class AuthenticatorService : Controller
 
         else
         {
-            var user = await _authService.GetUserByProviderSubAndIdAsync(validateProvider.Sub, provider.Id);
+            var user = await _userModel.GetUserByProviderSubAndIdAsync(validateProvider.Sub, provider.Id);
             if (user == null)
                 return BadRequest(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED.GetDescription() }
                 ));
 
-            var generateToken = await _authService.GenerateTokenJwtAsync(user.Email);
+            var generateToken = await _jsonWebTokenService.GenerateTokenAsync(user.Email);
             return Ok(new ResponseApiSucess(
                 new { Token = generateToken }
             ));
         }
+    }
+
+    /// <summary>
+    /// Method service for reset password
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request)
+    {
+        var validationResult = await new PostResetPasswordValidator().ValidateAsync(request);
+        if (!validationResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        var user = await _userModel.GetUserByEmailAsync(request.Email);
+        if (user == null)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
+            ));
+
+        // TODO: Criar model para SMTP 
+        // TODO: Adicionar SMTP na chamada para enviar email
+        // TODO: Adicionar teste no healtCheck
+
+        var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempAsync(user.Id);
+        if (tokenResetPassword == null)
+        {
+            await _authDbCacheService.CreateTokenPasswordResetAttempAsync(user.Id, user.Email);
+            return Ok(new ResponseApiSucess(null));
+        }
+        else
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() }
+            ));
     }
 }
