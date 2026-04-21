@@ -34,7 +34,6 @@ public class UsersController : Controller
     /// <response code="201">Create with sucess</response>
     /// <response code="400">Invalid request</response>
     /// <response code="409">User already exists</response>
-    /// <returns>Sucess / Erro</returns>
     [HttpPost("singup")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]

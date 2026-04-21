@@ -128,8 +128,7 @@ public class AuthenticatorService : Controller
     /// <summary>
     /// Method service for reset password
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    /// <param name="request">request.email</param>
     public async Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request)
     {
         var validationResult = await new PostResetPasswordValidator().ValidateAsync(request);
@@ -141,22 +140,41 @@ public class AuthenticatorService : Controller
         var user = await _userModel.GetUserByEmailAsync(request.Email);
         if (user == null)
             return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
+                    new List<string>() { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
             ));
 
         // TODO: Criar model para SMTP 
         // TODO: Adicionar SMTP na chamada para enviar email
         // TODO: Adicionar teste no healtCheck
 
-        var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempAsync(user.Id);
+        var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempByUserIdAsync(user.Id);
         if (tokenResetPassword == null)
         {
             await _authDbCacheService.CreateTokenPasswordResetAttempAsync(user.Id, user.Email);
-            return Ok(new ResponseApiSucess(null));
+            return StatusCode(
+                201,
+                new ResponseApiSucess(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_201_USER_TOKEN.GetDescription()
+            ));
         }
         else
             return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() }
+                    new List<string>() { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() }
             ));
+    }
+
+    /// <summary>
+    /// Method service to change password in database
+    /// </summary>
+    /// <param name="request">requset.pin_token and request.email</param>
+    /// <returns></returns>
+    public async Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request)
+    {
+        var validationResult = await new PatchResetPasswordValidator().ValidateAsync(request);
+        if (!validationResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        return Ok();
     }
 }
