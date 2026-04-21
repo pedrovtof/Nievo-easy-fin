@@ -83,8 +83,10 @@ public class Startup
         // Others
         services.AddScoped<JsonWebTokenService>();
         services.AddScoped<SSoProviderAuth>();
+        services.AddScoped<SmtpProvider>();
 
         // Model
+        services.AddScoped<SmtpModel>();
         services.AddScoped<AuthDbCacheService>();
         services.AddScoped<UserModel>();
         services.AddScoped<UserProviderSsoModel>();

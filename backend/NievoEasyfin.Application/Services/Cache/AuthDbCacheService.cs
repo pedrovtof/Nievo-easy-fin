@@ -37,7 +37,7 @@ namespace NievoEasyfin.Application.Services.Cache
         /// <param name="userId">int</param>
         /// <param name="email">string</param>
         /// <returns>True</returns>
-        public async Task<bool> CreateTokenPasswordResetAttempAsync(int userId, string email)
+        public async Task<TokenPasswordResetEntity> CreateTokenPasswordResetAttempAsync(int userId, string email)
         {
             var tk = new TokenPasswordResetEntity
             {
@@ -51,7 +51,7 @@ namespace NievoEasyfin.Application.Services.Cache
             var serialized = JsonSerializer.Serialize(tk);
             await Conn.StringSetAsync(key, serialized, TimeSpan.FromSeconds(CACHE_DATABASE_DEFAULT_TTL));
 
-            return true;
+            return tk;
         }
     }
 }

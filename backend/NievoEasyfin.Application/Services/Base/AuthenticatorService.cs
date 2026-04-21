@@ -25,6 +25,8 @@ public class AuthenticatorService : Controller
 
     private readonly SSoProviderAuth _ssoProviderAuth;
 
+    private readonly SmtpModel _smtpModel;
+
 
     public AuthenticatorService(
         CryptoPasswordService cryptoPasswordService,
@@ -32,7 +34,9 @@ public class AuthenticatorService : Controller
         UserModel userModel,
         UserProviderSsoModel userProviderSsoModel,
         JsonWebTokenService jsonWebTokenService,
-        SSoProviderAuth ssoProviderAuth
+        SSoProviderAuth ssoProviderAuth,
+        SmtpProvider smtpProvider,
+        SmtpModel smtpModel
     )
     {
         _cryptoPasswordService = cryptoPasswordService;
@@ -41,6 +45,7 @@ public class AuthenticatorService : Controller
         _userProviderSsoModel = userProviderSsoModel;
         _jsonWebTokenService = jsonWebTokenService;
         _ssoProviderAuth = ssoProviderAuth;
+        _smtpModel = smtpModel;
     }
 
     /// <summary>
@@ -143,14 +148,15 @@ public class AuthenticatorService : Controller
                     new List<string>() { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
             ));
 
-        // TODO: Criar model para SMTP 
-        // TODO: Adicionar SMTP na chamada para enviar email
         // TODO: Adicionar teste no healtCheck
 
         var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempByUserIdAsync(user.Id);
         if (tokenResetPassword == null)
         {
-            await _authDbCacheService.CreateTokenPasswordResetAttempAsync(user.Id, user.Email);
+            var tk = await _authDbCacheService.CreateTokenPasswordResetAttempAsync(user.Id, user.Email);
+
+            var smtp = await _smtpModel.ResetTokenMailAsync(user.Email, tk.PinToken);
+
             return StatusCode(
                 201,
                 new ResponseApiSucess(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_201_USER_TOKEN.GetDescription()

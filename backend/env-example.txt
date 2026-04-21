@@ -36,3 +36,17 @@ CACHE_DATABASE_RETRY_POLICY_MIN_CONNECT = "500"
 CACHE_DATABASE_RETRY_POLICY_MAX_CONNECT = "1000"
 # Abort on connect true/false
 CACHE_DATABASE_ABORT_ON_CONNECT_FAIL = "false"
+
+
+# SMTP envs
+# You should take a look at 
+# NievoEasyfin.Application/Infrastructure/Auth/SmtpProvider.cs
+# SendMailFromToAsync => SecureSocketOptions.XPTO
+SMTP_DEFAULT_FROM_ADRESS_MAIL = ""
+SMTP_SERVER_USER_NAME = ""
+SMTP_SERVER_USER_PASSWORD = ""
+SMTP_SERVER_HOST = ""
+SMTP_SERVER_PORT = ""
+
+# MAIL TEMPLATES envs
+PATH_MAIL_BODY_TEMPLATE_PASSWORD_RESET_TOKEN = "/full/path/file.txt"
