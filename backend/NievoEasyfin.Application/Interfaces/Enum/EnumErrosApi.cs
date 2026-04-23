@@ -197,7 +197,7 @@ public enum EnumErrosApi
     /// Email not found, validate if you typed it correctly
     /// </summary>
     [Description("Email not found, validate if you typed it correctly")]
-    POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND,
+    POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND,
 
     [Description("The user may not have an account or may need to wait a bit longer for another token.")]
     POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE,
@@ -219,9 +219,59 @@ public enum EnumErrosApi
     /// Email not found, validate if you typed it correctly
     /// </summary>
     [Description("Email not found, validate if you typed it correctly")]
-    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND,
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND,
 
+    /// <summary>
+    /// The user may not have an account or may need to request another token.
+    /// </summary>
+    [Description("The user may not have an account or may need to request another token.")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_TOKEN_NOT_FOUND_IN_CACHE,
 
+    /// <summary>
+    /// 
+    /// </summary>
+    [Description("The token is not valid")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_TOKEN_INVALID,
+
+    /// <summary>
+    /// Password reset with sucess
+    /// </summary>
+    [Description("The token is not valid")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_RESET,
+
+    /// <summary>
+    /// Password must not be empty
+    /// </summary>
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL,
+
+    /// <summary>
+    /// The password must be between 6 and 12 letters
+    /// </summary>
+    [Description("The token is not valid")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WITH_WRONG_LENGHT,
+
+    /// <summary>
+    /// Password must have at least one uppercase letter, one lowercase letter, one number and one special character
+    /// </summary>
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WRONG_FORMAT,
+
+    /// <summary>
+    /// The new password must not be the same as the current one.
+    /// </summary>
+    [Description("The new password must not be the same as the current one")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_IS_THE_SAME,
+
+    /// <summary>
+    /// A error was ocurred, please try again latter.
+    /// </summary>
+    [Description("An error has happened during the operation. Please try again later.")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_NOT_UPDATED,
+
+    /// <summary>
+    /// Password changed.
+    /// </summary>
+    [Description("Password changed.")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED,
 
     #endregion ResetPasswordRequest
 }

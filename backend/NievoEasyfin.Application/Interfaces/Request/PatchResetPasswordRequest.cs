@@ -18,4 +18,10 @@ public class PatchResetPasswordRequest
     /// </summary>
     [JsonPropertyName("pin_token")]
     public string PinToken { get; set; }
+
+    /// <summary>
+    /// New Password
+    /// </summary>
+    [JsonPropertyName("password")]
+    public string Password { get; set; }
 }

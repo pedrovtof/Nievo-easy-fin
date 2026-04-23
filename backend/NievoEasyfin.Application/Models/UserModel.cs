@@ -32,7 +32,6 @@ public class UserModel : UserEntity
     /// <returns>UserView</returns>
     public async Task<UserEntity> CreateUserAsync(string name, string password, string email, int statusId = 1, int? phone = null)
     {
-
         UserEntity user = new UserEntity()
         {
             Name = name,
@@ -131,5 +130,23 @@ public class UserModel : UserEntity
         );
 
         return dataFrame;
+    }
+
+    /// <summary>
+    /// Method to update user password
+    /// </summary>
+    /// <param name="userId">User id</param>
+    /// <param name="password">New hashed password</param>
+    /// <returns>true if password was updated successfully, false otherwise</returns>
+    public async Task<bool> UpdateUserPasswordAsync(int userId, string password)
+    {
+        int rowsAffected = await _AuthMainNodeDatabase.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(u => u.Password, password)
+                .SetProperty(u => u.UpdatedAt, DateTime.Now)
+            );
+
+        return rowsAffected > 0 ? true : false; ;
     }
 }

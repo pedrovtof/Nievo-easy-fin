@@ -1,6 +1,7 @@
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
 using FluentValidation;
+using NievoEasyfin.Application.Helper;
 
 namespace NievoEasyfin.Application.Interfaces.Validator;
 
@@ -9,6 +10,8 @@ namespace NievoEasyfin.Application.Interfaces.Validator;
 /// </summary>
 public class PatchResetPasswordValidator : AbstractValidator<PatchResetPasswordRequest>
 {
+    private static PasswordValidatorHelper _passwordValidatorHelper = new PasswordValidatorHelper();
+
     /// <summary>
     /// Constructor  to validate resquest PatchResetPassword
     /// </summary>
@@ -23,5 +26,13 @@ public class PatchResetPasswordValidator : AbstractValidator<PatchResetPasswordR
         RuleFor(x => x.PinToken)
             .NotEmpty()
                 .WithErrorCode(EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL.ToString());
+
+        RuleFor(x => x.Password)
+            .NotEmpty()
+                .WithErrorCode(EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL.ToString())
+            .Length(6, 12)
+                .WithErrorCode(EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WITH_WRONG_LENGHT.ToString())
+            .Must((x) => _passwordValidatorHelper.ValidatePasswordRegex(x))
+                .WithErrorCode(EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WRONG_FORMAT.ToString());
     }
 }

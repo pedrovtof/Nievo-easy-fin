@@ -52,5 +52,14 @@ namespace NievoEasyfin.Application.Services.Cache
 
             return tk;
         }
+
+        /// <summary>
+        /// Method to validate token
+        /// </summary>
+        /// <param name="requestToken">Request body token</param>
+        /// <param name="cachetoken">Cache Token</param>
+        /// <returns>true / false</returns>
+        public async Task<bool> ValidateTokenAsync(int requestToken, int cachetoken)
+            => requestToken == cachetoken ? true : false;
     }
 }

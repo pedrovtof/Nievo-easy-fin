@@ -62,7 +62,7 @@ public class AuthenticatorService : Controller
 
         var user = await _userModel.GetUserByEmailAsync(request.Email);
         if (user == null)
-            return BadRequest(new ResponseApiError(
+            return NotFound(new ResponseApiError(
                 new List<string>() {
                     EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription(),
                     EnumErrosApi.POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_BLOCKED.GetDescription()
@@ -144,11 +144,9 @@ public class AuthenticatorService : Controller
 
         var user = await _userModel.GetUserByEmailAsync(request.Email);
         if (user == null)
-            return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_NOT_FOUNND.GetDescription() }
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND.GetDescription() }
             ));
-
-        // TODO: Adicionar teste no healtCheck
 
         var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempByUserIdAsync(user.Id);
         if (tokenResetPassword == null)
@@ -163,7 +161,7 @@ public class AuthenticatorService : Controller
             ));
         }
         else
-            return BadRequest(new ResponseApiError(
+            return NotFound(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() }
             ));
     }
@@ -181,6 +179,38 @@ public class AuthenticatorService : Controller
                 new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        return Ok();
+        var user = await _userModel.GetUserByEmailAsync(request.Email);
+        if (user == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND.GetDescription() }
+            ));
+
+        var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempByUserIdAsync(user.Id);
+        if (tokenResetPassword == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_TOKEN_NOT_FOUND_IN_CACHE.GetDescription() }
+            ));
+
+        var validateToken = await _authDbCacheService.ValidateTokenAsync(int.Parse(request.PinToken), tokenResetPassword.PinToken);
+        if (!validateToken)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_TOKEN_INVALID.GetDescription() }
+            ));
+
+        var hashPassword = await _cryptoPasswordService.HashPasswordAsync(request.Password);
+        if (hashPassword == user.Password)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_IS_THE_SAME.GetDescription() }
+            ));
+
+        var resetPassword = await _userModel.UpdateUserPasswordAsync(user.Id, hashPassword);
+        if (!resetPassword)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_NOT_UPDATED.GetDescription() }
+            ));
+
+        return Ok(new ResponseApiSucess(
+            EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED
+        ));
     }
 }

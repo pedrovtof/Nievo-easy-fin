@@ -85,7 +85,8 @@ public class AuthenticatorController : Controller
     ///     PATCH v1/Authenticator/password-reset
     ///     {
     ///        "email": "Joe.Black@example.com",
-    ///        "pin_token": "111111"
+    ///        "pin_token": "111111",
+    ///        "password": "1Meet-Death"
     ///     }
     /// </remarks>
     /// <param name="request">request.pin_token and request.email</param>
