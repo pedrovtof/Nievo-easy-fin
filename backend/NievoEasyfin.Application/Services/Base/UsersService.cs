@@ -4,81 +4,101 @@ using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Extensions.Enum;
-using NievoEasyfin.Application.Services.Auth;
-namespace NievoEasyfin.Application.Services.Base.Users
+using NievoEasyfin.Application.Services.Security;
+using NievoEasyfin.Application.Models;
+using NievoEasyfin.Application.Infrastructure.Auth;
+
+namespace NievoEasyfin.Application.Services.Base.Users;
+
+public class UsersService : Controller
 {
-    public class UsersService : Controller
+    private readonly CryptoPasswordService _cryptoPasswordService;
+
+    private readonly UserModel _userModel;
+
+    private readonly SSoProviderAuth _ssoProviderAuth;
+
+    private readonly UserProviderSsoModel _userProviderSsoModel;
+
+
+    public UsersService(
+        CryptoPasswordService cryptoPasswordService,
+        UserModel userModel,
+        UserProviderSsoModel userProviderSsoModel,
+        SSoProviderAuth ssoProviderAuth
+    )
     {
-        private static AuthService _authService;
+        _cryptoPasswordService = cryptoPasswordService;
+        _userModel = userModel;
+        _userProviderSsoModel = userProviderSsoModel;
+        _ssoProviderAuth = ssoProviderAuth;
+    }
 
-        public UsersService(AuthService authService)
+    /// <summary>
+    /// Method service for create user basic
+    /// </summary>
+    /// <param name="request">request PostCreateUserRequest</param>
+    /// <returns>ResponseApiSucess/ResponseApiError</returns>
+    public async Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request)
+    {
+        var validationResult = await new PostCreateUserValidator().ValidateAsync(request);
+        if (!validationResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        string hash = await _cryptoPasswordService.HashPasswordAsync(request.Password);
+
+        var userEmail = await _userModel.GetUserByEmailWithAnyStatusAsync(request.Email);
+        if (userEmail != null)
+            return BadRequest(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS.GetDescription() }
+            ));
+
+        var user = await _userModel.CreateUserAsync(request.Name, hash, request.Email);
+
+        return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
+    }
+
+    /// <summary>
+    /// Method service for create user sso
+    /// </summary>
+    /// <param name="request">request PostCreateUserSsoAsync</param>
+    /// <returns>ResponseApiSucess/ResponseApiError</returns>
+    public async Task<IActionResult> PostCreateUserSsoAsync(PostCreateUserSsoRequest request)
+    {
+        var validatorResult = await new PostCreateUserSsoValidator().ValidateAsync(request);
+        if (!validatorResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        var provider = await _ssoProviderAuth.GetProviderByNameAsync(request.Provider);
+        if (provider == null)
+            return BadRequest(new ResponseApiError(
+                new List<string>() {
+                    EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription(),
+                    EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE.GetDescription()
+                }
+            ));
+
+        var validateProvider = await _ssoProviderAuth.ValidateProviderAsync(provider.Name, request.ProviderAccessToken);
+        if (validateProvider.Error != null)
+            return BadRequest(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
+            ));
+
+        var userSub = await _userProviderSsoModel.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
+        if (userSub == null)
         {
-            _authService = authService;
+            var user = await _userModel.GetUserByEmailWithAnyStatusAsync(validateProvider.Email);
+            if (user == null)
+                user = await _userModel.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
+
+            var userProviderSso = await _userProviderSsoModel.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
+            return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
         }
-
-        /// <summary>
-        /// Method service for create user basic
-        /// </summary>
-        /// <param name="request">request PostCreateUserRequest</param>
-        /// <returns>ResponseApiSucess/ResponseApiError</returns>
-        public async Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request)
-        {
-            var validationResult = await new PostCreateUserValidator().ValidateAsync(request);
-            if (!validationResult.IsValid)
-                return BadRequest(
-                    new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
-                );
-
-            string hash = await _authService.ConvertRequestPasswordToStringAsync(request.Password);
-
-            var userEmail = await _authService.GetUserByEmailAsync(request.Email);
-            if (userEmail != null)
-                return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS.GetDescription() }
-                ));
-
-            var user = await _authService.CreateUserAsync(request.Name, hash, request.Email);
-
-            return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
-        }
-
-        /// <summary>
-        /// Method service for create user sso
-        /// </summary>
-        /// <param name="request">request PostCreateUserSsoAsync</param>
-        /// <returns>ResponseApiSucess/ResponseApiError</returns>
-        public async Task<IActionResult> PostCreateUserSsoAsync(PostCreateUserSsoRequest request)
-        {
-            var validatorResult = await new PostCreateUserSsoValidator().ValidateAsync(request);
-            if (!validatorResult.IsValid)
-                return BadRequest(
-                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
-                );
-
-            var provider = await _authService.GetProviderByNameAsync(request.Provider);
-            if (provider == null)
-                return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() }
-                ));
-
-            var validateProvider = await _authService.ProviderValidateAsync(provider.Name, request.ProviderAccessToken);
-            if (validateProvider.Error != null)
-                return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() }
-                ));
-
-            var userSub = await _authService.GetUserProviderSsoBySubAndProviderAsync(validateProvider.Sub, provider.Id);
-            if (userSub == null)
-            {
-                var user = await _authService.GetUserByEmailAsync(validateProvider.Email);
-                if (user == null)
-                    user = await _authService.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
-
-                var userProviderSso = await _authService.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
-                return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
-            }
-            else
-                return StatusCode(200, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
-        }
+        else
+            return Ok(new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
     }
 }

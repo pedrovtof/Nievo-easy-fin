@@ -1,21 +1,20 @@
-namespace NievoEasyfin.Application.Interfaces.Response
+namespace NievoEasyfin.Application.Interfaces.Response;
+
+/// <summary>
+/// Class template for API response with sucess
+/// </summary>
+public class ResponseApiSucess
 {
+    public bool Success { get; set; } = true;
+
+    public object? Data { get; set; } = new { };
+
     /// <summary>
-    /// Class template for API response with sucess
+    /// Method to create the template
     /// </summary>
-    public class ResponseApiSucess
+    /// <param name="data">any {}</param>
+    public ResponseApiSucess(object data)
     {
-        public bool Success { get; set; } = true;
-
-        public object? Data { get; set; } = new { };
-
-        /// <summary>
-        /// Method to create the template
-        /// </summary>
-        /// <param name="data">any {}</param>
-        public ResponseApiSucess(object data)
-        {
-            Data = data;
-        }
+        Data = data;
     }
 }

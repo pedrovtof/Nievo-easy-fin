@@ -1,7 +1,7 @@
 using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Services.Cache;
 using NievoEasyfin.Application.Services.Base.Users;
-using NievoEasyfin.Application.Services.Auth;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Infrastructure.Auth;
@@ -13,117 +13,132 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
 
-namespace NievoEasyfin.Auth
+namespace NievoEasyfin.Auth;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-            ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop;
-            Console.WriteLine($"Configurated Startup App");
-        }
+        Configuration = configuration;
+        ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop;
+        Console.WriteLine($"Configurated Startup App");
+    }
 
-        public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; }
 
-        // Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+    // Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        Console.WriteLine("Define the Cors rules as 0.0.0.0");
+        services.AddCors(options =>
         {
-            Console.WriteLine("Define the Cors rules as 0.0.0.0");
-            services.AddCors(options =>
+            options.AddDefaultPolicy(policy =>
             {
-                options.AddDefaultPolicy(policy =>
-                {
-                    policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
+        Console.WriteLine("Add controllers and endpoints");
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+
+        ConfigureSwagger(services);
+
+        Console.WriteLine("Configuring JWT authentication");
+        var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
+        var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
+        });
+
+        services.AddAuthorization();
+
+        Console.WriteLine("Creating Database services");
+        services.AddDbContext<AuthOrigin>();
+        services.AddDbContext<AuthReplica>();
+
+        Console.WriteLine("Creating Database Cache services");
+        services.AddSingleton<AuthDbCacheService>();
+
+        Console.WriteLine("Creating Transient services");
+        services.AddTransient<JsonWebTokenConfiguration>();
+
+        Console.WriteLine("Creating context services");
+
+        // Others
+        services.AddScoped<JsonWebTokenService>();
+        services.AddScoped<SSoProviderAuth>();
+        services.AddScoped<SmtpProvider>();
+
+        // Model
+        services.AddScoped<SmtpModel>();
+        services.AddScoped<AuthDbCacheService>();
+        services.AddScoped<UserModel>();
+        services.AddScoped<UserProviderSsoModel>();
+        services.AddScoped<UserProviderSsoModel>();
+
+        // Service 
+        services.AddScoped<CryptoPasswordService>();
+        services.AddScoped<AuthenticatorService>();
+        services.AddScoped<UsersService>();
+    }
+
+    // Use this method to configure the HTTP request pipeline.
+    public void Configure(WebApplication app, IWebHostEnvironment env)
+    {
+        Console.WriteLine("Configuring the app to use Cors, Authentication, Authorization and MapControllers");
+        app.UseCors();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.Run();
+    }
+
+    public void ConfigureSwagger(IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "NievoEasyfin Auth API",
+                Version = "v1"
             });
 
-            Console.WriteLine("Add controllers and endpoints");
-            services.AddControllers();
-            services.AddEndpointsApiExplorer();
+            var xmlFileAuth = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPathAuth = Path.Combine(AppContext.BaseDirectory, xmlFileAuth);
+            c.IncludeXmlComments(xmlPathAuth);
 
-            services.AddSwaggerGen(c =>
+            var bearerScheme = new OpenApiSecurityScheme
             {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "NievoEasyfin Auth API",
-                    Version = "v1"
-                });
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Informe o token JWT no formato: Bearer {token}"
+            };
 
-                var xmlFileAuth = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPathAuth = Path.Combine(AppContext.BaseDirectory, xmlFileAuth);
-                c.IncludeXmlComments(xmlPathAuth);
-
-                var bearerScheme = new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "Informe o token JWT no formato: Bearer {token}"
-                };
-
-                c.AddSecurityDefinition("Bearer", bearerScheme);
-                c.AddSecurityRequirement(document => new Microsoft.OpenApi.OpenApiSecurityRequirement
-                {
-                    [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
-                });
-            });
-            Console.WriteLine("Configured Swagger with xml paths and endpoints");
-
-            Console.WriteLine("Configuring JWT authentication");
-            var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
-            var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            c.AddSecurityDefinition("Bearer", bearerScheme);
+            c.AddSecurityRequirement(document => new Microsoft.OpenApi.OpenApiSecurityRequirement
             {
-                options.SaveToken = true;
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromMinutes(5)
-                };
+                [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
             });
-
-            services.AddAuthorization();
-
-            Console.WriteLine("Creating Database services");
-            services.AddDbContext<AuthOrigin>();
-            services.AddDbContext<AuthReplica>();
-
-            Console.WriteLine("Creating Transient services");
-            services.AddTransient<JsonWebTokenConfiguration>();
-
-            Console.WriteLine("Creating context services");
-            services.AddScoped<JsonWebTokenService>();
-            services.AddScoped<SSoProviderAuth>();
-            services.AddScoped<UserModel>();
-            services.AddScoped<UserProviderSsoModel>();
-            services.AddScoped<UserProviderSsoModel>();
-            services.AddScoped<CryptoPasswordService>();
-            services.AddScoped<AuthenticatorService>();
-            services.AddScoped<AuthService>();
-            services.AddScoped<UsersService>();
-        }
-
-        // Use this method to configure the HTTP request pipeline.
-        public void Configure(WebApplication app, IWebHostEnvironment env)
-        {
-            Console.WriteLine("Configuring the app to use Cors, Authentication, Authorization and MapControllers");
-            app.UseCors();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.MapControllers();
-            app.Run();
-        }
+        });
+        Console.WriteLine("Configured Swagger with xml paths and endpoints");
     }
 }

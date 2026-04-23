@@ -3,18 +3,13 @@ using System.Text.Json.Serialization;
 namespace NievoEasyfin.Application.Interfaces.Request;
 
 /// <summary>
-/// This class is a template for PostLoginUserAsync
+/// This class is a template for PostResetPassword
 /// </summary>
-public class PostLoginUserRequest
+public class PostResetPasswordRequest
 {
     /// <summary>
-    /// Email
+    /// User email
     /// </summary>
     [JsonPropertyName("email")]
     public string Email { get; set; }
-
-    /// <summary>
-    /// Password
-    /// </summary>
-    public string Password { get; set; }
 }

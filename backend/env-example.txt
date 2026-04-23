@@ -1,5 +1,52 @@
+# Crypto envs
 # Only change with you have a good reason
-PASSWORD_CRYPTO_ITERATIONS=""
-PASSWORD_CRYPTO_KEYSIZE= ""
-# GENERATE USING THE MODEL CLASS FOR CRYPTOPASSWORD BY Convert.ToHexString(GenerateSalt()) with debug
+PASSWORD_CRYPTO_ITERATIONS="350000"
+PASSWORD_CRYPTO_KEYSIZE= "64"
+
+# ALWAYS CHANGE THE SALT DURING THE FIRST DEPLOY 
+# GENERATE SALT USING THE MODEL CLASS FOR CRYPTOPASSWORD BY Convert.ToHexString(GenerateSalt()) with debug
 PASSWORD_CRYPTO_SALT = "" 
+
+#Google SSO envs
+GOOGLE_ID_CLIENT = ""
+GOOGLE_ID_KEY = ""
+GOOGLE_API_USER_INFO = "https://www.googleapis.com/oauth2/v3/userinfo"
+GOOGLE_API_TOKEN_INFO = "https://oauth2.googleapis.com/tokeninfo"
+
+# JWT envs
+JWT_PRIVATE_CONTRACT_STRING = ""
+JWT_PUBLIC_CONTRACT_STRING = ""
+
+# Redis envs
+CACHE_DATABASE_HOST = "127.0.0.1"
+CACHE_DATABASE_PORT = "6379"
+CACHE_DATABASE_NUMBER = "1"
+# Default TTL redis, 10.000.000 => 1 SEG
+CACHE_DATABASE_DEFAULT_TTL = "300000000"
+# timeout for connections
+CACHE_DATABASE_TIMEOUT_CONNECT = "5000"
+# synchronous commands
+CACHE_DATABASE_SYNCTIMEOUT_CONNECT = "3000"
+# asynchronous commands
+CACHE_DATABASE_ASYNCTIMEOUT_CONNECT = "3000"
+# Retry up to x times
+CACHE_DATABASE_CONNECTION_RETRY = "3"
+# X ms increment per attempt, max Y ms
+CACHE_DATABASE_RETRY_POLICY_MIN_CONNECT = "500"
+CACHE_DATABASE_RETRY_POLICY_MAX_CONNECT = "1000"
+# Abort on connect true/false
+CACHE_DATABASE_ABORT_ON_CONNECT_FAIL = "false"
+
+
+# SMTP envs
+# You should take a look at 
+# NievoEasyfin.Application/Infrastructure/Auth/SmtpProvider.cs
+# SendMailFromToAsync => SecureSocketOptions.XPTO
+SMTP_DEFAULT_FROM_ADRESS_MAIL = ""
+SMTP_SERVER_USER_NAME = ""
+SMTP_SERVER_USER_PASSWORD = ""
+SMTP_SERVER_HOST = ""
+SMTP_SERVER_PORT = ""
+
+# MAIL TEMPLATES envs
+PATH_MAIL_BODY_TEMPLATE_PASSWORD_RESET_TOKEN = "/full/path/file.txt"

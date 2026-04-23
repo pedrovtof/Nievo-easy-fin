@@ -5,57 +5,56 @@ const API_CONFIG = {
     TIMEOUT: import.meta.env.VITE_TIMEOUT_API || 10000,
 };
 
-const api = axios.create({
-    baseURL: API_CONFIG.BASE_URL,
+// ─── Shared response interceptor ─────────────────────────────────────────────
+
+const applyResponseInterceptor = (instance) => {
+    instance.interceptors.response.use(
+        (response) => {
+            const { status, message } = response.data ?? {};
+            if (status && message && status === 'error') {
+                console.error(`API Error: ${message}`);
+            }
+            return response;
+        },
+        (error) => Promise.reject(error)
+    );
+};
+
+// ─── Public API (rotas sem autenticação) ─────────────────────────────────────
+
+export const publicApi = axios.create({
+    baseURL: `${API_CONFIG.BASE_URL}public/`,
     timeout: API_CONFIG.TIMEOUT,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor
-api.interceptors.request.use(
+applyResponseInterceptor(publicApi);
+
+// ─── Private API (rotas autenticadas) ────────────────────────────────────────
+
+export const privateApi = axios.create({
+    baseURL: `${API_CONFIG.BASE_URL}private/`,
+    timeout: API_CONFIG.TIMEOUT,
+    headers: { 'Content-Type': 'application/json' },
+});
+
+// Injeta o token automaticamente nas requisições privadas
+privateApi.interceptors.request.use(
     (config) => {
-        // You can add auth tokens here if needed
-        // const token = localStorage.getItem('token');
-        // if (token) {
-        //   config.headers.Authorization = `Bearer ${token}`;
-        // }
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle standard message/status format
-api.interceptors.response.use(
-    (response) => {
-        // Use the standard response format if present
-        const { status, message, data } = response.data;
+applyResponseInterceptor(privateApi);
 
-        // Check if the response matches your standard structure
-        if (status && message) {
-            // You can handle specific statuses here globally (e.g. show toast)
-            if (status === 'error') {
-                console.error(`API Error: ${message}`);
-                // Optionally reject here if you want 'error' status to be caught
-                // return Promise.reject(new Error(message));
-            }
-        }
+// ─── Default export (mantém compatibilidade com imports existentes) ───────────
 
-        // Return the response.data directly for easier access, or the full response
-        // returning full response to access status/headers if needed, 
-        // but usually response.data is what we want.
-        // Let's return the full response object but attach helper properties if needed.
-        return response;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-export default api;
+export default publicApi;
 
 // ─── Users ───────────────────────────────────────────────────────────────────
 
@@ -64,11 +63,28 @@ export default api;
  * @param {{ name: string, email: string, password: string }} userData
  * @returns {Promise<import('axios').AxiosResponse>}
  */
-export const createUser = (userData) => api.post('v1/Users/singup', userData);
+export const createUser = (userData) => publicApi.post('v1/Users/singup', userData);
 
 /**
  * Cria um novo usuário via SSO (ex: Google).
  * @param {{ provider_name: string, provider_access_token: string }} ssoData
  * @returns {Promise<import('axios').AxiosResponse>}
  */
-export const createUserSSO = (ssoData) => api.post('v1/Users/singup-sso', ssoData);
+export const createUserSSO = (ssoData) => publicApi.post('v1/Users/singup-sso', ssoData);
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Autentica um usuário com email e senha.
+ * @param {{ email: string, password: string }} credentials
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const loginUser = (credentials) => publicApi.post('v1/Authenticator/singin', credentials);
+
+/**
+ * Autentica um usuário via SSO (ex: Google).
+ * @param {{ provider_name: string, provider_access_token: string }} ssoData
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const loginUserSSO = (ssoData) => publicApi.post('v1/Authenticator/singin-sso', ssoData);
+
