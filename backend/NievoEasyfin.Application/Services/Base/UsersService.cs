@@ -4,8 +4,6 @@ using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Extensions.Enum;
-
-using NievoEasyfin.Application.Data.Context.Cache;
 using NievoEasyfin.Application.Services.Security;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Infrastructure.Auth;

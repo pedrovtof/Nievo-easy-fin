@@ -2,7 +2,6 @@ using NievoEasyfin.Application.Data.Context.Cache;
 using NievoEasyfin.Application.Data.Cache.Views;
 using NievoEasyfin.Application.Data.Entities.Cache;
 using System.Text.Json;
-using NRedisStack.DataTypes;
 
 namespace NievoEasyfin.Application.Services.Cache
 {

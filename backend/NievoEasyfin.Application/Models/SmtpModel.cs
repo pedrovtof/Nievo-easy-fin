@@ -6,6 +6,12 @@ namespace NievoEasyfin.Application.Models
     {
         public SmtpModel() : base() { }
 
+        /// <summary>
+        /// Method used to send email to reset password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<bool> ResetTokenMailAsync(string email, int token)
         {
             string? fileWithBody = null;
@@ -18,8 +24,8 @@ namespace NievoEasyfin.Application.Models
             {
                 fileWithBody = $"""
                     <span>
-                    Email: EMAIL_USER
-                    Token: TOKEN_USER
+                        Email: EMAIL_USER
+                        Token: TOKEN_USER
                     </span>
                 """;
             }
