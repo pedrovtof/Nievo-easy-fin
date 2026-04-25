@@ -7,6 +7,8 @@ namespace NievoEasyfin.Application.Infrastructure.Auth
 {
     public class SmtpProvider
     {
+        protected readonly string SMTP_DEFAULT_PREFIX_MAIL_CONTENT = DotNetEnv.Env.GetString("SMTP_DEFAULT_PREFIX_MAIL_CONTENT");
+
         protected readonly string SMTP_DEFAULT_FROM_ADRESS_MAIL = DotNetEnv.Env.GetString("SMTP_DEFAULT_FROM_ADRESS_MAIL");
 
         protected readonly string SMTP_SERVER_USER_NAME = DotNetEnv.Env.GetString("SMTP_SERVER_USER_NAME");

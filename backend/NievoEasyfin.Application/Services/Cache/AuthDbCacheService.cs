@@ -61,5 +61,19 @@ namespace NievoEasyfin.Application.Services.Cache
         /// <returns>true / false</returns>
         public async Task<bool> ValidateTokenAsync(int requestToken, int cachetoken)
             => requestToken == cachetoken ? true : false;
+
+
+        /// <summary>
+        /// Method to check redis
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async Task<string?> TestCacheServiceAsync(string key, string value)
+        {
+            key = $"healthcheck:{key}";
+            await Conn.StringSetAsync(key, value, TimeSpan.FromSeconds(CACHE_DATABASE_DEFAULT_TTL));
+            return await Conn.StringGetAsync(key);
+        }
     }
 }
