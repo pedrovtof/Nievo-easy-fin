@@ -16,5 +16,6 @@ public class PostLoginUserRequest
     /// <summary>
     /// Password
     /// </summary>
+    [JsonPropertyName("password")]
     public string Password { get; set; }
 }
