@@ -12,6 +12,7 @@ namespace NievoEasyfin.Auth.Controllers.Public;
 public class AuthenticatorController : Controller
 {
     private readonly IAuthenticatorService _authenticatorService;
+
     public AuthenticatorController(IAuthenticatorService authenticatorService)
     {
         _authenticatorService = authenticatorService;
