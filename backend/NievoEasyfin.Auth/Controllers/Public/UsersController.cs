@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces.Request;
-using NievoEasyfin.Application.Services.Base.Users;
+using NievoEasyfin.Application.Interfaces.Services;
 using NievoEasyfin.Application.Interfaces.Response;
 using Microsoft.AspNetCore.Authorization;
 
@@ -10,9 +10,9 @@ namespace NievoEasyfin.Auth.Controllers.Public;
 [Route("api/public/v1/[controller]")]
 public class UsersController : Controller
 {
-    private readonly UsersService _usersService;
+    private readonly IUsersService _usersService;
 
-    public UsersController(UsersService users)
+    public UsersController(IUsersService users)
     {
         _usersService = users;
     }

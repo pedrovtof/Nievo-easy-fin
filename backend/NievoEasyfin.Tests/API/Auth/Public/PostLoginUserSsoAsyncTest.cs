@@ -1,12 +1,9 @@
-using Bogus;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Extensions.Enum;
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Interfaces.Response;
-using NievoEasyfin.Application.Interfaces.Services;
-using NievoEasyfin.Auth.Controllers.Public;
 using NievoEasyfin.Tests.Build.Request;
 using NSubstitute;
 using Xunit;
@@ -14,255 +11,91 @@ using Xunit.Abstractions;
 
 namespace NievoEasyfin.Tests.API.Auth.Public;
 
-public class PostLoginUserSsoAsyncTest
+public class PostLoginUserSsoAsyncTest : AuthenticatorTestBase
 {
-    private readonly Faker _faker = new Faker("pt_BR");
-    private readonly ITestOutputHelper _testOutputHelper;
+    public PostLoginUserSsoAsyncTest(ITestOutputHelper output) : base(output) { }
 
-    public PostLoginUserSsoAsyncTest(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
+    #region Success
 
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with success
-    /// </summary>
     [Fact(DisplayName = "Login SSO deverá ser feito com sucesso")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_SucessAsync()
+    public async Task PostLoginUserSsoAsync_DadosValidos_RetornaSucesso()
     {
         // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
+        var request = new PostLoginUserSsoRequestBuilder();
+        var okResult = BuildOk(new { Token = "mocked-jwt-token" });
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiSucess(new { Token = "mocked-jwt-token" });
-        var okResult = new OkObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
+        MockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
                    .Returns(Task.FromResult<IActionResult>(okResult));
 
-        var controller = new AuthenticatorController(mockService);
-
         // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
+        var result = await Controller.PostLoginUserSsoAsync(request);
 
         // Assert
         var objectResult = result.Should().BeOfType<OkObjectResult>().Subject;
         var responseValue = objectResult.Value.Should().BeOfType<ResponseApiSucess>().Subject;
 
         responseValue.Should().NotBeNull();
-        _testOutputHelper.WriteLine($"\n Validado sucesso SSO com provedor {requestBuilder.Provider} \n");
+        Output.WriteLine($"\n Validado sucesso SSO com provedor {request.Provider} \n");
     }
 
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with provider SSO not configured error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de provedor SSO não configurado")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGUREDAsync()
+    #endregion
+
+    #region BadRequest Errors
+
+    public static IEnumerable<object[]> BadRequestErrors => new List<object[]>
+    {
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED, "Provedor SSO não configurado" },
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED, "Usuário bloqueado" },
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED, "Provedor não configurado" },
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE, "Provedor inativo" },
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE, "Resposta inválida do provedor" },
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NULL_OR_EMPTY, "Provedor nulo ou vazio" },
+        new object[] { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY, "Access token do provedor nulo ou vazio" },
+    };
+
+    [Theory(DisplayName = "Login SSO deverá retornar BadRequest para cenários de erro")]
+    [MemberData(nameof(BadRequestErrors))]
+    public async Task PostLoginUserSsoAsync_CenarioDeErro_RetornaBadRequest(EnumErrosApi enumError, string cenario)
     {
         // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
+        var request = new PostLoginUserSsoRequestBuilder();
+        var badRequestResult = BuildBadRequest(enumError);
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
+        MockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
                    .Returns(Task.FromResult<IActionResult>(badRequestResult));
 
-        var controller = new AuthenticatorController(mockService);
-
         // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
+        var result = await Controller.PostLoginUserSsoAsync(request);
 
         // Assert
         var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
         var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
 
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de provedor SSO não configurado. \n");
+        responseValue.Messages.Should().Contain(enumError.GetDescription());
+        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
     }
 
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with user blocked error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de usuário bloqueado")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKEDAsync()
+    #endregion
+
+    #region Service Delegation
+
+    [Fact(DisplayName = "Login SSO deve delegar a chamada ao service exatamente uma vez")]
+    public async Task PostLoginUserSsoAsync_QuandoChamado_DeveDelegarAoService()
     {
         // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
+        var request = new PostLoginUserSsoRequestBuilder();
+        var okResult = BuildOk(new { Token = "mocked-jwt-token" });
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
+        MockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
+                   .Returns(Task.FromResult<IActionResult>(okResult));
 
         // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
+        await Controller.PostLoginUserSsoAsync(request);
 
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de usuário bloqueado no SSO. \n");
+        // Assert — verifica que o service foi chamado exatamente 1 vez
+        await MockService.Received(1).PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>());
+        Output.WriteLine("\n Validado que o service foi chamado exatamente 1 vez. \n");
     }
 
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with provider not configured error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de provedor não configurado")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGUREDAsync()
-    {
-        // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
-
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
-
-        // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_CONFIGURED.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de provedor não configurado. \n");
-    }
-
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with provider inactive error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de provedor inativo")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVEAsync()
-    {
-        // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
-
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
-
-        // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_INACTIVE.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de provedor inativo. \n");
-    }
-
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with provider not 200 response error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de resposta inválida do provedor")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSEAsync()
-    {
-        // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
-
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
-
-        // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de resposta inválida do provedor. \n");
-    }
-
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with empty provider error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de provedor nulo ou vazio")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NULL_OR_EMPTYAsync()
-    {
-        // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
-        requestBuilder.WithProvider(string.Empty);
-
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NULL_OR_EMPTY.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
-
-        // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NULL_OR_EMPTY.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de provedor nulo ou vazio. \n");
-    }
-
-    /// <summary>
-    /// Method to test endpoint PostLoginUserSsoAsync with empty provider access token error
-    /// </summary>
-    [Fact(DisplayName = "Login SSO deverá retornar erro de access token do provedor nulo ou vazio")]
-    public async Task FluentAssertions_PostLoginUserSsoAsync_POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTYAsync()
-    {
-        // Arrange
-        var requestBuilder = new PostLoginUserSsoRequestBuilder();
-        requestBuilder.Default();
-        requestBuilder.WithProviderAccessToken(string.Empty);
-
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostLoginUserSsoAsync(Arg.Any<PostLogiPostLoginUserSsoRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
-
-        // Act
-        var result = await controller.PostLoginUserSsoAsync(requestBuilder);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de access token do provedor nulo ou vazio. \n");
-    }
+    #endregion
 }

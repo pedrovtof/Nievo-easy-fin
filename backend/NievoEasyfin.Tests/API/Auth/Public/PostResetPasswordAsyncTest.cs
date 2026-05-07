@@ -1,12 +1,9 @@
-using Bogus;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Extensions.Enum;
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Interfaces.Response;
-using NievoEasyfin.Application.Interfaces.Services;
-using NievoEasyfin.Auth.Controllers.Public;
 using NievoEasyfin.Tests.Build.Request;
 using NSubstitute;
 using Xunit;
@@ -14,165 +11,112 @@ using Xunit.Abstractions;
 
 namespace NievoEasyfin.Tests.API.Auth.Public;
 
-public class PostResetPasswordAsyncTest
+public class PostResetPasswordAsyncTest : AuthenticatorTestBase
 {
-    private readonly Faker _faker = new Faker("pt_BR");
-    private readonly ITestOutputHelper _testOutputHelper;
+    public PostResetPasswordAsyncTest(ITestOutputHelper output) : base(output) { }
 
-    public PostResetPasswordAsyncTest(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
+    #region Success
 
-    /// <summary>
-    /// Method to test endpoint PostResetPasswordAsync with success
-    /// </summary>
     [Fact(DisplayName = "Solicitação de reset de senha deverá ser feita com sucesso")]
-    public async Task FluentAssertions_PostResetPasswordAsync_SucessAsync()
+    public async Task PostResetPasswordAsync_DadosValidos_RetornaSucesso()
     {
         // Arrange
-        var requestBuilder = new PostResetPasswordRequestBuilder();
-        requestBuilder.Default();
+        var request = new PostResetPasswordRequestBuilder();
+        var okResult = BuildOk(new { Message = "Token sent" });
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiSucess(new { Message = "Token sent" });
-        var okResult = new OkObjectResult(expectedResponse);
-
-        mockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
+        MockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
                    .Returns(Task.FromResult<IActionResult>(okResult));
 
-        var controller = new AuthenticatorController(mockService);
-
         // Act
-        var result = await controller.PostResetPasswordAsync(requestBuilder);
+        var result = await Controller.PostResetPasswordAsync(request);
 
         // Assert
         var objectResult = result.Should().BeOfType<OkObjectResult>().Subject;
         var responseValue = objectResult.Value.Should().BeOfType<ResponseApiSucess>().Subject;
 
         responseValue.Should().NotBeNull();
-        _testOutputHelper.WriteLine($"\n Validado sucesso ao solicitar reset de senha para o email {requestBuilder.Email} \n");
+        Output.WriteLine($"\n Validado sucesso ao solicitar reset de senha para o email {request.Email} \n");
     }
 
-    /// <summary>
-    /// Method to test endpoint PostResetPasswordAsync with invalid email error
-    /// </summary>
-    [Fact(DisplayName = "Solicitação de reset de senha deverá retornar erro de email inválido")]
-    public async Task FluentAssertions_PostResetPasswordAsync_POSTRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAILAsync()
+    #endregion
+
+    #region BadRequest Errors
+
+    public static IEnumerable<object[]> BadRequestErrors => new List<object[]>
+    {
+        new object[] { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL, "Email inválido" },
+        new object[] { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTY, "Email nulo ou vazio" },
+        new object[] { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE, "Token já gerado em cache" },
+    };
+
+    [Theory(DisplayName = "Solicitação de reset de senha deverá retornar BadRequest para cenários de erro")]
+    [MemberData(nameof(BadRequestErrors))]
+    public async Task PostResetPasswordAsync_CenarioDeErro_RetornaBadRequest(EnumErrosApi enumError, string cenario)
     {
         // Arrange
-        var requestBuilder = new PostResetPasswordRequestBuilder();
-        requestBuilder.Default();
-        requestBuilder.WithEmail("invalid-email");
+        var request = new PostResetPasswordRequestBuilder();
+        var badRequestResult = BuildBadRequest(enumError);
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
+        MockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
                    .Returns(Task.FromResult<IActionResult>(badRequestResult));
 
-        var controller = new AuthenticatorController(mockService);
-
         // Act
-        var result = await controller.PostResetPasswordAsync(requestBuilder);
+        var result = await Controller.PostResetPasswordAsync(request);
 
         // Assert
         var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
         var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
 
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de email inválido. \n");
+        responseValue.Messages.Should().Contain(enumError.GetDescription());
+        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
     }
 
-    /// <summary>
-    /// Method to test endpoint PostResetPasswordAsync with empty email error
-    /// </summary>
-    [Fact(DisplayName = "Solicitação de reset de senha deverá retornar erro de email nulo ou vazio")]
-    public async Task FluentAssertions_PostResetPasswordAsync_POSTRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTYAsync()
-    {
-        // Arrange
-        var requestBuilder = new PostResetPasswordRequestBuilder();
-        requestBuilder.Default();
-        requestBuilder.WithEmail(string.Empty);
+    #endregion
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTY.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
+    #region NotFound Errors
 
-        mockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
-
-        // Act
-        var result = await controller.PostResetPasswordAsync(requestBuilder);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTY.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de email nulo ou vazio. \n");
-    }
-
-    /// <summary>
-    /// Method to test endpoint PostResetPasswordAsync with user not found error
-    /// </summary>
     [Fact(DisplayName = "Solicitação de reset de senha deverá retornar erro de usuário não encontrado")]
-    public async Task FluentAssertions_PostResetPasswordAsync_POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNNDAsync()
+    public async Task PostResetPasswordAsync_UsuarioNaoEncontrado_RetornaNotFound()
     {
         // Arrange
-        var requestBuilder = new PostResetPasswordRequestBuilder();
-        requestBuilder.Default();
+        var request = new PostResetPasswordRequestBuilder();
+        var notFoundResult = BuildNotFound(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND);
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND.GetDescription() });
-        var notFoundResult = new NotFoundObjectResult(expectedResponse);
-
-        mockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
+        MockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
                    .Returns(Task.FromResult<IActionResult>(notFoundResult));
 
-        var controller = new AuthenticatorController(mockService);
-
         // Act
-        var result = await controller.PostResetPasswordAsync(requestBuilder);
+        var result = await Controller.PostResetPasswordAsync(request);
 
         // Assert
         var objectResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
         var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
 
         responseValue.Messages.Should().Contain(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de usuário não encontrado. \n");
+        Output.WriteLine($"\n Validado erro de usuário não encontrado. \n");
     }
 
-    /// <summary>
-    /// Method to test endpoint PostResetPasswordAsync with token found in cache error
-    /// </summary>
-    [Fact(DisplayName = "Solicitação de reset de senha deverá retornar erro de token já gerado")]
-    public async Task FluentAssertions_PostResetPasswordAsync_POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHEAsync()
+    #endregion
+
+    #region Service Delegation
+
+    [Fact(DisplayName = "Reset de senha deve delegar a chamada ao service exatamente uma vez")]
+    public async Task PostResetPasswordAsync_QuandoChamado_DeveDelegarAoService()
     {
         // Arrange
-        var requestBuilder = new PostResetPasswordRequestBuilder();
-        requestBuilder.Default();
+        var request = new PostResetPasswordRequestBuilder();
+        var okResult = BuildOk(new { Message = "Token sent" });
 
-        var mockService = Substitute.For<IAuthenticatorService>();
-        var expectedResponse = new ResponseApiError(new List<string> { EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription() });
-        var badRequestResult = new BadRequestObjectResult(expectedResponse);
-
-        mockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        var controller = new AuthenticatorController(mockService);
+        MockService.PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>())
+                   .Returns(Task.FromResult<IActionResult>(okResult));
 
         // Act
-        var result = await controller.PostResetPasswordAsync(requestBuilder);
+        await Controller.PostResetPasswordAsync(request);
 
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(EnumErrosApi.POSTRESETPASSWORDASYNC_AUTHSERVICE_400_USER_TOKEN_FOUND_IN_CACHE.GetDescription());
-        _testOutputHelper.WriteLine($"\n Validado erro de token já gerado em cache. \n");
+        // Assert — verifica que o service foi chamado exatamente 1 vez
+        await MockService.Received(1).PostResetPasswordAsync(Arg.Any<PostResetPasswordRequest>());
+        Output.WriteLine("\n Validado que o service foi chamado exatamente 1 vez. \n");
     }
+
+    #endregion
 }

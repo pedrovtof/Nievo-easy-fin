@@ -96,7 +96,7 @@ public class Startup
         // Service 
         services.AddScoped<CryptoPasswordService>();
         services.AddScoped<IAuthenticatorService, AuthenticatorService>();
-        services.AddScoped<UsersService>();
+        services.AddScoped<IUsersService, UsersService>();
     }
 
     // Use this method to configure the HTTP request pipeline.

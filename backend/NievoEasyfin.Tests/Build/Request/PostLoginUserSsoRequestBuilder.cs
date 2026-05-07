@@ -1,38 +1,31 @@
-using System;
 using Bogus;
 using NievoEasyfin.Application.Interfaces.Request;
 
-namespace NievoEasyfin.Tests.Build.Request
+namespace NievoEasyfin.Tests.Build.Request;
+
+/// <summary>
+/// Fluent builder for PostLogiPostLoginUserSsoRequest.
+/// Default values are set in the constructor — no need to call Default().
+/// </summary>
+public class PostLoginUserSsoRequestBuilder : PostLogiPostLoginUserSsoRequest
 {
-    public class PostLoginUserSsoRequestBuilder : PostLogiPostLoginUserSsoRequest
+    private readonly Faker _faker = new Faker("pt_BR");
+
+    public PostLoginUserSsoRequestBuilder()
     {
-        private readonly Faker _faker = new Faker("pt_BR");
+        Provider = "google";
+        ProviderAccessToken = _faker.Random.AlphaNumeric(100);
+    }
 
-        /// <summary>
-        /// Default setter to build
-        /// </summary>
-        internal void Default()
-        {
-            Provider = "google";
-            ProviderAccessToken = _faker.Random.AlphaNumeric(100);
-        }
+    public PostLoginUserSsoRequestBuilder WithProvider(string provider)
+    {
+        Provider = provider;
+        return this;
+    }
 
-        /// <summary>
-        /// Setter to build provider
-        /// </summary>
-        /// <param name="provider">str</param>
-        internal void WithProvider(string provider)
-        {
-            Provider = provider;
-        }
-
-        /// <summary>
-        /// Setter to build provider access token
-        /// </summary>
-        /// <param name="providerAccessToken">str</param>
-        internal void WithProviderAccessToken(string providerAccessToken)
-        {
-            ProviderAccessToken = providerAccessToken;
-        }
+    public PostLoginUserSsoRequestBuilder WithProviderAccessToken(string providerAccessToken)
+    {
+        ProviderAccessToken = providerAccessToken;
+        return this;
     }
 }
