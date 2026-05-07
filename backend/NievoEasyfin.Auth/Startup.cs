@@ -4,6 +4,7 @@ using NievoEasyfin.Application.Services.Cache;
 using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Services.Base.Authenticator;
+using NievoEasyfin.Application.Interfaces.Services;
 using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Services.Security;
 using FluentValidation;
@@ -94,8 +95,8 @@ public class Startup
 
         // Service 
         services.AddScoped<CryptoPasswordService>();
-        services.AddScoped<AuthenticatorService>();
-        services.AddScoped<UsersService>();
+        services.AddScoped<IAuthenticatorService, AuthenticatorService>();
+        services.AddScoped<IUsersService, UsersService>();
     }
 
     // Use this method to configure the HTTP request pipeline.

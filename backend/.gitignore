@@ -6,6 +6,8 @@
 *.user
 *.sln.docstates
 
+AI/Cache/*
+
 # Build results
 
 [Dd]ebug/

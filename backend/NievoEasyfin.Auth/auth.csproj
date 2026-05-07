@@ -22,4 +22,8 @@
     <ProjectReference Include="..\NievoEasyfin.Application\application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NievoEasyfin.Tests" />
+  </ItemGroup>
+
 </Project>

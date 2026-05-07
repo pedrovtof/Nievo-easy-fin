@@ -3,6 +3,7 @@ using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Interfaces.Response;
 using Microsoft.AspNetCore.Authorization;
+using NievoEasyfin.Application.Interfaces.Services;
 
 namespace NievoEasyfin.Auth.Controllers.Public;
 
@@ -10,8 +11,9 @@ namespace NievoEasyfin.Auth.Controllers.Public;
 [Route("api/public/v1/[controller]")]
 public class AuthenticatorController : Controller
 {
-    private readonly AuthenticatorService _authenticatorService;
-    public AuthenticatorController(AuthenticatorService authenticatorService)
+    private readonly IAuthenticatorService _authenticatorService;
+
+    public AuthenticatorController(IAuthenticatorService authenticatorService)
     {
         _authenticatorService = authenticatorService;
     }

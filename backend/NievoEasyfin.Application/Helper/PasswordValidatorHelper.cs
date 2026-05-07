@@ -7,7 +7,7 @@ namespace NievoEasyfin.Application.Helper;
 /// </summary>
 public class PasswordValidatorHelper
 {
-    private static Regex REGEX_RULES = new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,12}$");
+    private static Regex REGEX_RULES = new Regex(DotNetEnv.Env.GetString("REGEX_PASSWORD_RULE"));
 
     public PasswordValidatorHelper()
     {

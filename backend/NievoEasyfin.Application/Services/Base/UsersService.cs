@@ -7,10 +7,11 @@ using NievoEasyfin.Application.Extensions.Enum;
 using NievoEasyfin.Application.Services.Security;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Infrastructure.Auth;
+using NievoEasyfin.Application.Interfaces.Services;
 
 namespace NievoEasyfin.Application.Services.Base.Users;
 
-public class UsersService : Controller
+public class UsersService : Controller, IUsersService
 {
     private readonly CryptoPasswordService _cryptoPasswordService;
 
