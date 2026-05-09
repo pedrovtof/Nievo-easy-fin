@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Interfaces.Request;
-using NievoEasyfin.Application.Services.Base.Authenticator;
 using NievoEasyfin.Application.Interfaces.Response;
 using Microsoft.AspNetCore.Authorization;
 using NievoEasyfin.Application.Interfaces.Services;

@@ -4,8 +4,6 @@ using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using NievoEasyfin.Application.Models;
-using System.Text.Json;
-using NievoEasyfin.Application.Data.Context.Cache;
 using NievoEasyfin.Application.Services.Cache;
 
 namespace NievoEasyfin.Auth.Controllers.Admin;
