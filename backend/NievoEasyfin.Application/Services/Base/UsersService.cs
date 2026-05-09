@@ -4,29 +4,28 @@ using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Validator;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Extensions.Enum;
-using NievoEasyfin.Application.Services.Security;
-using NievoEasyfin.Application.Models;
-using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Interfaces.Services;
+using NievoEasyfin.Application.Interfaces.Models;
+using NievoEasyfin.Application.Interfaces.Infrastructure;
 
 namespace NievoEasyfin.Application.Services.Base.Users;
 
 public class UsersService : Controller, IUsersService
 {
-    private readonly CryptoPasswordService _cryptoPasswordService;
+    private readonly ICryptoPasswordService _cryptoPasswordService;
 
-    private readonly UserModel _userModel;
+    private readonly IUserModel _userModel;
 
-    private readonly SSoProviderAuth _ssoProviderAuth;
+    private readonly ISSoProviderAuth _ssoProviderAuth;
 
-    private readonly UserProviderSsoModel _userProviderSsoModel;
+    private readonly IUserProviderSsoModel _userProviderSsoModel;
 
 
     public UsersService(
-        CryptoPasswordService cryptoPasswordService,
-        UserModel userModel,
-        UserProviderSsoModel userProviderSsoModel,
-        SSoProviderAuth ssoProviderAuth
+        ICryptoPasswordService cryptoPasswordService,
+        IUserModel userModel,
+        IUserProviderSsoModel userProviderSsoModel,
+        ISSoProviderAuth ssoProviderAuth
     )
     {
         _cryptoPasswordService = cryptoPasswordService;

@@ -1,12 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
+using NievoEasyfin.Application.Interfaces.Services;
 
 namespace NievoEasyfin.Application.Services.Security;
 
 /// <summary>
 /// Class model for Crypto password
 /// </summary>
-public class CryptoPasswordService
+public class CryptoPasswordService : ICryptoPasswordService
 {
     private static readonly int Iterations = DotNetEnv.Env.GetInt("PASSWORD_CRYPTO_ITERATIONS");
 

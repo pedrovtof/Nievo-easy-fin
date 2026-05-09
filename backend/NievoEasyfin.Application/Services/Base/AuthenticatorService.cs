@@ -1,44 +1,40 @@
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyfin.Application.Extensions.Enum;
-using NievoEasyfin.Application.Infrastructure.Auth;
 using NievoEasyfin.Application.Interfaces.Enum;
 using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Application.Interfaces.Validator;
-using NievoEasyfin.Application.Models;
-using NievoEasyfin.Application.Services.Cache;
-using NievoEasyfin.Application.Services.Security;
-
 using NievoEasyfin.Application.Interfaces.Services;
+using NievoEasyfin.Application.Interfaces.Models;
+using NievoEasyfin.Application.Interfaces.Infrastructure;
 
 namespace NievoEasyfin.Application.Services.Base.Authenticator;
 
 public class AuthenticatorService : Controller, IAuthenticatorService
 {
-    private readonly CryptoPasswordService _cryptoPasswordService;
+    private readonly ICryptoPasswordService _cryptoPasswordService;
 
-    private readonly UserModel _userModel;
+    private readonly IUserModel _userModel;
 
-    private readonly AuthDbCacheService _authDbCacheService;
+    private readonly IAuthDbCacheService _authDbCacheService;
 
-    private readonly UserProviderSsoModel _userProviderSsoModel;
+    private readonly IUserProviderSsoModel _userProviderSsoModel;
 
-    private readonly JsonWebTokenService _jsonWebTokenService;
+    private readonly IJsonWebTokenService _jsonWebTokenService;
 
-    private readonly SSoProviderAuth _ssoProviderAuth;
+    private readonly ISSoProviderAuth _ssoProviderAuth;
 
-    private readonly SmtpModel _smtpModel;
+    private readonly ISmtpModel _smtpModel;
 
 
     public AuthenticatorService(
-        CryptoPasswordService cryptoPasswordService,
-        AuthDbCacheService authDbCacheService,
-        UserModel userModel,
-        UserProviderSsoModel userProviderSsoModel,
-        JsonWebTokenService jsonWebTokenService,
-        SSoProviderAuth ssoProviderAuth,
-        SmtpProvider smtpProvider,
-        SmtpModel smtpModel
+        ICryptoPasswordService cryptoPasswordService,
+        IAuthDbCacheService authDbCacheService,
+        IUserModel userModel,
+        IUserProviderSsoModel userProviderSsoModel,
+        IJsonWebTokenService jsonWebTokenService,
+        ISSoProviderAuth ssoProviderAuth,
+        ISmtpModel smtpModel
     )
     {
         _cryptoPasswordService = cryptoPasswordService;
@@ -80,7 +76,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
         var generateToken = await _jsonWebTokenService.GenerateTokenAsync(user.Email);
 
         return Ok(new ResponseApiSucess(
-            new { Token = generateToken }
+            new PostLoginUserResponse(generateToken)
         ));
     }
 

@@ -1,12 +1,14 @@
 using System.Reflection;
 using NievoEasyfin.Application.Data.Context.Database;
+using NievoEasyfin.Application.Interfaces.Services;
+using NievoEasyfin.Application.Interfaces.Models;
+using NievoEasyfin.Application.Interfaces.Infrastructure;
+using NievoEasyfin.Application.Infrastructure.Auth;
+using NievoEasyfin.Application.Services.Security;
 using NievoEasyfin.Application.Services.Cache;
 using NievoEasyfin.Application.Services.Base.Users;
 using NievoEasyfin.Application.Models;
 using NievoEasyfin.Application.Services.Base.Authenticator;
-using NievoEasyfin.Application.Interfaces.Services;
-using NievoEasyfin.Application.Infrastructure.Auth;
-using NievoEasyfin.Application.Services.Security;
 using FluentValidation;
 using NievoEasyfin.Application.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -82,19 +84,18 @@ public class Startup
         Console.WriteLine("Creating context services");
 
         // Others
-        services.AddScoped<JsonWebTokenService>();
-        services.AddScoped<SSoProviderAuth>();
+        services.AddScoped<IJsonWebTokenService, JsonWebTokenService>();
+        services.AddScoped<ISSoProviderAuth, SSoProviderAuth>();
         services.AddScoped<SmtpProvider>();
 
         // Model
-        services.AddScoped<SmtpModel>();
-        services.AddScoped<AuthDbCacheService>();
-        services.AddScoped<UserModel>();
-        services.AddScoped<UserProviderSsoModel>();
-        services.AddScoped<UserProviderSsoModel>();
+        services.AddScoped<ISmtpModel, SmtpModel>();
+        services.AddScoped<IAuthDbCacheService, AuthDbCacheService>();
+        services.AddScoped<IUserModel, UserModel>();
+        services.AddScoped<IUserProviderSsoModel, UserProviderSsoModel>();
 
         // Service 
-        services.AddScoped<CryptoPasswordService>();
+        services.AddScoped<ICryptoPasswordService, CryptoPasswordService>();
         services.AddScoped<IAuthenticatorService, AuthenticatorService>();
         services.AddScoped<IUsersService, UsersService>();
     }

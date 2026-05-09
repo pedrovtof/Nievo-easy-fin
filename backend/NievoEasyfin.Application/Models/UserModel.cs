@@ -3,13 +3,14 @@ using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Dapper;
+using NievoEasyfin.Application.Interfaces.Models;
 
 namespace NievoEasyfin.Application.Models;
 
 /// <summary>
 /// Class model for user
 /// </summary>
-public class UserModel : UserEntity
+public class UserModel : UserEntity, IUserModel
 {
     private readonly AuthOrigin _AuthMainNodeDatabase;
 

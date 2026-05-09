@@ -3,13 +3,14 @@ using Microsoft.IdentityModel.Tokens;
 using NievoEasyfin.Application.Configuration;
 using System.Security.Claims;
 using NievoEasyfin.Application.Extensions.Claims;
+using NievoEasyfin.Application.Interfaces.Services;
 
 namespace NievoEasyfin.Application.Services.Security;
 
 /// <summary>
 /// Class service to JWT
 /// </summary>
-public class JsonWebTokenService
+public class JsonWebTokenService : IJsonWebTokenService
 {
     private static JsonWebTokenConfiguration _jsonWebTokenConfiguration;
 

@@ -1,13 +1,14 @@
 using NievoEasyfin.Application.Data.Entities;
 using NievoEasyfin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
+using NievoEasyfin.Application.Interfaces.Models;
 
 namespace NievoEasyfin.Application.Models;
 
 /// <summary>
 /// Class model to user_provider_sso
 /// </summary>
-public class UserProviderSsoModel : UserProviderSsoEntity
+public class UserProviderSsoModel : UserProviderSsoEntity, IUserProviderSsoModel
 {
     private readonly AuthOrigin _AuthMainNodeDatabase;
 

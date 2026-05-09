@@ -1,8 +1,9 @@
 using NievoEasyfin.Application.Infrastructure.Auth;
+using NievoEasyfin.Application.Interfaces.Models;
 
 namespace NievoEasyfin.Application.Models
 {
-    public class SmtpModel : SmtpProvider
+    public class SmtpModel : SmtpProvider, ISmtpModel
     {
         public SmtpModel() : base() { }
 

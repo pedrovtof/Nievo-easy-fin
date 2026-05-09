@@ -55,4 +55,27 @@ public abstract class AuthDbContext : DbContext
         }
         return;
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                // SQLite doesn't support schemas in the same way as Postgres
+                entity.SetSchema(null);
+
+                foreach (var property in entity.GetProperties())
+                {
+                    // SERIAL is Npgsql specific, for SQLite we want the default
+                    if (property.GetColumnType()?.Contains("SERIAL", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        property.SetColumnType(null);
+                    }
+                }
+            }
+        }
+    }
 }

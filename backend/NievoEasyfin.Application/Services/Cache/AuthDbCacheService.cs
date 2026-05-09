@@ -2,10 +2,11 @@ using NievoEasyfin.Application.Data.Context.Cache;
 using NievoEasyfin.Application.Data.Cache.Views;
 using NievoEasyfin.Application.Data.Entities.Cache;
 using System.Text.Json;
+using NievoEasyfin.Application.Interfaces.Services;
 
 namespace NievoEasyfin.Application.Services.Cache
 {
-    public class AuthDbCacheService : AuthDbCacheContext
+    public class AuthDbCacheService : AuthDbCacheContext, IAuthDbCacheService
     {
         public string PathToken => "User:TokenPasswordReset";
 

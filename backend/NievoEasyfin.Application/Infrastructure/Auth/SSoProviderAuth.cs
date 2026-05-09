@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 using NievoEasyfin.Application.Interfaces.Response;
 using System.Text.Json;
+using NievoEasyfin.Application.Interfaces.Infrastructure;
 
 namespace NievoEasyfin.Application.Infrastructure.Auth;
 
 /// <summary>
 /// Class model to validate the provider response
 /// </summary>
-public class SSoProviderAuth : SsoProviderEntity
+public class SSoProviderAuth : SsoProviderEntity, ISSoProviderAuth
 {
     private static AuthReplica? _AuthReplicaNodeDatabase;
 
