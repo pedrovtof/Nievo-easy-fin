@@ -6,7 +6,6 @@ using NievoEasyfin.Application.Interfaces.Request;
 using NievoEasyfin.Application.Interfaces.Response;
 using NievoEasyfin.Tests.Build.Request;
 using NSubstitute;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyfin.Tests.API.Auth.Public;
