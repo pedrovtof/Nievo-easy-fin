@@ -6,7 +6,6 @@ PASSWORD_CRYPTO_KEYSIZE= "64"
 # ALWAYS CHANGE THE SALT DURING THE FIRST DEPLOY 
 # GENERATE SALT USING THE MODEL CLASS FOR CRYPTOPASSWORD BY Convert.ToHexString(GenerateSalt()) with debug
 PASSWORD_CRYPTO_SALT = "" 
-REGEX_PASSWORD_RULE = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,12}$"
 
 #Google SSO envs
 GOOGLE_ID_CLIENT = ""
