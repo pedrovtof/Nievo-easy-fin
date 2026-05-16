@@ -37,6 +37,10 @@ CACHE_DATABASE_RETRY_POLICY_MAX_CONNECT = "1000"
 # Abort on connect true/false
 CACHE_DATABASE_ABORT_ON_CONNECT_FAIL = "false"
 
+# POSTGRES envs
+PGSQL_DATABASE_AUTH_CONNECTION_READ_REPLICA_STRING = "Host=localhost;Port=5433;Database=signup;Username=app_signup_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyfin.Auth;"
+PGSQL_DATABASE_AUTH_CONNECTION_STRING = "Host=localhost;Port=5432;Database=signup;Username=app_signup_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyfin.Auth;"
+ 
 
 # SMTP envs
 # You should take a look at 

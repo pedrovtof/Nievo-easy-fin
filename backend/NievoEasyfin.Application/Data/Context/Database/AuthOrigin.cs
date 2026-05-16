@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-
 namespace NievoEasyfin.Application.Data.Context.Database;
 
 /// <summary>
@@ -10,7 +9,7 @@ namespace NievoEasyfin.Application.Data.Context.Database;
 /// </summary>
 public class AuthOrigin : AuthDbContext
 {
-    protected override string KeyNameConnection => "auth_pgsql_origin";
+    protected override string PGSQL_DATABASE_AUTH_CONNECTION_STRING => DotNetEnv.Env.GetString("PGSQL_DATABASE_AUTH_CONNECTION_STRING");
 
     public AuthOrigin(DbContextOptions<AuthOrigin> options, IConfiguration configuration)
         : base(options, configuration)
