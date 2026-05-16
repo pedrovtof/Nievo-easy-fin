@@ -212,7 +212,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
             ));
 
         return Ok(new ResponseApiSucess(
-            EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED
+            EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED.GetDescription()
         ));
     }
 }

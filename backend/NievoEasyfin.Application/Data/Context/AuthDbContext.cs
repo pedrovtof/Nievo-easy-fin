@@ -16,7 +16,7 @@ namespace NievoEasyfin.Application.Data.Context;
 public abstract class AuthDbContext : DbContext
 {
     private IConfiguration _configuration;
-    protected abstract string KeyNameConnection { get; }
+    protected abstract string PGSQL_DATABASE_AUTH_CONNECTION_STRING { get; }
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<UserStatusEntity> UserStatuses { get; set; }
     public DbSet<UserTypeEntity> UserTypes { get; set; }
@@ -28,31 +28,29 @@ public abstract class AuthDbContext : DbContext
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
+    /// <summary>
+    /// Method to configure connection for database
+    /// </summary>
+    /// <param name="optionsBuilder"></param>
+    /// <exception cref="ArgumentException"></exception>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured)
-        {
             return;
-        }
 
-        var connectionString = _configuration.GetConnectionString(KeyNameConnection);
+        string connectionString = PGSQL_DATABASE_AUTH_CONNECTION_STRING;
 
         if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid connection string variable KeyNameConnection is Null or Empty");
-        }
+            throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid connection string variable PGSQL_DATABASE_AUTH_CONNECTION_STRING is Null or Empty");
 
-        switch (KeyNameConnection)
+        try
         {
-            case "auth_pgsql_replica":
-                optionsBuilder.UseNpgsql(connectionString);
-                break;
-            case "auth_pgsql_origin":
-                optionsBuilder.UseNpgsql(connectionString);
-                break;
-            default:
-                throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid database type, not configurated in AuthDbContext value => " + KeyNameConnection + " <=");
+            optionsBuilder.UseNpgsql(connectionString);
+            return;
         }
-        return;
+        catch
+        {
+            throw new ArgumentException($"[AuthDbContext][OnConfiguring] connection string");
+        }
     }
 }

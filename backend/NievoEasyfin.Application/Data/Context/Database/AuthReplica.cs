@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-
 namespace NievoEasyfin.Application.Data.Context.Database;
 
 /// <summary>
@@ -10,7 +9,7 @@ namespace NievoEasyfin.Application.Data.Context.Database;
 /// <returns>Connectio to Auth database PGSQL in READ_REPLICA node</returns>
 public class AuthReplica : AuthDbContext
 {
-    protected override string KeyNameConnection => "auth_pgsql_replica";
+    protected override string PGSQL_DATABASE_AUTH_CONNECTION_STRING => DotNetEnv.Env.GetString("PGSQL_DATABASE_AUTH_CONNECTION_READ_REPLICA_STRING");
 
     public AuthReplica(DbContextOptions<AuthReplica> options, IConfiguration configuration)
         : base(options, configuration)
