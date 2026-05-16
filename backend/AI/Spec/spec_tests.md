@@ -17,7 +17,7 @@ Garantir a integridade das regras de negócio, validações de API e integraçã
 ### 3.1 Nomenclatura de Arquivos e Classes
 
 - Os arquivos de teste devem espelhar a estrutura do projeto principal.
-- Exemplo: `NievoEasyfin.Application/Services/Base/UsersService.cs` -> `NievoEasyfin.Tests/Application/Services/Base/UsersServiceTests.cs`.
+- Exemplo: `NievoEasyFin.Application/Services/Base/UsersService.cs` -> `NievoEasyFin.Tests/Application/Services/Base/UsersServiceTests.cs`.
 
 ### 3.2 Nomenclatura de Métodos (Padrão: Objeto_Estado_Resultado)
 
@@ -33,7 +33,7 @@ Garantir a integridade das regras de negócio, validações de API e integraçã
 ## 4. Estratégia de Mocking
 
 - Utilizar `NSubstitute` para todas as dependências de serviço.
-- Criar classes de `Faker` (Bogus) em `NievoEasyfin.Tests/Mocks/Fakers` para entidades e requests comuns.
+- Criar classes de `Faker` (Bogus) em `NievoEasyFin.Tests/Mocks/Fakers` para entidades e requests comuns.
 
 ## 5. Casos de Teste Iniciais (Exemplo: UsersService)
 
@@ -46,7 +46,7 @@ Garantir a integridade das regras de negócio, validações de API e integraçã
 
 ## 6. Testes de Integração
 
-- Localizados em `NievoEasyfin.Tests/API/`.
+- Localizados em `NievoEasyFin.Tests/API/`.
 - Devem testar o pipeline completo (Controller -> Service -> Database/Mocks).
 - Utilizar `WebApplicationFactory` se necessário para subir o ambiente de teste.
 

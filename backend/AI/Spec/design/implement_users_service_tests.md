@@ -21,7 +21,7 @@ Since dependencies like `UserModel` and `CryptoPasswordService` are concrete cla
 - **Invalid Provider**: Provider not found or inactive.
 
 ## 5. Files to Create
-- `NievoEasyfin.Tests/Mocks/Fakers/UserEntityFaker.cs`
-- `NievoEasyfin.Tests/Mocks/Fakers/PostCreateUserRequestFaker.cs`
-- `NievoEasyfin.Tests/Application/Services/Base/UsersServiceTests.cs`
-- `NievoEasyfin.Tests/Mocks/Database/DbContextMockFactory.cs` (Helper to create mocked contexts)
+- `NievoEasyFin.Tests/Mocks/Fakers/UserEntityFaker.cs`
+- `NievoEasyFin.Tests/Mocks/Fakers/PostCreateUserRequestFaker.cs`
+- `NievoEasyFin.Tests/Application/Services/Base/UsersServiceTests.cs`
+- `NievoEasyFin.Tests/Mocks/Database/DbContextMockFactory.cs` (Helper to create mocked contexts)
