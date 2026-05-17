@@ -2,8 +2,8 @@ DOCUMENT_DOCKER_PATH=docs/docker-compose.yml
 BACKEND_PATH=./backend
 FRONTEND_PATH=./frontend/web
 INFRA_PATH=./infraestrutura/docker
-VENV_PATH=env
-VENV_PATH_ACTIVATE=env/bin/activate
+VENV_PATH=./backend/venv
+VENV_PATH_ACTIVATE=$(VENV_PATH)/bin/activate
 
 GITHUB_SA=
 PYTHONPATH=.
@@ -44,11 +44,15 @@ dotnet-run-auth: ## Execute service auth.csproj
 dotnet-run-core: ## Execute service auth.csproj
 	dotnet watch run --project $(BACKEND_PATH)/NievoEasyFin.Core
 
+python-env:
+	python3 -m venv $(VENV_PATH)
+	source $(VENV_PATH)/bin/activate
+
 infra-up: ## Execute docker up for database/gateway
 	docker compose -f $(INFRA_PATH)/docker-compose.yml up -d
 	docker ps -a
 
-web-exec: ## initialize the web application
+web-exec: ## Initialize the web application
 	npm --prefix $(FRONTEND_PATH) run dev   	
 
 web-test: ## Execute test for web
@@ -57,6 +61,6 @@ web-test: ## Execute test for web
 docker-build: ## Build images
 		@echo "Not implemented" # docker build -t 
 	
-docker-nievo: ## up the nievo app
+docker-nievo: ## Up the nievo app
 	infra-up
 	docker compose up -d
