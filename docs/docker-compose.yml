@@ -9,7 +9,7 @@ services:
     networks:
       - docs
     ports:
-      - "8030:8000"
+      - "6030:8000"
 
 networks:
   docs:
