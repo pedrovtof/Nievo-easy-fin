@@ -58,6 +58,9 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The login request data.</param>
     /// <returns>An <see cref="IActionResult"/> with the JWT token on success, or error details on failure.</returns>
+    /// Method service to login
+    /// </summary>
+    /// <param name="request">request PostLoginUserRequest</param>
     public async Task<IActionResult> PostLoginUserAsync(PostLoginUserRequest request)
     {
         var validatorResult = await new PostLoginUserValidatorAsync().ValidateAsync(request);
@@ -93,6 +96,9 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The SSO login request data.</param>
     /// <returns>An <see cref="IActionResult"/> with the JWT token on success, or error details on failure.</returns>
+    /// Method service to Login Sso 
+    /// </summary>
+    /// <param name="request">request PostLoginUserRequest</param>
     public async Task<IActionResult> PostLoginUserSsoAsync(PostLogiPostLoginUserSsoRequest request)
     {
         var validatorResult = await new PostLoginUserSsoValidatorAsync().ValidateAsync(request);
@@ -142,6 +148,9 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The request containing the user's email.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the reset initiation.</returns>
+    /// Method service for reset password
+    /// </summary>
+    /// <param name="request">request.email</param>
     public async Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request)
     {
         var validationResult = await new PostResetPasswordValidator().ValidateAsync(request);
@@ -179,6 +188,10 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The request containing the email, token, and new password.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the password change.</returns>
+    /// Method service to change password in database
+    /// </summary>
+    /// <param name="request">requset.pin_token and request.email</param>
+    /// <returns></returns>
     public async Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request)
     {
         var validationResult = await new PatchResetPasswordValidator().ValidateAsync(request);

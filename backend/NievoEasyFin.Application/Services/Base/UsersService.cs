@@ -43,6 +43,10 @@ public class UsersService : Controller, IUsersService
     /// </summary>
     /// <param name="request">The user creation request data.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the user creation.</returns>
+    /// Method service for create user basic
+    /// </summary>
+    /// <param name="request">request PostCreateUserRequest</param>
+    /// <returns>ResponseApiSucess/ResponseApiError</returns>
     public async Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request)
     {
         var validationResult = await new PostCreateUserValidator().ValidateAsync(request);
@@ -69,6 +73,10 @@ public class UsersService : Controller, IUsersService
     /// </summary>
     /// <param name="request">The SSO user creation request data.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the SSO user creation.</returns>
+    /// Method service for create user sso
+    /// </summary>
+    /// <param name="request">request PostCreateUserSsoAsync</param>
+    /// <returns>ResponseApiSucess/ResponseApiError</returns>
     public async Task<IActionResult> PostCreateUserSsoAsync(PostCreateUserSsoRequest request)
     {
         var validatorResult = await new PostCreateUserSsoValidator().ValidateAsync(request);

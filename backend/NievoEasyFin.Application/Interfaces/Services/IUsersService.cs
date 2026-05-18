@@ -20,5 +20,8 @@ public interface IUsersService
     /// </summary>
     /// <param name="request">The SSO user creation request data.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the SSO user creation.</returns>
+public interface IUsersService
+{
+    Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request);
     Task<IActionResult> PostCreateUserSsoAsync(PostCreateUserSsoRequest request);
 }

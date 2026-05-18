@@ -34,5 +34,10 @@ public interface IAuthenticatorService
     /// </summary>
     /// <param name="request">The request containing the email, reset token, and new password.</param>
     /// <returns>An IActionResult indicating the result of the password update.</returns>
+public interface IAuthenticatorService
+{
+    Task<IActionResult> PostLoginUserAsync(PostLoginUserRequest request);
+    Task<IActionResult> PostLoginUserSsoAsync(PostLogiPostLoginUserSsoRequest request);
+    Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request);
     Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request);
 }

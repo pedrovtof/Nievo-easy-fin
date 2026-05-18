@@ -8,6 +8,7 @@ namespace NievoEasyFin.Application.Services.Security;
 
 /// <summary>
 /// Service responsible for generating and managing JSON Web Tokens (JWT).
+/// Class service to JWT
 /// </summary>
 public class JsonWebTokenService
 {
@@ -27,6 +28,10 @@ public class JsonWebTokenService
     /// </summary>
     /// <param name="email">The email of the user for whom the token is being generated.</param>
     /// <returns>A signed JWT token string.</returns>
+    /// Method to generate token jwt
+    /// </summary>
+    /// <param name="email">email of the user</param>
+    /// <returns>token jwt</returns>
     public async Task<string> GenerateTokenAsync(string email)
     {
         var handler = new JwtSecurityTokenHandler();
@@ -55,6 +60,10 @@ public class JsonWebTokenService
     /// </summary>
     /// <param name="email">The user's email address.</param>
     /// <returns>A task representing the asynchronous operation, containing the created <see cref="ClaimsIdentity"/>.</returns>
+    /// Method to create subject of the jwt
+    /// </summary>
+    /// <param name="email">user email</param>
+    /// <returns>ClaimsIdentity</returns>
     private async Task<ClaimsIdentity> ClaimsIdentityTokenAsync(string email)
     {
         var ci = new ClaimsIdentity();
