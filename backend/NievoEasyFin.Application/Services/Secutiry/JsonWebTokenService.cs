@@ -7,22 +7,26 @@ using NievoEasyFin.Application.Extensions.Claims;
 namespace NievoEasyFin.Application.Services.Security;
 
 /// <summary>
-/// Class service to JWT
+/// Service responsible for generating and managing JSON Web Tokens (JWT).
 /// </summary>
 public class JsonWebTokenService
 {
     private static JsonWebTokenConfiguration _jsonWebTokenConfiguration;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonWebTokenService"/> class.
+    /// </summary>
+    /// <param name="jsonWebTokenConfiguration">The configuration settings for JWT generation.</param>
     public JsonWebTokenService(JsonWebTokenConfiguration jsonWebTokenConfiguration)
     {
         _jsonWebTokenConfiguration = jsonWebTokenConfiguration;
     }
 
     /// <summary>
-    /// Method to generate token jwt
+    /// Generates a JWT token for the specified user email.
     /// </summary>
-    /// <param name="email">email of the user</param>
-    /// <returns>token jwt</returns>
+    /// <param name="email">The email of the user for whom the token is being generated.</param>
+    /// <returns>A signed JWT token string.</returns>
     public async Task<string> GenerateTokenAsync(string email)
     {
         var handler = new JwtSecurityTokenHandler();
@@ -47,10 +51,10 @@ public class JsonWebTokenService
     }
 
     /// <summary>
-    /// Method to create subject of the jwt
+    /// Creates a <see cref="ClaimsIdentity"/> for the user token based on their email.
     /// </summary>
-    /// <param name="email">user email</param>
-    /// <returns>ClaimsIdentity</returns>
+    /// <param name="email">The user's email address.</param>
+    /// <returns>A task representing the asynchronous operation, containing the created <see cref="ClaimsIdentity"/>.</returns>
     private async Task<ClaimsIdentity> ClaimsIdentityTokenAsync(string email)
     {
         var ci = new ClaimsIdentity();

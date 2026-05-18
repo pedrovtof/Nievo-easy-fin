@@ -13,6 +13,9 @@ using NievoEasyFin.Application.Interfaces.Services;
 
 namespace NievoEasyFin.Application.Services.Base.Authenticator;
 
+/// <summary>
+/// Implementation of the <see cref="IAuthenticatorService"/>, handling the core logic for user authentication, SSO, and password management.
+/// </summary>
 public class AuthenticatorService : Controller, IAuthenticatorService
 {
     private readonly CryptoPasswordService _cryptoPasswordService;
@@ -51,9 +54,10 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     }
 
     /// <summary>
-    /// Method service to login
+    /// Processes a standard login request using email and password.
     /// </summary>
-    /// <param name="request">request PostLoginUserRequest</param>
+    /// <param name="request">The login request data.</param>
+    /// <returns>An <see cref="IActionResult"/> with the JWT token on success, or error details on failure.</returns>
     public async Task<IActionResult> PostLoginUserAsync(PostLoginUserRequest request)
     {
         var validatorResult = await new PostLoginUserValidatorAsync().ValidateAsync(request);
@@ -85,9 +89,10 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     }
 
     /// <summary>
-    /// Method service to Login Sso 
+    /// Processes an SSO login request using a third-party provider.
     /// </summary>
-    /// <param name="request">request PostLoginUserRequest</param>
+    /// <param name="request">The SSO login request data.</param>
+    /// <returns>An <see cref="IActionResult"/> with the JWT token on success, or error details on failure.</returns>
     public async Task<IActionResult> PostLoginUserSsoAsync(PostLogiPostLoginUserSsoRequest request)
     {
         var validatorResult = await new PostLoginUserSsoValidatorAsync().ValidateAsync(request);
@@ -133,9 +138,10 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     }
 
     /// <summary>
-    /// Method service for reset password
+    /// Initiates the password reset process by generating a token and sending it via email.
     /// </summary>
-    /// <param name="request">request.email</param>
+    /// <param name="request">The request containing the user's email.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the reset initiation.</returns>
     public async Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request)
     {
         var validationResult = await new PostResetPasswordValidator().ValidateAsync(request);
@@ -169,10 +175,10 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     }
 
     /// <summary>
-    /// Method service to change password in database
+    /// Completes the password reset process by validating the token and updating the password in the database.
     /// </summary>
-    /// <param name="request">requset.pin_token and request.email</param>
-    /// <returns></returns>
+    /// <param name="request">The request containing the email, token, and new password.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the password change.</returns>
     public async Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request)
     {
         var validationResult = await new PatchResetPasswordValidator().ValidateAsync(request);

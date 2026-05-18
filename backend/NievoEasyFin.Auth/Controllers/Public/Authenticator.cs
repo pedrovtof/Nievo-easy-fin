@@ -6,6 +6,9 @@ using NievoEasyFin.Application.Interfaces.Services;
 
 namespace NievoEasyFin.Auth.Controllers.Public;
 
+/// <summary>
+/// Controller responsible for public authentication endpoints, including login, SSO, and password recovery.
+/// </summary>
 [ApiController]
 [Route("api/public/v1/[controller]")]
 public class AuthenticatorController : Controller

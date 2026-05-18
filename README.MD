@@ -145,3 +145,147 @@ Para evitar ataques o serviço conta com um rateLimit do kong.
 | Custo         | 0     | 0     | 0     |
 
 # English - EUA
+
+# Introduction
+
+The product was conceived through a personal conflict of its developer, who needed to record his daily expenditure flow to understand his cost of living and cash flow.
+
+The software was developed to replace a spreadsheet previously used by the programmer located on Google Drive, which contained dynamic chart tabs and cells for entering values. The problem with the spreadsheet was the functions, which could often generate errors because they were strongly linked to the charts, and the constant need to change spreadsheets every year.
+
+We can conclude that the spreadsheet lacked data consistency and maintenance flexibility.
+
+## Why the technologies?
+
+Before checking the Stack choices (structure and technologies of a product), we are required to understand the software for academic purposes and without prior investment, limiting the developer's technology choices.
+
+```mermaid
+flowchart TD
+
+ local["Local Machine"]
+
+ subgraph Frontend["Frontend"]
+        next["React / Next.js"]
+        tailWind["Css / Tailwind"]
+        vmF["Dedicated Server"] --> next
+        vmF --> tailWind
+  end
+ subgraph Cicd["CD-CI"]
+        git["Github"]
+        gitA["Github Actions"]
+        git --> gitA
+  end
+ subgraph K8S["K8S"]
+        pods
+        pods --> py["Python / Flask"]
+        pods --> kong["Kong API Gateway"]
+        kong --> rateLimit["Rate limit access"]
+        kong --> auth["Auth"]
+  end
+ subgraph Backend["Backend"]
+        vmB["Dedicated Server"] --> Dotnet["Dotnet"]
+        cluster["Dedicated Cluster"] --> K8S
+  end
+
+ subgraph Database["Database"]
+    subgraph Cluster["Cluster"]
+        dbCore[("Postgres-A")]
+        dbCoreRR[("Postgres-B")]
+    end
+
+  dbData[(ClickHouse)]
+  dbMemory[(Redis)]
+
+  docker["Docker Compose"] --> Cluster
+  docker --> dbData
+  docker --> dbMemory
+
+  vmC["Dedicated Server"] --> docker
+  
+ end
+
+local --> Backend
+local --> Frontend
+local --> Database
+
+Backend --> Cicd
+Frontend --> Cicd
+Database --> Cicd
+```
+
+Chosen programming technologies:
+
+* C#
+* Python
+    Flask
+* JavaScript
+    Node
+    React
+
+### Infrastructure
+
+The application uses database clusters and Kubernetes, both running in Docker containers on an internal network.
+
+The container images will be from the community, as in the case of Redis or Clickhouse; some exceptions may use standard images such as Ubuntu. In both cases, the OS will consist of:
+
+* Ubuntu Server
+* Debian Bookworm
+* CentOS
+
+### Front-end
+
+Developed in React with Next, provisioned on a Debian Bookworm virtual machine.
+
+### Back-end
+
+Structure composed of:
+
+* C# Monolith (core)
+* Two microservices:
+    Python, as a data service
+    C#, as a login service
+
+Services should not have fully open communication; internal communication between services is possible with private endpoints. This isolation is part of the microservices architecture. The only external means of communication between them should be frontend calls to KongAPI using public endpoints.
+
+Since it has two microservices and a monolith, the architecture is hybrid.
+
+To prevent attacks, the service relies on Kong's rateLimit.
+
+### Database
+
+* ClickHouse, analytical database
+* Redis, cache database
+* Postgres, relational database with replica
+
+### Considerations
+
+* With this architecture, it is possible to have specific problems in different services, prioritizing the Core service.
+* The Core service is OOP (Object-Oriented Programming).
+* KongAPI can be integrated with Grafana/Prometheus.
+* The service is local, so an adequate network is not provisioned.
+* Python was chosen to handle mathematical and analytical operations due to its exceptional and solid performance. Its main disadvantage is high computational cost and difficulty in handling many simultaneous requests.
+* C# was chosen as the Core of the application for its consistency and resilience. Its main disadvantage is the learning curve and verbosity.
+* JavaScript for the Front-end is a market standard with a low learning curve. Its disadvantage is the average response time being lower than competing technologies like PHP. On the front-end, it can overload the client-side if poorly optimized.
+* Postgres, due to its structure and behavior regarding database segmentation and having an architecture that reinforces the use of schemas, is great for high requests but does not handle large volumes of data and internal procedures very well.
+* Redis is a market standard and has high compatibility with Kong, with extremely agile response time. Its disadvantage is the lack of updates since the newer versions are paid.
+* ClickHouse is a columnar database with one of the best current performances. It is poor for data alteration transactions but handles high data loads in its tables extremely well.
+
+### Programming Comparison Matrix
+
+| Category      | Python| C#    | JavaScript |
+|---------------|-------|-------|-------|
+| Ease          | 10    | 6     | 8     |
+| Speed         | 10    | 4     | 6     |
+| Performance   | 7     | 9     | 6     |
+| Community     | 10    | 7     | 10    |
+| Documentation | 10    | 10    | 8     |
+
+### Database Comparison Matrix
+
+| Category      | Redis | Postgres  | ClickHouse    |
+|---------------|-------|-------|-------|
+| Ease          | 6     | 8     | 6     |
+| Speed         | 10    | 6     | 9     |
+| Performance   | 10    | 6     | 9     |
+| Scalability   | 5     | 8     | 8     |
+| Community     | 6     | 10    | 4     |
+| Cost          | 0     | 0     | 0     |

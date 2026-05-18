@@ -1,3 +1,6 @@
 .DS_Store
 Thumbs.db
 .vscode
+backend/AI/temp/*
+frontend/AI/temp/*
+gemini/temp/*

@@ -4,7 +4,7 @@ using System.Text;
 namespace NievoEasyFin.Application.Services.Security;
 
 /// <summary>
-/// Class model for Crypto password
+/// Service responsible for secure password hashing and validation using PBKDF2.
 /// </summary>
 public class CryptoPasswordService
 {
@@ -17,7 +17,7 @@ public class CryptoPasswordService
     private static HashAlgorithmName AlgorithmHash = HashAlgorithmName.SHA512;
 
     /// <summary>
-    /// Service constructor
+    /// Initializes a new instance of the <see cref="CryptoPasswordService"/> class.
     /// </summary>
     public CryptoPasswordService()
     {
@@ -25,20 +25,20 @@ public class CryptoPasswordService
     }
 
     /// <summary>
-    /// Method to create salt
+    /// Generates a random cryptographic salt.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A byte array containing the generated salt.</returns>
     private byte[] GenerateSalt()
     {
         return RandomNumberGenerator.GetBytes(KeySize);
     }
 
     /// <summary>
-    /// Method to Hash password user
+    /// Hashes a plain-text password using PBKDF2.
     /// </summary>
-    /// <param name="password">password from request</param>
-    /// <returns>Hash string</returns>
-    /// <exception cref="ArgumentException">Invalid input</exception>
+    /// <param name="password">The plain-text password to hash.</param>
+    /// <returns>The hexadecimal string representation of the hashed password.</returns>
+    /// <exception cref="ArgumentException">Thrown when the password is null or empty.</exception>
     public async Task<string> HashPasswordAsync(string password)
     {
         if (string.IsNullOrEmpty(password))
@@ -50,11 +50,11 @@ public class CryptoPasswordService
     }
 
     /// <summary>
-    /// Method for validate the password.
+    /// Validates a plain-text password against a stored hash.
     /// </summary>
-    /// <param name="password">Input from request</param>
-    /// <param name="hash">value in database</param>
-    /// <returns>True/False</returns>
+    /// <param name="password">The plain-text password to validate.</param>
+    /// <param name="hash">The stored hexadecimal hash to compare against.</param>
+    /// <returns><c>true</c> if the password matches the hash; otherwise, <c>false</c>.</returns>
     public async Task<bool> HashValidateAsync(string password, string hash)
     {
         if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(hash))
