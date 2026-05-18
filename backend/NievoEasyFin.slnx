@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/NievoEasyFin.Application/">
+    <Project Path="NievoEasyFin.Application/application.csproj" />
+  </Folder>
+  <Folder Name="/NievoEasyFin.Auth/">
+    <Project Path="NievoEasyFin.Auth/auth.csproj" />
+  </Folder>
+  <Folder Name="/NievoEasyFin.Core/">
+    <Project Path="NievoEasyFin.Core/core.csproj" />
+  </Folder>
+  <Folder Name="/NievoEasyFin.Test/">
+    <Project Path="NievoEasyFin.Tests/test.csproj" />
+  </Folder>
+</Solution>
