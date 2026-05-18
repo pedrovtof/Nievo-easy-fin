@@ -11,6 +11,9 @@ using NievoEasyFin.Application.Interfaces.Services;
 
 namespace NievoEasyFin.Application.Services.Base.Users;
 
+/// <summary>
+/// Service responsible for user management, including standard and SSO registration.
+/// </summary>
 public class UsersService : Controller, IUsersService
 {
     private readonly CryptoPasswordService _cryptoPasswordService;
@@ -36,6 +39,10 @@ public class UsersService : Controller, IUsersService
     }
 
     /// <summary>
+    /// Creates a new user account with email and password.
+    /// </summary>
+    /// <param name="request">The user creation request data.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the user creation.</returns>
     /// Method service for create user basic
     /// </summary>
     /// <param name="request">request PostCreateUserRequest</param>
@@ -62,6 +69,10 @@ public class UsersService : Controller, IUsersService
     }
 
     /// <summary>
+    /// Creates a new user account or links an existing one via an SSO provider.
+    /// </summary>
+    /// <param name="request">The SSO user creation request data.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the SSO user creation.</returns>
     /// Method service for create user sso
     /// </summary>
     /// <param name="request">request PostCreateUserSsoAsync</param>

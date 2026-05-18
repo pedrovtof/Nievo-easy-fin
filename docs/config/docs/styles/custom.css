@@ -1,168 +1,224 @@
-/* ======= BASE GERAL ======= */
+/* ======= DESIGN SYSTEM: THE SILENT NAVIGATOR ======= */
+/* Based on frontend/desing/stict/DESIGN.md */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap');
+
 :root {
-    --md-primary-fg-color: #007b83;
-    /* Azul petróleo elegante */
-    --md-accent-fg-color: #ff715b;
-    /* Coral suave */
-    --md-default-bg-color: #f8fafc;
-    /* Fundo branco gelo */
-    --md-default-fg-color: #1e293b;
-    /* Texto grafite */
+    /* Palette */
+    --primary: #555f71;
+    --secondary: #5a6064;
+    --tertiary: #00639e;
+    
+    /* Surface Tiers - Tonal Layering */
+    --surface-lowest: #ffffff;
+    --surface-low: #f8fafc;
+    --surface-container: #f1f5f9;
+    --surface-high: #e2e8f0;
+    --surface-highest: #cbd5e1;
+    --surface-dim: #d3dbdd;
+
+    /* MkDocs Material Variable Overrides */
+    --md-primary-fg-color: var(--primary);
+    --md-primary-fg-color--light: var(--secondary);
+    --md-primary-fg-color--dark: var(--primary);
+    
+    --md-accent-fg-color: var(--tertiary);
+    
+    --md-default-bg-color: var(--surface-lowest);
+    --md-default-fg-color: var(--primary); /* No pure black, use Primary Charcoal */
+    
     --md-code-bg-color: #1e1e2e;
-    /* Fundo de código escuro */
     --md-code-fg-color: #f8f8f2;
-    /* Texto do código */
-    --md-border-color: #e2e8f0;
-    /* Bordas e divisórias suaves */
+    
+    /* Ghost Border Fallback - 15% Opacity */
+    --md-border-color: rgba(85, 95, 113, 0.15);
 }
 
+/* Modo Escuro (Slate) Alignment */
+[data-md-color-scheme="slate"] {
+    --md-primary-fg-color: #cbd5e1;
+    --md-accent-fg-color: #0084d1;
+    --md-default-bg-color: #1a1c1e;
+    --md-default-fg-color: #e2e8f0;
+    --md-code-bg-color: #0d1117;
+    --md-border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-md-color-scheme="slate"] .md-tabs__link {
+    color: #000000b0 !important;
+}
+
+/* ======= TYPOGRAPHY ======= */
+body, input {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .md-header__title, .md-nav__link--active {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+}
+
+.md-typeset h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--primary);
+    margin-bottom: 2rem;
+}
+
+/* Editorial Stack: Pair display-sm headlines with label-md metadata */
+.md-typeset h2 {
+    font-size: 1.5rem;
+    margin-top: 2.5rem;
+    color: var(--primary);
+}
+
+/* ======= NO-LINE RULE & TONAL LAYERING ======= */
+
+/* Header */
+.md-header {
+    background-color: var(--primary);
+    box-shadow: none;
+    border-bottom: 1px solid var(--md-border-color);
+}
+
+/* Hide Copyright */
 .md-copyright {
     display: none;
-    padding: 0rem;
+    padding: 0;
 }
 
-/* ======= MODO ESCURO ======= */
-[data-md-color-scheme="slate"] {
-    --md-primary-fg-color: #00a8a8;
-    /* Azul petróleo mais claro */
-    --md-accent-fg-color: #ff9966;
-    /* Coral quente */
-    --md-default-bg-color: #0d1117;
-    /* Fundo escuro */
-    --md-default-fg-color: #e6edf3;
-    /* Texto claro */
-    --md-code-bg-color: #161b22;
-    /* Fundo de código */
-    --md-code-fg-color: #f8f8f2;
-    /* Texto do código */
-    --md-border-color: #30363d;
-    /* Bordas no dark mode */
-}
-
-/* ======= CABEÇALHO ======= */
-
-
-
-.md-header {
-    background-color: var(--md-primary-fg-color);
-    color: white;
-    /*box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);*/
-    transition: background-color 0.3s ease;
-}
-
-.md-header__title {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-/* ======= LINKS ======= */
-a {
-    color: var(--md-accent-fg-color);
+/* Links - Editorial Voice */
+.md-typeset a {
+    color: inherit;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: opacity 0.2s ease;
 }
 
-a:hover {
-    color: var(--md-primary-fg-color);
-    text-decoration: underline;
+.md-typeset a:hover {
+    opacity: 0.7;
+    text-decoration: none;
 }
 
-/* ======= NAVEGAÇÃO LATERAL ======= */
+/* Breadcrumbs (Etapas) */
+.md-ellipsis {
+    color: var(--secondary) !important;
+}
+
+.md-nav__link--passed {
+    color: var(--secondary) !important;
+}
+
+/* Navigation Lateral - Boundary through background shifts */
 .md-nav__link {
-    font-weight: 500;
-    border-left: 3px solid transparent;
+    border-left: none !important; /* Forbidden 1px borders */
+    border-radius: 8px;
+    margin: 4px 0;
     transition: all 0.2s ease;
 }
 
 .md-nav__link:hover {
-    color: var(--md-accent-fg-color);
-    border-left-color: var(--md-accent-fg-color);
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: var(--surface-low);
+    color: var(--tertiary);
 }
 
-[data-md-color-scheme="slate"] .md-nav__link:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+.md-nav__link--active {
+    background-color: var(--surface-container);
+    color: var(--primary);
+    font-weight: 700;
 }
 
-/* ======= CÓDIGO E BLOCO DE CÓDIGO ======= */
-code,
-pre {
+/* Tables - Divider-Free / Tonal Layering */
+.md-typeset table {
+    border: none;
+    background-color: var(--surface-low);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.md-typeset th {
+    background-color: var(--surface-high);
+    color: var(--primary);
+    border: none !important;
+    padding: 1rem;
+    font-weight: 700;
+}
+
+.md-typeset td {
+    border: none !important;
+    border-bottom: 1px solid var(--md-border-color) !important; /* Ghost border fallback */
+    padding: 1rem;
+}
+
+.md-typeset tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Blockquotes - Editorial Clarity */
+.md-typeset blockquote {
+    border-left: none;
+    background-color: var(--surface-low);
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: var(--secondary);
+    font-style: italic;
+    margin: 1.5rem 0;
+}
+
+/* Buttons - Functional Elegance */
+.md-button {
+    border-radius: 1rem !important; /* lg roundedness */
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    border: none !important;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.md-button:active {
+    transform: scale(0.98);
+}
+
+.md-button--primary {
+    background-color: var(--primary);
+    color: white !important;
+}
+
+.md-button--primary:hover {
+    background-color: var(--secondary);
+}
+
+/* Ambient Shadows for floating elements */
+.md-select__inner, .md-dropdown, .md-search__result {
+    box-shadow: 0px 24px 48px rgba(45, 52, 53, 0.06) !important;
+    border-radius: 12px;
+}
+
+/* Code Blocks */
+code, pre {
     font-family: 'Fira Code', monospace;
 }
 
 pre code {
     background-color: var(--md-code-bg-color);
-    color: var(--md-code-fg-color);
-    border-radius: 6px;
-    padding: 0.75rem;
-    display: block;
-    line-height: 1.4;
-}
-
-/* ======= BOTÃO COPIAR CÓDIGO ======= */
-.md-clipboard {
-    background-color: var(--md-accent-fg-color);
-    color: white;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-}
-
-.md-clipboard:hover {
-    background-color: var(--md-primary-fg-color);
-}
-
-/* ======= TABELAS ======= */
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1rem 0;
-    border: 1px solid var(--md-border-color);
-}
-
-th,
-td {
-    border: 1px solid var(--md-border-color);
-    padding: 0.75rem;
-    text-align: left;
-}
-
-th {
-    background-color: var(--md-primary-fg-color);
-    color: white;
-    font-weight: 600;
-}
-
-/* ======= BLOCOS DE CITAÇÃO ======= */
-blockquote {
-    border-left: 4px solid var(--md-accent-fg-color);
-    padding: 0.75rem 1rem;
-    background-color: rgba(0, 0, 0, 0.02);
-    color: var(--md-default-fg-color);
-    border-radius: 4px;
-}
-
-/* ======= BOTÕES ======= */
-.md-button {
-    background-color: var(--md-accent-fg-color);
-    color: white;
-    border-radius: 4px;
-    padding: 0.4rem 1rem;
-    transition: all 0.2s ease;
-    font-weight: 500;
-}
-
-.md-button:hover {
-    background-color: var(--md-primary-fg-color);
-}
-
-/* ======= RODAPÉ ======= */
-.md-footer {
-    background-color: var(--md-primary-fg-color);
-    text-align: center;
+    border-radius: 12px;
     padding: 1rem;
-    font-size: 0.9rem;
 }
 
-.md-footer-meta__inner {
-    padding: 0;
+/* Financial Chips (Success/Danger context) */
+.md-typeset .admonition.success {
+    border-left: none;
+    background-color: rgba(0, 158, 99, 0.1); /* Soft success */
+    border-radius: 8px;
+}
+
+.md-typeset .admonition.danger, .md-typeset .admonition.error {
+    border-left: none;
+    background-color: rgba(211, 47, 47, 0.1); /* Soft error/warning per DESIGN.md */
+    border-radius: 8px;
 }
