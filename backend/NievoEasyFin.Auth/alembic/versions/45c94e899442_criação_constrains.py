@@ -23,7 +23,6 @@ def upgrade() -> None:
     op.execute("""
         DO $$
             BEGIN
-
             IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_user_provider_sso_provider_id') THEN
                 ALTER TABLE journey.user_provider_sso
                 ADD CONSTRAINT fk_user_provider_sso_provider_id FOREIGN KEY (sso_provider_id) REFERENCES journey.sso_provider(id);
