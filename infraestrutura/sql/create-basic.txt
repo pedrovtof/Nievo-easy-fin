@@ -1,0 +1,22 @@
+create database core;
+
+create database signup;
+
+create role app_signup_service_efn with login password 'senhaSuperSegura';
+
+create role app_core_service_efn with login password 'senhaSuperSegura';
+
+create role app_migration_service_efn with login password 'senhasegUr';
+
+grant all privileges on database core to app_migration_service_efn;
+
+grant all privileges on database signup to app_migration_service_efn;
+
+create role cross_database_user with login password 'senhaSuperSegura';
+
+grant connect on database core to cross_database_user;
+
+grant connect on database signup to cross_database_user;
+
+GRANT ALL ON SCHEMA public TO app_migration_service_efn; -- executar na base de dados core e signup
+

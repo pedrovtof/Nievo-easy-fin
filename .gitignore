@@ -4,3 +4,6 @@ Thumbs.db
 backend/AI/temp/*
 frontend/AI/temp/*
 gemini/temp/*
+
+.antigravity/*
+.antigravitycli/*

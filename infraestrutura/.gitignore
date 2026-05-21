@@ -4,3 +4,4 @@ data/*
 *.sql
 *.sql.gz
 *.sql.bak
+.env

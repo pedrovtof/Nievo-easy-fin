@@ -7,3 +7,4 @@
 /clickhouse/node_b/data/*
 
 /redish/data/*
+.env

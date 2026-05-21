@@ -49,7 +49,7 @@ def upgrade() -> None:
 
         CREATE INDEX IF NOT EXISTS idx_user_status ON user_details.user (status_id);
 
-        GRANT SELECT ON user_details.user TO CROSS_DATABASE_USER;
+        GRANT SELECT ON user_details.user TO cross_database_user;
 
         GRANT USAGE ON SCHEMA user_details TO cross_database_user;
 
@@ -61,7 +61,7 @@ def upgrade() -> None:
 
         GRANT SELECT ON TABLE user_details.user_status TO app_signup_service_efn;
 
-        GRANT USAGE ON SCHEMA user_details TO CROSS_DATABASE_USER;
+        GRANT USAGE ON SCHEMA user_details TO cross_database_user;
     """)
     pass
 
