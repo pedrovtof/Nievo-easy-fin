@@ -107,6 +107,7 @@ const RegisterView = ({
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
+                          type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
                         >
@@ -133,6 +134,7 @@ const RegisterView = ({
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
+                          type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
                         >

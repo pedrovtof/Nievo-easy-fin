@@ -9,13 +9,11 @@ const MockGuidePopup = () => {
   // Only render if in mock mode
   if (import.meta.env.VITE_USE_MOCK !== 'true') return null;
 
-  useEffect(() => {
-    if (open) {
-      setFormData(getMockState());
-    }
-  }, [open]);
+  const handleOpen = () => {
+    setFormData(getMockState());
+    setOpen(true);
+  };
 
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const copyToClipboard = (text) => {
