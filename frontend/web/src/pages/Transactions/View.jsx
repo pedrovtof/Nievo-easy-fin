@@ -4,6 +4,13 @@ import AddIcon from '@mui/icons-material/Add';
 import { useText } from '../../hooks/useText';
 import { TransactionsWrapper, FiltersBar, StyledTableContainer, StyledTableHead, HeaderCell, BodyCell } from './styles';
 
+/**
+ * Transactions View Template
+ * Pure presentation component to display a sortable/filterable list of transactions.
+ *
+ * @param {Object} props - Contains transactions data, loading state, and error message.
+ * @returns {JSX.Element} The rendered visual layer of the Transactions page.
+ */
 const TransactionsView = ({ data, loading, error }) => {
   const { t } = useText();
 

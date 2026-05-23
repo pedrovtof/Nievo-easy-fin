@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import TransactionsView from './View';
 import { getTransactionsData } from './api';
 
+/**
+ * Transactions Page Controller
+ * Fetches and manages the state for the user's transaction history.
+ *
+ * @returns {JSX.Element} The rendered Transactions page controller.
+ */
 const Transactions = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { setupMockAdapter } from './mockData';
 
+/**
+ * Core API Client instance
+ * Configured with Axios to talk to the backend, and attaches the JWT automatically.
+ * Automatically intercepted by mockData.js if VITE_USE_MOCK is enabled.
+ */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
   headers: {

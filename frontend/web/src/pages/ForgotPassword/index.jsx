@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import ForgotPasswordView from './View';
 import { requestPasswordReset } from './api';
 
+/**
+ * Forgot Password Page Controller
+ * Manages state and API interaction for the password reset flow.
+ *
+ * @returns {JSX.Element} The rendered Forgot Password page controller.
+ */
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);

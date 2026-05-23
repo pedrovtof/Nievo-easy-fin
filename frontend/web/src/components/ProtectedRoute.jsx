@@ -1,6 +1,15 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
+/**
+ * Protected Route Guard
+ * Intercepts routing to check for an active user session (JWT).
+ * Redirects unauthenticated users to the Login page.
+ *
+ * @param {Object} props
+ * @param {JSX.Element} props.children - The protected component to render if authenticated.
+ * @returns {JSX.Element} The children or a Navigate redirect.
+ */
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('auth_token');
   const location = useLocation();

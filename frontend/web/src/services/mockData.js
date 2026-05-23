@@ -53,7 +53,7 @@ export const setupMockAdapter = (apiClient) => {
             data: { success: false, messages: ["Invalid email or password. Check the Mock Guide."] } 
           };
         }
-      } catch (e) {
+      } catch {
         error.mockData = { status: 401, data: { success: false, messages: ["Invalid login request."] } };
       }
     } else if (config.url.includes('/auth/register')) {
@@ -67,7 +67,7 @@ export const setupMockAdapter = (apiClient) => {
           mockUsers.push(newUser);
           error.mockData = { status: 200, data: mockResponses.loginSuccess(newUser) };
         }
-      } catch (e) {
+      } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
       }
     } else if (config.url.includes('/auth/change-password')) {
@@ -79,17 +79,17 @@ export const setupMockAdapter = (apiClient) => {
           user.password = body.newPassword;
           error.mockData = { status: 200, data: { success: true, message: "Password updated." } };
         } else {
-          error.mockData = { status: 401, data: { success: false, messages: ["Invalid old password or email."] } };
+          error.mockData = { status: 401, data: { success: false, messages: ["Invalid credentials"] } };
         }
-      } catch (e) {
-        error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
+      } catch {
+        error.mockData = { status: 400, data: { success: false, messages: ["Bad request"] } };
       }
     } else if (config.url.includes('/auth/forgot-password')) {
       try {
         typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
         // In a real app we don't usually leak if the email exists, we just return 200.
         error.mockData = { status: 200, data: { success: true, message: "Reset link sent." } };
-      } catch (e) {
+      } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
       }
     } else if (config.url.includes('/dashboard')) {

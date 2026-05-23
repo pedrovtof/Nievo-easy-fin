@@ -1,8 +1,9 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useMemo, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { getDesignTokens } from '../theme/theme';
 
-export const ColorModeContext = createContext({
+export const ThemeContext = createContext({
   mode: 'light',
   toggleColorMode: () => {},
 });

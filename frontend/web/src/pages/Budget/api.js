@@ -1,7 +1,9 @@
-import api from '../../services/api';
+/**
+ * Budget API definitions
+ * Export functions here that interact with the /budget endpoints.
+ */
 
 export const getBudgetData = () => {
-  // If we had a budget endpoint: return api.get('/budget');
   // For now we mock it directly if there's no endpoint.
   return Promise.resolve({
     data: {

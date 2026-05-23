@@ -11,6 +11,12 @@ import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 
+/**
+ * Main Application Component
+ * Configures the application routing, theme provider, and authentication guards.
+ *
+ * @returns {JSX.Element} The root application component tree.
+ */
 function App() {
   return (
     <BrowserRouter>

@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import DashboardView from './View';
 import { getDashboardData } from './api';
 
+/**
+ * Dashboard Page Controller
+ * Fetches and manages the primary financial overview data for the user.
+ *
+ * @returns {JSX.Element} The rendered Dashboard page controller.
+ */
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

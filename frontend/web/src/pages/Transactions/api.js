@@ -1,4 +1,7 @@
-import api from '../../services/api';
+/**
+ * Transactions API definitions
+ * Export functions here that interact with the /transactions endpoints.
+ */
 
 export const getTransactionsData = () => {
   return Promise.resolve({

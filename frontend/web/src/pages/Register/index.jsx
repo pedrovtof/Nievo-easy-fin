@@ -4,6 +4,13 @@ import { useGoogleLogin } from '@react-oauth/google';
 import RegisterView from './View';
 import { createUser, createUserSSO } from './api';
 
+/**
+ * Register Page Controller
+ * Manages state, validation, and API interactions for user registration.
+ * Connects directly to the RegisterView for presentation.
+ *
+ * @returns {JSX.Element} The rendered Register page controller.
+ */
 const Register = () => {
   const navigate = useNavigate();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -31,7 +38,7 @@ const Register = () => {
         } else {
           setFormError('Failed to create account.');
         }
-      } catch (err) {
+      } catch {
         setFormError('Failed to authenticate with Google.');
       } finally {
         setIsGoogleLoading(false);
@@ -72,7 +79,7 @@ const Register = () => {
       } else {
         setFormError('Failed to create account. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setFormError('An unexpected error occurred. Please try again.');
     } finally {
       setIsFormLoading(false);

@@ -3,6 +3,13 @@ import { Typography, Box, CircularProgress, Chip } from '@mui/material';
 import { useText } from '../../hooks/useText';
 import { DashboardContainer, SummaryGrid, SummaryCard, TransactionList, TransactionItem } from './styles';
 
+/**
+ * Dashboard View Template
+ * Pure presentation component to display the financial overview metrics.
+ *
+ * @param {Object} props - Contains dashboard data, loading state, and error message.
+ * @returns {JSX.Element} The rendered visual layer of the Dashboard page.
+ */
 const DashboardView = ({ data, loading, error }) => {
   const { t } = useText();
 

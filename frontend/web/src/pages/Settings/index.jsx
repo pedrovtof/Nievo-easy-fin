@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
 import SettingsView from './View';
 import { getSettingsData, updateSettings } from './api';
-import { ColorModeContext } from '../../context/ThemeContext';
+import { ThemeContext } from '../../context/ThemeContext';
 
+/**
+ * Settings Page Controller
+ * Manages state and logic for user profile updates.
+ *
+ * @returns {JSX.Element} The rendered Settings page controller.
+ */
 const Settings = () => {
-  const { mode, toggleColorMode } = useContext(ColorModeContext);
+  const { mode, toggleColorMode } = useContext(ThemeContext);
   const [profile, setProfile] = useState(null);
   const [toggles, setToggles] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,8 +29,7 @@ const Settings = () => {
           setProfile(responseData.data.profile);
           setToggles(responseData.data.toggles);
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
         setError('Failed to load settings data');
       } finally {
         setLoading(false);
@@ -46,7 +51,7 @@ const Settings = () => {
     try {
       await updateSettings({ profile, toggles });
       alert('Settings saved successfully!');
-    } catch (err) {
+    } catch {
       alert('Failed to save settings.');
     }
   };

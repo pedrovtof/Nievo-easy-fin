@@ -4,7 +4,7 @@ import { useText } from '../../hooks/useText';
 import { BudgetContainer, SummaryGrid, SummaryCard, CategoryGrid, CategoryCard, StyledLinearProgress } from './styles';
 
 const BudgetView = ({ data, loading, error }) => {
-  const { t } = useText();
+  useText();
 
   if (loading) {
     return <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>;

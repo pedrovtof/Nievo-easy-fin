@@ -6,6 +6,12 @@ import LoginView from './View';
 // Assuming they do since the original used them. If mock is enabled, it intercepts them.
 import { loginUser, loginUserSSO } from './api';
 
+/**
+ * Login Page Controller
+ * Manages state, validation, and API interactions for user authentication.
+ *
+ * @returns {JSX.Element} The rendered Login page controller.
+ */
 const Login = () => {
   const navigate = useNavigate();
 

@@ -1,3 +1,7 @@
+/**
+ * Main Entry Point
+ * Initializes the React application, strict mode, and injects the global mock overlay.
+ */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';

@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import BudgetView from './View';
 import { getBudgetData } from './api';
 
+/**
+ * Budget Page Controller
+ * Fetches and manages the state for category allocations and spending limits.
+ *
+ * @returns {JSX.Element} The rendered Budget page controller.
+ */
 const Budget = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

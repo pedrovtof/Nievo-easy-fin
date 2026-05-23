@@ -6,6 +6,13 @@ import LockResetIcon from '@mui/icons-material/LockReset';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ForgotContainer, ForgotCard, HeaderBox, StyledForm } from './styles';
 
+/**
+ * Forgot Password View Template
+ * Pure presentation component for the password recovery interface.
+ *
+ * @param {Object} props - Properties mapping state and handlers from the Controller.
+ * @returns {JSX.Element} The rendered visual layer of the Forgot Password page.
+ */
 const ForgotPasswordView = ({
   email, handleInputChange,
   formError, formSuccess, isLoading,

@@ -7,6 +7,13 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useText } from '../../hooks/useText';
 import { SettingsContainer, SectionCard, SectionHeader } from './styles';
 
+/**
+ * Settings View Template
+ * Pure presentation component for editing the user profile and preferences.
+ *
+ * @param {Object} props - Properties mapping state and handlers from the Controller.
+ * @returns {JSX.Element} The rendered visual layer of the Settings page.
+ */
 const SettingsView = ({ profile, toggles, loading, error, globalDarkMode, onGlobalDarkModeToggle, onProfileChange, onToggleChange, onSave, onChangePassword }) => {
   const { t } = useText();
 

@@ -22,6 +22,13 @@ const MockField = ({ label, value, onCopy }) => (
   </Box>
 );
 
+/**
+ * Mock Guide Popup View
+ * Presentation layer for the mock data overlay.
+ *
+ * @param {Object} props - Properties mapping state and handlers from the Controller.
+ * @returns {JSX.Element} The rendered dialog.
+ */
 const MockGuidePopupView = ({ open, mockData, onOpen, onClose, onCopy }) => {
   return (
     <>
