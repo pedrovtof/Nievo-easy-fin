@@ -50,7 +50,7 @@ export const setupMockAdapter = (apiClient) => {
     
     if (config.url.includes('/auth/login')) {
       try {
-        const body = JSON.parse(config.data);
+        const body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
         const user = mockUsers.find(u => u.email === body.email && u.password === body.password);
         if (user) {
           error.mockData = { status: 200, data: mockResponses.loginSuccess(user) };
@@ -61,7 +61,7 @@ export const setupMockAdapter = (apiClient) => {
           };
         }
       } catch (e) {
-        error.mockData = { status: 200, data: mockResponses.loginSuccess(mockUsers[0]) };
+        error.mockData = { status: 401, data: { success: false, messages: ["Invalid login request."] } };
       }
     } else if (config.url.includes('/auth/register')) {
       try {
