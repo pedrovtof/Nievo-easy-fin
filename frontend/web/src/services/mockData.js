@@ -73,13 +73,18 @@ export const setupMockAdapter = (apiClient) => {
     } else if (config.url.includes('/auth/change-password') || (config.url.includes('/Authenticator/password-reset') && config.method === 'patch')) {
       try {
         const body = JSON.parse(config.data);
-        // Assuming body contains { email, oldPassword, newPassword }
-        const user = mockUsers.find(u => u.email === body.email && u.password === body.oldPassword);
-        if (user) {
-          user.password = body.newPassword;
-          error.mockData = { status: 200, data: { success: true, message: "Password updated." } };
+        // Real API body: { email, pin_token, password }
+        // Mock just validates pin_token is present and updates the password
+        if (body.pin_token && body.password) {
+          const user = mockUsers.find(u => u.email === body.email);
+          if (user) {
+            user.password = body.password;
+            error.mockData = { status: 200, data: { success: true, message: "Password updated." } };
+          } else {
+            error.mockData = { status: 404, data: { success: false, messages: ["User not found"] } };
+          }
         } else {
-          error.mockData = { status: 401, data: { success: false, messages: ["Invalid credentials"] } };
+          error.mockData = { status: 401, data: { success: false, messages: ["Invalid or missing PIN token"] } };
         }
       } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request"] } };
