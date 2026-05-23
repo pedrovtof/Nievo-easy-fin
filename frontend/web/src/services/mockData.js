@@ -91,6 +91,14 @@ export const setupMockAdapter = (apiClient) => {
       } catch (e) {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
       }
+    } else if (config.url.includes('/auth/forgot-password')) {
+      try {
+        typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+        // In a real app we don't usually leak if the email exists, we just return 200.
+        error.mockData = { status: 200, data: { success: true, message: "Reset link sent." } };
+      } catch (e) {
+        error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
+      }
     } else if (config.url.includes('/dashboard')) {
       error.mockData = { status: 200, data: mockResponses.dashboard };
     } else {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MockGuidePopupView from './View';
 import { getMockState, updateMockState } from '../../services/mockData';
 

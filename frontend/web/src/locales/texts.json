@@ -19,6 +19,13 @@
     "registerButton": "Sign Up",
     "loginLink": "Already have an account? Sign in"
   },
+  "ForgotPassword": {
+    "title": "Reset Password",
+    "description": "Enter the email associated with your account and we'll send you a link to reset your password.",
+    "emailLabel": "Email Address",
+    "submitButton": "Send Reset Link",
+    "backToLogin": "Return to Login"
+  },
   "Dashboard": {
     "title": "Dashboard",
     "totalBalance": "Total Balance",

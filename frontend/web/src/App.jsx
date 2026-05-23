@@ -5,7 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Budget from './pages/Budget';
 import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword';
+import ForgotPassword from './pages/ForgotPassword/index';
 import Settings from './pages/Settings';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
