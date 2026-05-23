@@ -23,20 +23,13 @@ export const mockResponses = {
 };
 
 export const getMockState = () => ({
-  userEmail: mockUsers[0].email,
-  userPassword: mockUsers[0].password,
-  totalBalance: mockResponses.dashboard.data.totalBalance,
-  income: mockResponses.dashboard.data.income,
-  expenses: mockResponses.dashboard.data.expenses,
+  users: mockUsers.map(u => ({ email: u.email, password: u.password })),
+  dashboard: {
+    totalBalance: mockResponses.dashboard.data.totalBalance,
+    income: mockResponses.dashboard.data.income,
+    expenses: mockResponses.dashboard.data.expenses,
+  }
 });
-
-export const updateMockState = (updates) => {
-  if (updates.userEmail !== undefined) mockUsers[0].email = updates.userEmail;
-  if (updates.userPassword !== undefined) mockUsers[0].password = updates.userPassword;
-  if (updates.totalBalance !== undefined) mockResponses.dashboard.data.totalBalance = Number(updates.totalBalance);
-  if (updates.income !== undefined) mockResponses.dashboard.data.income = Number(updates.income);
-  if (updates.expenses !== undefined) mockResponses.dashboard.data.expenses = Number(updates.expenses);
-};
 
 export const setupMockAdapter = (apiClient) => {
   apiClient.interceptors.request.use((config) => {

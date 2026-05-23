@@ -2,18 +2,19 @@ import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Fab, Typography, Box, TextField, IconButton } from '@mui/material';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import SaveIcon from '@mui/icons-material/Save';
 import { FabContainer } from './styles';
 
-const MockField = ({ label, value, onChange, onCopy }) => (
+const MockField = ({ label, value, onCopy }) => (
   <Box display="flex" alignItems="center" gap={1} mb={2}>
     <TextField
       label={label}
       value={value || ''}
-      onChange={onChange}
       fullWidth
       variant="outlined"
       size="small"
+      InputProps={{
+        readOnly: true,
+      }}
     />
     <IconButton onClick={() => onCopy(value)} title="Copy value">
       <ContentCopyIcon />
@@ -21,7 +22,7 @@ const MockField = ({ label, value, onChange, onCopy }) => (
   </Box>
 );
 
-const MockGuidePopupView = ({ open, formData, onOpen, onClose, onCopy, onChange, onSubmit }) => {
+const MockGuidePopupView = ({ open, mockData, onOpen, onClose, onCopy }) => {
   return (
     <>
       <FabContainer>
@@ -31,32 +32,36 @@ const MockGuidePopupView = ({ open, formData, onOpen, onClose, onCopy, onChange,
       </FabContainer>
 
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Mock Data Editor</DialogTitle>
+        <DialogTitle>Mock Data Guide</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body2" gutterBottom mb={3}>
-            Edit the temporary mock data stored in memory. Changes will persist until the server restarts.
+            Here is the current state of the mock database. 
+            Any users created during this session will appear below, making it easy to copy their credentials.
           </Typography>
           
-          <Typography variant="subtitle2" color="primary" gutterBottom>
-            Default User Credentials
-          </Typography>
-          <MockField label="Email" value={formData.userEmail} onChange={(e) => onChange('userEmail', e.target.value)} onCopy={onCopy} />
-          <MockField label="Password" value={formData.userPassword} onChange={(e) => onChange('userPassword', e.target.value)} onCopy={onCopy} />
+          {mockData?.users?.map((user, idx) => (
+            <Box key={idx} mb={3} p={2} border="1px solid" borderColor="divider" borderRadius={1}>
+              <Typography variant="subtitle2" color="primary" gutterBottom>
+                {idx === 0 ? "Default User" : `Created User ${idx}`}
+              </Typography>
+              <MockField label="Email" value={user.email} onCopy={onCopy} />
+              <MockField label="Password" value={user.password} onCopy={onCopy} />
+            </Box>
+          ))}
 
           <Typography variant="subtitle2" color="primary" gutterBottom mt={3}>
             Dashboard Data
           </Typography>
-          <MockField label="Total Balance" value={formData.totalBalance} onChange={(e) => onChange('totalBalance', e.target.value)} onCopy={onCopy} />
-          <MockField label="Income" value={formData.income} onChange={(e) => onChange('income', e.target.value)} onCopy={onCopy} />
-          <MockField label="Expenses" value={formData.expenses} onChange={(e) => onChange('expenses', e.target.value)} onCopy={onCopy} />
+          <Box p={2} border="1px solid" borderColor="divider" borderRadius={1}>
+            <MockField label="Total Balance" value={mockData?.dashboard?.totalBalance} onCopy={onCopy} />
+            <MockField label="Income" value={mockData?.dashboard?.income} onCopy={onCopy} />
+            <MockField label="Expenses" value={mockData?.dashboard?.expenses} onCopy={onCopy} />
+          </Box>
 
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} color="inherit">
-            Cancel
-          </Button>
-          <Button onClick={onSubmit} color="primary" variant="contained" startIcon={<SaveIcon />}>
-            Submit Changes
+          <Button onClick={onClose} color="primary" variant="contained">
+            Close
           </Button>
         </DialogActions>
       </Dialog>
