@@ -35,7 +35,20 @@ export const setupMockAdapter = (apiClient) => {
     const error = new Error('mock-intercepted');
     
     if (config.url.includes('/auth/login')) {
-      error.mockData = { status: 200, data: mockResponses.login };
+      try {
+        const body = JSON.parse(config.data);
+        if (body.email === 'demo@nievo.com' && body.password === 'password123') {
+          error.mockData = { status: 200, data: mockResponses.login };
+        } else {
+          error.mockData = { 
+            status: 401, 
+            data: { success: false, messages: ["Invalid email or password. Use demo@nievo.com / password123"] } 
+          };
+        }
+      } catch (e) {
+        // If no body or parse error, just accept it for simplicity or SSO
+        error.mockData = { status: 200, data: mockResponses.login };
+      }
     } else if (config.url.includes('/dashboard')) {
       error.mockData = { status: 200, data: mockResponses.dashboard };
     } else {
