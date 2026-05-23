@@ -41,7 +41,7 @@ export const setupMockAdapter = (apiClient) => {
     // We throw a special error with the mock response, which we'll catch in the response interceptor
     const error = new Error('mock-intercepted');
     
-    if (config.url.includes('/auth/login')) {
+    if (config.url.includes('/auth/login') || (config.url.includes('/Authenticator/singin') && !config.url.includes('/Authenticator/singin-sso'))) {
       try {
         const body = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
         const user = mockUsers.find(u => u.email === body.email && u.password === body.password);
@@ -56,7 +56,7 @@ export const setupMockAdapter = (apiClient) => {
       } catch {
         error.mockData = { status: 401, data: { success: false, messages: ["Invalid login request."] } };
       }
-    } else if (config.url.includes('/auth/register')) {
+    } else if (config.url.includes('/auth/register') || config.url.includes('/Users/singup')) {
       try {
         const body = JSON.parse(config.data);
         const exists = mockUsers.find(u => u.email === body.email);
@@ -70,7 +70,7 @@ export const setupMockAdapter = (apiClient) => {
       } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
       }
-    } else if (config.url.includes('/auth/change-password')) {
+    } else if (config.url.includes('/auth/change-password') || (config.url.includes('/Authenticator/password-reset') && config.method === 'patch')) {
       try {
         const body = JSON.parse(config.data);
         // Assuming body contains { email, oldPassword, newPassword }
@@ -84,7 +84,7 @@ export const setupMockAdapter = (apiClient) => {
       } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request"] } };
       }
-    } else if (config.url.includes('/auth/forgot-password')) {
+    } else if (config.url.includes('/auth/forgot-password') || (config.url.includes('/Authenticator/password-reset') && config.method === 'post')) {
       try {
         typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
         // In a real app we don't usually leak if the email exists, we just return 200.

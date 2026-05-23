@@ -18,6 +18,7 @@ const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [formError, setFormError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -64,6 +65,12 @@ const Register = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setFormError('Please enter a valid email address.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setFormError('Passwords do not match.');
       return;
@@ -95,6 +102,8 @@ const Register = () => {
       isGoogleLoading={isGoogleLoading}
       showPassword={showPassword}
       setShowPassword={setShowPassword}
+      showConfirmPassword={showConfirmPassword}
+      setShowConfirmPassword={setShowConfirmPassword}
       onSubmit={handleFormSubmit}
       onGoogleSignup={handleGoogleButtonClick}
     />

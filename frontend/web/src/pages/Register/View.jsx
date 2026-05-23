@@ -20,6 +20,7 @@ const RegisterView = ({
   formData, handleInputChange,
   formError, isFormLoading, isGoogleLoading,
   showPassword, setShowPassword,
+  showConfirmPassword, setShowConfirmPassword,
   onSubmit, onGoogleSignup
 }) => {
   const { t } = useText();
@@ -123,7 +124,7 @@ const RegisterView = ({
                 <TextField
                   variant="outlined"
                   id="confirmPassword"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
@@ -135,10 +136,10 @@ const RegisterView = ({
                       <InputAdornment position="end">
                         <IconButton
                           type="button"
-                          onClick={() => setShowPassword(!showPassword)}
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           edge="end"
                         >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
                     ),
