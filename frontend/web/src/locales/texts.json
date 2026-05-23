@@ -1,0 +1,63 @@
+{
+  "App": {
+    "title": "Nievo Easy Fin"
+  },
+  "Login": {
+    "title": "Welcome Back",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "loginButton": "Sign In",
+    "registerLink": "Don't have an account? Sign up",
+    "forgotPasswordLink": "Forgot password?"
+  },
+  "Register": {
+    "title": "Create Account",
+    "nameLabel": "Full Name",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "registerButton": "Sign Up",
+    "loginLink": "Already have an account? Sign in"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "totalBalance": "Total Balance",
+    "income": "Income",
+    "expenses": "Expenses",
+    "recentTransactions": "Recent Transactions"
+  },
+  "Budget": {
+    "title": "Budget Management",
+    "addBudget": "Add Budget",
+    "totalBudget": "Total Budget",
+    "spent": "Spent",
+    "remaining": "Remaining"
+  },
+  "Transactions": {
+    "title": "Transactions",
+    "addTransaction": "Add Transaction",
+    "date": "Date",
+    "description": "Description",
+    "amount": "Amount",
+    "category": "Category"
+  },
+  "Settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "logout": "Log Out"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "budget": "Budget",
+    "transactions": "Transactions",
+    "settings": "Settings"
+  },
+  "Common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading..."
+  }
+}
