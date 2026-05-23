@@ -7,7 +7,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useText } from '../../hooks/useText';
 import { SettingsContainer, SectionCard, SectionHeader } from './styles';
 
-const SettingsView = ({ profile, toggles, loading, error, onProfileChange, onToggleChange, onSave }) => {
+const SettingsView = ({ profile, toggles, loading, error, globalDarkMode, onGlobalDarkModeToggle, onProfileChange, onToggleChange, onSave }) => {
   const { t } = useText();
 
   if (loading) {
@@ -104,7 +104,7 @@ const SettingsView = ({ profile, toggles, loading, error, onProfileChange, onTog
               
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Typography variant="body2" fontWeight="bold">Dark Mode</Typography>
-                <Switch checked={toggles.darkMode} onChange={() => onToggleChange('darkMode')} />
+                <Switch checked={globalDarkMode} onChange={onGlobalDarkModeToggle} />
               </Box>
 
               <Box mt={2}>

@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import SettingsView from './View';
 import { getSettingsData, updateSettings } from './api';
+import { ColorModeContext } from '../../context/ThemeContext';
 
 const Settings = () => {
+  const { mode, toggleColorMode } = useContext(ColorModeContext);
   const [profile, setProfile] = useState(null);
   const [toggles, setToggles] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +57,8 @@ const Settings = () => {
       toggles={toggles}
       loading={loading}
       error={error}
+      globalDarkMode={mode === 'dark'}
+      onGlobalDarkModeToggle={toggleColorMode}
       onProfileChange={handleProfileChange}
       onToggleChange={handleToggleChange}
       onSave={handleSave}
