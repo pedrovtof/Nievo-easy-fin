@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MockGuidePopupView from './View';
-import { mockResponses } from '../../services/mockData';
+import { getMockState, updateMockState } from '../../services/mockData';
 
 const MockGuidePopup = () => {
   const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({});
 
   // Only render if in mock mode
   if (import.meta.env.VITE_USE_MOCK !== 'true') return null;
+
+  useEffect(() => {
+    if (open) {
+      setFormData(getMockState());
+    }
+  }, [open]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -15,15 +22,25 @@ const MockGuidePopup = () => {
     navigator.clipboard.writeText(text);
   };
 
-  const getMockDataString = () => JSON.stringify(mockResponses, null, 2);
+  const handleFieldChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    updateMockState(formData);
+    alert('Mock data updated for this session!');
+    handleClose();
+  };
 
   return (
     <MockGuidePopupView
       open={open}
+      formData={formData}
       onOpen={handleOpen}
       onClose={handleClose}
       onCopy={copyToClipboard}
-      mockDataString={getMockDataString()}
+      onChange={handleFieldChange}
+      onSubmit={handleSubmit}
     />
   );
 };
