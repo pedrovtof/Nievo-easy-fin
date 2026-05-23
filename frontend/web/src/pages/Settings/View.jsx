@@ -7,7 +7,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { useText } from '../../hooks/useText';
 import { SettingsContainer, SectionCard, SectionHeader } from './styles';
 
-const SettingsView = ({ profile, toggles, loading, error, globalDarkMode, onGlobalDarkModeToggle, onProfileChange, onToggleChange, onSave }) => {
+const SettingsView = ({ profile, toggles, loading, error, globalDarkMode, onGlobalDarkModeToggle, onProfileChange, onToggleChange, onSave, onChangePassword }) => {
   const { t } = useText();
 
   if (loading) {
@@ -81,7 +81,7 @@ const SettingsView = ({ profile, toggles, loading, error, globalDarkMode, onGlob
                   <Typography variant="body2" fontWeight="bold">Password</Typography>
                   <Typography variant="caption" color="text.secondary">Last changed 3 months ago</Typography>
                 </Box>
-                <Button variant="outlined">Change Password</Button>
+                <Button variant="outlined" onClick={onChangePassword}>Change Password</Button>
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box>

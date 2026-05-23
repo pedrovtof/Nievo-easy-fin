@@ -51,6 +51,19 @@ const Settings = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    const oldPassword = prompt('Enter your current password:');
+    if (!oldPassword) return;
+    const newPassword = prompt('Enter your new password:');
+    if (!newPassword) return;
+    try {
+      await import('./api').then(m => m.changePassword(profile.email, oldPassword, newPassword));
+      alert('Password updated successfully!');
+    } catch (err) {
+      alert(err.response?.data?.messages?.[0] || 'Failed to update password. Check your current password.');
+    }
+  };
+
   return (
     <SettingsView
       profile={profile}
@@ -62,6 +75,7 @@ const Settings = () => {
       onProfileChange={handleProfileChange}
       onToggleChange={handleToggleChange}
       onSave={handleSave}
+      onChangePassword={handleChangePassword}
     />
   );
 };

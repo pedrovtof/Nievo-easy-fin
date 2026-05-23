@@ -22,3 +22,7 @@ export const getSettingsData = () => {
 export const updateSettings = (data) => {
   return Promise.resolve({ success: true, data });
 };
+
+export const changePassword = (email, oldPassword, newPassword) => {
+  return api.post('/auth/change-password', { email, oldPassword, newPassword });
+};

@@ -1,16 +1,14 @@
 // This file intercepts the Axios requests when VITE_USE_MOCK is true.
 
+let mockUsers = [
+  { id: 1, name: 'Mock User', email: 'demo@nievo.com', password: 'password123' }
+];
+
 export const mockResponses = {
-  login: {
-    data: {
-      token: "mock-jwt-token-12345",
-      user: {
-        id: 1,
-        name: "Mock User",
-        email: "user@mock.com"
-      }
-    }
-  },
+  loginSuccess: (user) => ({
+    token: `mock-jwt-token-${user.id}`,
+    user: { id: user.id, name: user.name, email: user.email }
+  }),
   dashboard: {
     data: {
       totalBalance: 15420.50,
@@ -37,22 +35,50 @@ export const setupMockAdapter = (apiClient) => {
     if (config.url.includes('/auth/login')) {
       try {
         const body = JSON.parse(config.data);
-        if (body.email === 'demo@nievo.com' && body.password === 'password123') {
-          error.mockData = { status: 200, data: mockResponses.login };
+        const user = mockUsers.find(u => u.email === body.email && u.password === body.password);
+        if (user) {
+          error.mockData = { status: 200, data: mockResponses.loginSuccess(user) };
         } else {
           error.mockData = { 
             status: 401, 
-            data: { success: false, messages: ["Invalid email or password. Use demo@nievo.com / password123"] } 
+            data: { success: false, messages: ["Invalid email or password. Check the Mock Guide."] } 
           };
         }
       } catch (e) {
-        // If no body or parse error, just accept it for simplicity or SSO
-        error.mockData = { status: 200, data: mockResponses.login };
+        error.mockData = { status: 200, data: mockResponses.loginSuccess(mockUsers[0]) };
+      }
+    } else if (config.url.includes('/auth/register')) {
+      try {
+        const body = JSON.parse(config.data);
+        const exists = mockUsers.find(u => u.email === body.email);
+        if (exists) {
+          error.mockData = { status: 400, data: { success: false, messages: ["Email already in use."] } };
+        } else {
+          const newUser = { id: mockUsers.length + 1, name: body.fullName || 'New User', email: body.email, password: body.password };
+          mockUsers.push(newUser);
+          error.mockData = { status: 200, data: mockResponses.loginSuccess(newUser) };
+        }
+      } catch (e) {
+        error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
+      }
+    } else if (config.url.includes('/auth/change-password')) {
+      try {
+        const body = JSON.parse(config.data);
+        // Assuming body contains { email, oldPassword, newPassword }
+        const user = mockUsers.find(u => u.email === body.email && u.password === body.oldPassword);
+        if (user) {
+          user.password = body.newPassword;
+          error.mockData = { status: 200, data: { success: true, message: "Password updated." } };
+        } else {
+          error.mockData = { status: 401, data: { success: false, messages: ["Invalid old password or email."] } };
+        }
+      } catch (e) {
+        error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
       }
     } else if (config.url.includes('/dashboard')) {
       error.mockData = { status: 200, data: mockResponses.dashboard };
     } else {
-      error.mockData = { status: 200, data: {} };
+      error.mockData = { status: 200, data: { success: true } };
     }
     
     return Promise.reject(error);

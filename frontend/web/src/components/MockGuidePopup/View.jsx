@@ -17,7 +17,10 @@ const MockGuidePopupView = ({ open, onOpen, onClose, onCopy, mockDataString }) =
         <DialogTitle>Mock Data Guide</DialogTitle>
         <DialogContent dividers>
           <Typography variant="body1" gutterBottom>
-            You are currently running the app in Mock Mode. API calls are intercepted and return the following data.
+            You are currently running the app in Mock Mode. Temporary users are stored in memory.
+          </Typography>
+          <Typography variant="body2" color="primary" fontWeight="bold" gutterBottom>
+            Default Login: demo@nievo.com / password123
           </Typography>
           <Box position="relative">
             <PreformattedText>{mockDataString}</PreformattedText>
