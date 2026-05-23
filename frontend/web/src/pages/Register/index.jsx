@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import RegisterView from './View';
-import { createUser, createUserSSO } from '../../services/api';
+import { createUser, createUserSSO } from './api';
 
 const Register = () => {
   const navigate = useNavigate();

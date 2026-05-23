@@ -4,7 +4,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import LoginView from './View';
 // The auth API functions are correctly imported if they exist in services/api
 // Assuming they do since the original used them. If mock is enabled, it intercepts them.
-import { loginUser, loginUserSSO } from '../../services/api';
+import { loginUser, loginUserSSO } from './api';
 
 const Login = () => {
   const navigate = useNavigate();
