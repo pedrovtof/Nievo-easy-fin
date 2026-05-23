@@ -6,6 +6,12 @@ Este documento registra as principais milestones e alterações arquiteturais do
 
 O projeto encontra-se em fase ativa de desenvolvimento, com as funcionalidades base de autenticação e core sendo consolidadas.
 
+### 2026-05-23: Migração do Framework e Biblioteca de UI do Frontend
+*   **Framework:** Substituição do bundler **Next.js** pelo **Vite**, reduzindo o tempo de build e simplificando a configuração de desenvolvimento.
+*   **Estilização/UI:** Remoção completa do **Tailwind CSS** e adoção do **MUI (Material UI)** como biblioteca de componentes, trazendo consistência visual e acessibilidade nativa.
+*   **Refatoração:** Todos os componentes e páginas foram refatorados para o padrão de arquitetura modular (`index.jsx`, `View.jsx`, `styles.js`, `api.js`).
+*   **Limpeza:** Remoção de arquivos órfãos legados (`ForgotPassword.jsx` flat, `App.css`, `assets/react.svg`) e dos arquivos de configuração do Tailwind (`postcss.config.js`, `tailwind.config.js`).
+
 ### 2026-05-18: Melhoria Abrangente de Documentação
 *   **README:** Tradução completa para Inglês (EUA) e atualização dos diagramas de arquitetura.
 *   **MkDocs:** Expansão detalhada das seções de Arquitetura, Fluxos de Negócio, Boas Práticas e Procedimentos Operacionais.

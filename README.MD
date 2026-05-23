@@ -18,10 +18,10 @@ flowchart TD
  local["Maquina local"]
 
  subgraph Frontend["Frontend"]
-        next["React / Next.js"]
-        tailWind["Css / Tailwind"]
-        vmF["Servidor dedicado"] --> next
-        vmF --> tailWind
+        vite["React / Vite"]
+        mui["MUI (Material UI)"]
+        vmF["Servidor dedicado"] --> vite
+        vmF --> mui
   end
  subgraph Cicd["CD-CI"]
         git["Github"]
@@ -87,7 +87,7 @@ As imagens do container serão as da comunidade, como no caso do Redish ou Click
 
 ### Front-end
 
-Desenvolvido em React com Next, provisionado em maquina virtual Debian Bookworm.
+Desenvolvido em **React com Vite**, utilizando **MUI (Material UI)** como biblioteca de componentes e estilização. Provisionado em máquina virtual Debian Bookworm.
 
 ### Back-end
 
@@ -164,10 +164,10 @@ flowchart TD
  local["Local Machine"]
 
  subgraph Frontend["Frontend"]
-        next["React / Next.js"]
-        tailWind["Css / Tailwind"]
-        vmF["Dedicated Server"] --> next
-        vmF --> tailWind
+        vite["React / Vite"]
+        mui["MUI (Material UI)"]
+        vmF["Dedicated Server"] --> vite
+        vmF --> mui
   end
  subgraph Cicd["CD-CI"]
         git["Github"]
@@ -233,7 +233,7 @@ The container images will be from the community, as in the case of Redis or Clic
 
 ### Front-end
 
-Developed in React with Next, provisioned on a Debian Bookworm virtual machine.
+Developed in **React with Vite**, using **MUI (Material UI)** as the component and styling library. Provisioned on a Debian Bookworm virtual machine.
 
 ### Back-end
 
