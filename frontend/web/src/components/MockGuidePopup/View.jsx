@@ -1,8 +1,8 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Fab, Typography, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Fab, Typography, Box, TextField } from '@mui/material';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { FabContainer, PreformattedText } from './styles';
+import { FabContainer } from './styles';
 
 const MockGuidePopupView = ({ open, onOpen, onClose, onCopy, mockDataString }) => {
   return (
@@ -22,8 +22,16 @@ const MockGuidePopupView = ({ open, onOpen, onClose, onCopy, mockDataString }) =
           <Typography variant="body2" color="primary" fontWeight="bold" gutterBottom>
             Default Login: demo@nievo.com / password123
           </Typography>
-          <Box position="relative">
-            <PreformattedText>{mockDataString}</PreformattedText>
+          <Box position="relative" mt={2}>
+            <TextField
+              multiline
+              fullWidth
+              defaultValue={mockDataString}
+              variant="outlined"
+              InputProps={{
+                style: { fontFamily: 'monospace', fontSize: '0.85rem', backgroundColor: 'var(--mui-palette-background-default)' }
+              }}
+            />
             <Button
               variant="contained"
               size="small"
@@ -31,7 +39,7 @@ const MockGuidePopupView = ({ open, onOpen, onClose, onCopy, mockDataString }) =
               onClick={() => onCopy(mockDataString)}
               style={{ position: 'absolute', top: 16, right: 16 }}
             >
-              Copy Data
+              Copy Original Data
             </Button>
           </Box>
         </DialogContent>
