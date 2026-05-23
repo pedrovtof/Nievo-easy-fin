@@ -20,8 +20,3 @@ O projeto encontra-se em fase ativa de desenvolvimento, com as funcionalidades b
 *   Separação das responsabilidades de Autenticação em um microserviço dedicado.
 *   Configuração inicial do ambiente Docker com suporte a réplicas de leitura no Postgres e cluster ClickHouse.
 *   Implementação do login básico e suporte inicial a SSO Google.
-
-## Próximos Passos
-*   Finalização da integração entre o Monólito Core e o Microserviço de Analytics (Python).
-*   Expansão da cobertura de testes unitários e de integração.
-*   Implementação de dashboards avançados no frontend utilizando os insights gerados pelo microserviço de dados.
