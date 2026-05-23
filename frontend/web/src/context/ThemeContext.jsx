@@ -30,10 +30,10 @@ export const ThemeContextProvider = ({ children }) => {
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
+    <ThemeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         {children}
       </ThemeProvider>
-    </ColorModeContext.Provider>
+    </ThemeContext.Provider>
   );
 };
