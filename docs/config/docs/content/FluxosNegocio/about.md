@@ -181,10 +181,10 @@ flowchart TD
  local["Maquina local"]
 
  subgraph Frontend["Frontend"]
-        next["React / Next.js"]
-        tailWind["Css / Tailwind"]
-        vmF["Servidor dedicado"] --> next
-        vmF --> tailWind
+        vite["React / Vite"]
+        mui["MUI (Material UI)"]
+        vmF["Servidor dedicado"] --> vite
+        vmF --> mui
   end
  subgraph Cicd["CD-CI"]
         git["Github"]
