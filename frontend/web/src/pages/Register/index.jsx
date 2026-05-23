@@ -10,6 +10,7 @@ const Register = () => {
   const [isFormLoading, setIsFormLoading] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [formError, setFormError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -85,6 +86,8 @@ const Register = () => {
       formError={formError}
       isFormLoading={isFormLoading}
       isGoogleLoading={isGoogleLoading}
+      showPassword={showPassword}
+      setShowPassword={setShowPassword}
       onSubmit={handleFormSubmit}
       onGoogleSignup={handleGoogleButtonClick}
     />

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Typography, TextField, Button, Box, Alert, Link } from '@mui/material';
+import { Typography, TextField, Button, Box, Alert, Link, IconButton, InputAdornment } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { Link as RouterLink } from 'react-router-dom';
 import { useText } from '../../hooks/useText';
 import { RegisterContainer, RegisterCard, HeaderBox, StyledForm, SsoButton } from './styles';
@@ -17,6 +19,7 @@ const GoogleIcon = () => (
 const RegisterView = ({
   formData, handleInputChange,
   formError, isFormLoading, isGoogleLoading,
+  showPassword, setShowPassword,
   onSubmit, onGoogleSignup
 }) => {
   const { t } = useText();
@@ -93,13 +96,25 @@ const RegisterView = ({
                 <TextField
                   variant="outlined"
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
                   required
                   disabled={isSubmitting}
                   fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1 }}>
@@ -107,13 +122,25 @@ const RegisterView = ({
                 <TextField
                   variant="outlined"
                   id="confirmPassword"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
                   disabled={isSubmitting}
                   fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Box>
             </Box>
