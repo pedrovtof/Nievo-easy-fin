@@ -15,7 +15,7 @@ public class PatchResetPasswordRequestBuilder : PatchResetPasswordRequest
     public PatchResetPasswordRequestBuilder()
     {
         Email = _faker.Person.Email;
-        PinToken = _faker.Random.Number(100000, 999999).ToString();
+        PinToken = _faker.Random.Number(100000, 999999);
         Password = PasswordGenerator.Generate();
     }
 
@@ -25,7 +25,7 @@ public class PatchResetPasswordRequestBuilder : PatchResetPasswordRequest
         return this;
     }
 
-    public PatchResetPasswordRequestBuilder WithPinToken(string pinToken)
+    public PatchResetPasswordRequestBuilder WithPinToken(int pinToken)
     {
         PinToken = pinToken;
         return this;

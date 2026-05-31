@@ -8,6 +8,7 @@ using NievoEasyFin.Application.Services.Security;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Interfaces.Services;
+using NievoEasyFin.Application.Services.Cache;
 
 namespace NievoEasyFin.Application.Services.Base.Users;
 
@@ -24,18 +25,25 @@ public class UsersService : Controller, IUsersService
 
     private readonly UserProviderSsoModel _userProviderSsoModel;
 
+    private readonly SmtpModel _smtpModel;
+
+    private readonly AuthDbCacheService _authDbCacheService;
 
     public UsersService(
         CryptoPasswordService cryptoPasswordService,
         UserModel userModel,
         UserProviderSsoModel userProviderSsoModel,
-        SSoProviderAuth ssoProviderAuth
+        SSoProviderAuth ssoProviderAuth,
+        SmtpModel smtpModel,
+        AuthDbCacheService authDbCacheService
     )
     {
         _cryptoPasswordService = cryptoPasswordService;
         _userModel = userModel;
         _userProviderSsoModel = userProviderSsoModel;
         _ssoProviderAuth = ssoProviderAuth;
+        _smtpModel = smtpModel;
+        _authDbCacheService = authDbCacheService;
     }
 
     /// <summary>
@@ -43,10 +51,6 @@ public class UsersService : Controller, IUsersService
     /// </summary>
     /// <param name="request">The user creation request data.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the user creation.</returns>
-    /// Method service for create user basic
-    /// </summary>
-    /// <param name="request">request PostCreateUserRequest</param>
-    /// <returns>ResponseApiSucess/ResponseApiError</returns>
     public async Task<IActionResult> PostCreateUserAsync(PostCreateUserRequest request)
     {
         var validationResult = await new PostCreateUserValidator().ValidateAsync(request);
@@ -55,15 +59,26 @@ public class UsersService : Controller, IUsersService
                 new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        string hash = await _cryptoPasswordService.HashPasswordAsync(request.Password);
-
         var userEmail = await _userModel.GetUserByEmailWithAnyStatusAsync(request.Email);
         if (userEmail != null)
+        {
+            if(userEmail.StatusId == (int)EnumUserStatus.INVALID)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED.GetDescription() }
+                ));
+
             return BadRequest(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS.GetDescription() }
             ));
+        }
 
-        var user = await _userModel.CreateUserAsync(request.Name, hash, request.Email);
+        var tk = await _authDbCacheService.CreateTokenSingupUser(request.Email, request.Name);
+
+        var smtp = await _smtpModel.SingUpUserTokenMailAsync(request.Email, tk.PinToken);
+
+        string hash = await _cryptoPasswordService.HashPasswordAsync(request.Password);
+
+        var user = await _userModel.CreateUserAsync(request.Name, hash, request.Email, (int)EnumUserStatus.INVALID);
 
         return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
     }
@@ -73,10 +88,6 @@ public class UsersService : Controller, IUsersService
     /// </summary>
     /// <param name="request">The SSO user creation request data.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the SSO user creation.</returns>
-    /// Method service for create user sso
-    /// </summary>
-    /// <param name="request">request PostCreateUserSsoAsync</param>
-    /// <returns>ResponseApiSucess/ResponseApiError</returns>
     public async Task<IActionResult> PostCreateUserSsoAsync(PostCreateUserSsoRequest request)
     {
         var validatorResult = await new PostCreateUserSsoValidator().ValidateAsync(request);

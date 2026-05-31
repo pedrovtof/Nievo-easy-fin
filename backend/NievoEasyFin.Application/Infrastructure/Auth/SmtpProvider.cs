@@ -21,6 +21,8 @@ namespace NievoEasyFin.Application.Infrastructure.Auth
 
         protected readonly string PATH_MAIL_BODY_TEMPLATE_PASSWORD_RESET_TOKEN = DotNetEnv.Env.GetString("PATH_MAIL_BODY_TEMPLATE_PASSWORD_RESET_TOKEN");
 
+        protected readonly string PATH_MAIL_BODY_TEMPLATE_SINGUP_USER_TOKEN = DotNetEnv.Env.GetString("PATH_MAIL_BODY_TEMPLATE_SINGUP_USER_TOKEN");
+
         public SmtpProvider() { }
 
         /// <summary>

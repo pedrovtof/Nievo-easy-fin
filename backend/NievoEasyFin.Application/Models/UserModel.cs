@@ -78,13 +78,22 @@ public class UserModel : UserEntity
     }
 
     /// <summary>
-    /// Method to get user by email
+    /// Method to get active user by email
     /// </summary>
     /// <param name="email">string email</param>
     /// <param name="statusId">status number</param>
     /// <returns>UserEntity</returns>
     public async Task<UserEntity> GetUserByEmailAsync(string email, int statusId = 1)
         => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email && x.StatusId == statusId);
+
+    /// <summary>
+    /// Method to get all user by email 
+    /// </summary>
+    /// <param name="email">string email</param>
+    /// <returns>UserEntity</returns>
+    public async Task<UserEntity> GetUserAllByEmailAsync(string email)
+        => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
+
 
     /// <summary>
     /// Method to get user by email with any status
@@ -144,6 +153,24 @@ public class UserModel : UserEntity
             .Where(u => u.Id == userId)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(u => u.Password, password)
+                .SetProperty(u => u.UpdatedAt, DateTime.Now)
+            );
+
+        return rowsAffected > 0 ? true : false; ;
+    }
+
+    /// <summary>
+    /// Method to update user status
+    /// </summary>
+    /// <param name="userId">User id</param>
+    /// <param name="status">Status id</param>
+    /// <returns>true if password was updated successfully, false otherwise</returns>
+    public async Task<bool> UpdateUserStatusAsync(int userId, int status)
+    {
+        int rowsAffected = await _AuthMainNodeDatabase.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(u => u.StatusId, status)
                 .SetProperty(u => u.UpdatedAt, DateTime.Now)
             );
 

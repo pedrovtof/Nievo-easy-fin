@@ -25,7 +25,7 @@ public class PatchResetPasswordValidator : AbstractValidator<PatchResetPasswordR
 
         RuleFor(x => x.PinToken)
             .NotEmpty()
-                .WithErrorCode(EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL.ToString());
+                .WithErrorCode(EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_TOKEN_FORMAT.ToString());
 
         RuleFor(x => x.Password)
             .NotEmpty()

@@ -22,11 +22,12 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.execute("""
         INSERT INTO journey.sso_provider (\"name\",description,created_at,updated_at,active) VALUES
-        ('google','Google login sso','2026-04-04 12:24:29.679','2026-04-04 12:24:29.679',true);
+        ('google','Google login sso',current_timestamp,current_timestamp,true);
 
         INSERT INTO user_details.user_status (\"name\",description,created_at,updated_at,active) VALUES
-        ('Inativo','Usuário inativo','2026-04-14 08:29:50.997',NULL,1),
-        ('Ativo','Usuário ativo','2026-03-29 19:04:48.446',NULL,1);
+        ('Inactive','User inactive',current_timestamp,current_timestamp,1),
+        ('Active','User active',current_timestamp,current_timestamp,1),
+        ('Invalid','User does not validate the token',current_timestamp,current_timestamp,1);
     """)
     pass
 
@@ -48,6 +49,6 @@ def downgrade() -> None:
             LIMIT 1
         );
  
-        DELETE FROM user_details.user_status WHERE \"name\" in ('Inativo','Ativo');
+        DELETE FROM user_details.user_status WHERE \"name\" in ('Inactive','Active','Invalid');
     """)
     pass

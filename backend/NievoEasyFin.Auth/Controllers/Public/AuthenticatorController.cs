@@ -100,4 +100,43 @@ public class AuthenticatorController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PatchResetPasswordAsync([FromBody] PatchResetPasswordRequest request)
         => await _authenticatorService.PatchResetPasswordAsync(request);
+
+    /// <summary>
+    /// Endpoint to validate email
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST v1/Authenticator/validate:email
+    ///     {
+    ///        "email": "Joe.Black@example.com",
+    ///        "pin_token": "111111",
+    ///     }
+    /// </remarks>
+    /// <param name="request">request.pin_token and request.email</param>
+    [HttpPost("validate:email")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostValidateEmailAsync([FromBody] PostValidateEmailRequest request)
+        => await _authenticatorService.PostValidateEmailAsync(request);
+
+    /// <summary>
+    /// Endpoint to send the token for validate email
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST v1/Authenticator/send-validate:email
+    ///     {
+    ///        "email": "Joe.Black@example.com"
+    ///     }
+    /// </remarks>
+    /// <param name="request">request.email</param>
+    [HttpPost("send-validate:email")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostValidateEmailSendAsync([FromBody] PostValidateEmailSendRequest request)
+        => await _authenticatorService.PostValidateEmailSendAsync(request);
 }

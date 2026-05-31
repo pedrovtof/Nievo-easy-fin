@@ -39,7 +39,7 @@ public class UsersController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostCreateUserAsync([FromBody] PostCreateUserRequest request)
-        => await _usersService.PostCreateUserAsync(request);
+        => await _usersService.PostCreateUserAsync(request);   
 
     /// <summary>
     /// Endpoint to create user with SSO login

@@ -7,7 +7,9 @@ namespace NievoEasyFin.Application.Services.Cache
 {
     public class AuthDbCacheService : AuthDbCacheContext
     {
-        public string PathToken => "User:TokenPasswordReset";
+        private const string PATH_TOKEN_RESET_PASSWORD = "User:TokenPasswordReset";
+
+        private const string PATH_TOKEN_SINGUP_USER = "User:SingupUser";
 
         private readonly Random rnd = new Random();
 
@@ -23,11 +25,25 @@ namespace NievoEasyFin.Application.Services.Cache
         /// <returns>Null/Value from redis</returns>
         public async Task<TokenPasswordResetView?> GetTokenPasswordResetAttempByUserIdAsync(int userId)
         {
-            string? redisData = await Conn.StringGetAsync($"{PathToken}:{userId}");
+            string? redisData = await Conn.StringGetAsync($"{PATH_TOKEN_RESET_PASSWORD}:{userId}");
             if (string.IsNullOrEmpty(redisData))
                 return null;
 
             return JsonSerializer.Deserialize<TokenPasswordResetView>(redisData);
+        }
+
+        /// <summary>
+        /// Method to Get Token validate email by user email
+        /// </summary>
+        /// <param name="userId">int</param>
+        /// <returns>Null/Value from redis</returns>
+        public async Task<TokenEmailValidateView?> GetTokenEmailValidateAsync(string email)
+        {
+            string? redisData = await Conn.StringGetAsync($"{PATH_TOKEN_SINGUP_USER}:{email}");
+            if (string.IsNullOrEmpty(redisData))
+                return null;
+
+            return JsonSerializer.Deserialize<TokenEmailValidateView>(redisData);
         }
 
         /// <summary>
@@ -46,7 +62,32 @@ namespace NievoEasyFin.Application.Services.Cache
                 PinToken = rnd.Next(100000, 999999)
             };
 
-            var key = $"{PathToken}:{tk.UserId}";
+            var key = $"{PATH_TOKEN_RESET_PASSWORD}:{tk.UserId}";
+            var serialized = JsonSerializer.Serialize(tk);
+            await Conn.StringSetAsync(key, serialized, TimeSpan.FromSeconds(CACHE_DATABASE_DEFAULT_TTL));
+
+            return tk;
+        }
+
+
+        /// <summary>
+        /// Method to create Token singup in redis
+        /// </summary>
+        /// <param name="email">email of the user</param>
+        /// <param name="password">password of the user</param>
+        /// <param name="name">name of the user</param>
+        /// <returns>TokenSingupUserEntity</returns>
+        public async Task<TokenSingupUserEntity> CreateTokenSingupUser(string email, string name)
+        {
+            var tk = new TokenSingupUserEntity
+            {
+                Email = email,
+                Name = name,
+                CreatedAt = DateTime.UtcNow,
+                PinToken = rnd.Next(100000, 999999)
+            };
+
+            var key = $"{PATH_TOKEN_SINGUP_USER}:{tk.Email}";
             var serialized = JsonSerializer.Serialize(tk);
             await Conn.StringSetAsync(key, serialized, TimeSpan.FromSeconds(CACHE_DATABASE_DEFAULT_TTL));
 
