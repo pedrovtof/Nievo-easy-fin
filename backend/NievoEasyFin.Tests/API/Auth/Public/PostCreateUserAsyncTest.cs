@@ -48,6 +48,7 @@ public class PostCreateUserAsyncTest : UsersTestBase
         new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL, "Email vazio ou nulo" },
         new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS, "Email já existe" },
         new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID, "Email inválido" },
+        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED, "Email com cadastro pendente de validação" },
     };
 
     [Theory(DisplayName = "Criação de usuário deverá retornar BadRequest para cenários de erro")]

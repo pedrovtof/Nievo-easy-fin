@@ -120,4 +120,6 @@ public class AuthenticatorController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostValidateEmailAsync([FromBody] PostValidateEmailRequest request)
         => await _authenticatorService.PostValidateEmailAsync(request);
+
+
 }

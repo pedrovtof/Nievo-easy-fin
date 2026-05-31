@@ -269,4 +269,12 @@ public class AuthenticatorService : Controller, IAuthenticatorService
             ));
     }
 
+
+
+    /// <summary>
+    /// Stub — implementation in progress.
+    /// </summary>
+    public Task<IActionResult> PostValidateEmailSendAsync(PostValidateEmailSendRequest request)
+        => throw new NotImplementedException();
+
 }

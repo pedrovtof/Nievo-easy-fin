@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using NievoEasyFin.Application.Configuration;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
+using NievoEasyFin.Application.Data.Cache.Views;
+using NievoEasyFin.Application.Interfaces.Enum;
+using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base.Authenticator;
@@ -216,7 +219,7 @@ public class AuthenticatorServiceTests : IDisposable
         var pinToken = 123456;
         var request = PatchResetPasswordRequestFaker.Create().Generate();
         request.Email = user.Email!;
-        request.PinToken = pinToken.ToString();
+        request.PinToken = pinToken;
         request.Password = "Strong@123"; // Valid length (10 chars)
 
         var dbMock = new Mock<IDatabase>();
@@ -247,5 +250,155 @@ public class AuthenticatorServiceTests : IDisposable
         // Verify password updated in DB
         var updatedUser = await replica.Users.AsNoTracking().FirstAsync(u => u.Id == user.Id);
         updatedUser.Password.Should().NotBe("OldPasswordHash");
+    }
+
+    [Fact]
+    public async Task PostValidateEmailAsync_WhenUserNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var request = new PostValidateEmailRequest { Email = "notexist@example.com", PinToken = 123456 };
+        var service = CreateService(origin, replica);
+
+        // Act
+        var result = await service.PostValidateEmailAsync(request);
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(e => e.Contains("not have an account") || e.Contains("email is incorrect"));
+    }
+
+    [Fact]
+    public async Task PostValidateEmailAsync_WhenUserAlreadyActive_ReturnsBadRequest()
+    {
+        // Arrange
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.ACTIVE;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
+
+        var request = new PostValidateEmailRequest { Email = user.Email!, PinToken = 123456 };
+        var service = CreateService(origin, replica);
+
+        // Act
+        var result = await service.PostValidateEmailAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("already been validated") || e.Contains("blocked"));
+    }
+
+    [Fact]
+    public async Task PostValidateEmailAsync_WhenTokenNotFoundInCache_ReturnsNotFound()
+    {
+        // Arrange — user with INVALID status, but no token in Redis
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.INVALID;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
+
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(RedisValue.Null); // no token in cache
+
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+        var service = CreateService(origin, replica, cacheService);
+
+        var request = new PostValidateEmailRequest { Email = user.Email!, PinToken = 123456 };
+
+        // Act
+        var result = await service.PostValidateEmailAsync(request);
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(e => e.Contains("found one token") || e.Contains("not possible"));
+    }
+
+    [Fact]
+    public async Task PostValidateEmailAsync_WhenTokenMismatch_ReturnsBadRequest()
+    {
+        // Arrange — correct user, but wrong token submitted
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.INVALID;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
+
+        var correctPin = 654321;
+        var cacheData = new { email = user.Email, name = user.Name, pin_token = correctPin, created_at = DateTime.UtcNow };
+
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(JsonSerializer.Serialize(cacheData));
+
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+        var service = CreateService(origin, replica, cacheService);
+
+        var request = new PostValidateEmailRequest { Email = user.Email!, PinToken = 999999 }; // wrong token
+
+        // Act
+        var result = await service.PostValidateEmailAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("does not match") || e.Contains("try again"));
+    }
+
+    [Fact]
+    public async Task PostValidateEmailAsync_WithValidToken_ReturnsOkAndActivatesUser()
+    {
+        // Arrange
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.INVALID;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
+
+        var pinToken = 123456;
+        var cacheData = new { email = user.Email, name = user.Name, pin_token = pinToken, created_at = DateTime.UtcNow };
+
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(JsonSerializer.Serialize(cacheData));
+        dbMock.Setup(d => d.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(true);
+
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+        var service = CreateService(origin, replica, cacheService);
+
+        var request = new PostValidateEmailRequest { Email = user.Email!, PinToken = pinToken };
+
+        // Act
+        var result = await service.PostValidateEmailAsync(request);
+
+        // Assert
+        if (result is BadRequestObjectResult badReq)
+        {
+            var err = (ResponseApiError)badReq.Value!;
+            throw new Exception($"PostValidateEmail failed with: {string.Join(", ", err.Messages)}");
+        }
+        if (result is NotFoundObjectResult notFoundRes)
+        {
+            var err = (ResponseApiError)notFoundRes.Value!;
+            throw new Exception($"PostValidateEmail not found: {string.Join(", ", err.Messages)}");
+        }
+
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        okResult.Value.Should().BeOfType<ResponseApiSucess>();
+
+        // Verify user status updated to ACTIVE in the database
+        var updatedUser = await replica.Users.AsNoTracking().FirstAsync(u => u.Id == user.Id);
+        updatedUser.StatusId.Should().Be((int)EnumUserStatus.ACTIVE);
     }
 }

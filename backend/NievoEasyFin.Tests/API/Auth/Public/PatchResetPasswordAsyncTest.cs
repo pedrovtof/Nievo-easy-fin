@@ -45,6 +45,7 @@ public class PatchResetPasswordAsyncTest : AuthenticatorTestBase
     {
         new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL, "Email inválido" },
         new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTY, "Email nulo ou vazio" },
+        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_TOKEN_FORMAT, "Formato inválido do token" },
         new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_TOKEN_INVALID, "Token inválido" },
         new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL, "Senha nula ou vazia" },
         new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WITH_WRONG_LENGHT, "Tamanho incorreto da senha" },
@@ -81,7 +82,7 @@ public class PatchResetPasswordAsyncTest : AuthenticatorTestBase
 
     public static IEnumerable<object[]> NotFoundErrors => new List<object[]>
     {
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND, "Usuário não encontrado" },
+        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUND, "Usuário não encontrado" },
         new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_TOKEN_NOT_FOUND_IN_CACHE, "Token não encontrado no cache" },
     };
 
