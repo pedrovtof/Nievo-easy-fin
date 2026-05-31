@@ -32,7 +32,6 @@ public class AuthenticatorService : Controller, IAuthenticatorService
 
     private readonly SmtpModel _smtpModel;
 
-
     public AuthenticatorService(
         CryptoPasswordService cryptoPasswordService,
         AuthDbCacheService authDbCacheService,
@@ -58,9 +57,6 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The login request data.</param>
     /// <returns>An <see cref="IActionResult"/> with the JWT token on success, or error details on failure.</returns>
-    /// Method service to login
-    /// </summary>
-    /// <param name="request">request PostLoginUserRequest</param>
     public async Task<IActionResult> PostLoginUserAsync(PostLoginUserRequest request)
     {
         var validatorResult = await new PostLoginUserValidatorAsync().ValidateAsync(request);
@@ -97,8 +93,6 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// <param name="request">The SSO login request data.</param>
     /// <returns>An <see cref="IActionResult"/> with the JWT token on success, or error details on failure.</returns>
     /// Method service to Login Sso 
-    /// </summary>
-    /// <param name="request">request PostLoginUserRequest</param>
     public async Task<IActionResult> PostLoginUserSsoAsync(PostLogiPostLoginUserSsoRequest request)
     {
         var validatorResult = await new PostLoginUserSsoValidatorAsync().ValidateAsync(request);
@@ -148,9 +142,6 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The request containing the user's email.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the reset initiation.</returns>
-    /// Method service for reset password
-    /// </summary>
-    /// <param name="request">request.email</param>
     public async Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request)
     {
         var validationResult = await new PostResetPasswordValidator().ValidateAsync(request);
@@ -188,10 +179,6 @@ public class AuthenticatorService : Controller, IAuthenticatorService
     /// </summary>
     /// <param name="request">The request containing the email, token, and new password.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the password change.</returns>
-    /// Method service to change password in database
-    /// </summary>
-    /// <param name="request">requset.pin_token and request.email</param>
-    /// <returns></returns>
     public async Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request)
     {
         var validationResult = await new PatchResetPasswordValidator().ValidateAsync(request);
@@ -203,7 +190,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
         var user = await _userModel.GetUserByEmailAsync(request.Email);
         if (user == null)
             return NotFound(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND.GetDescription() }
+                    new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }
             ));
 
         var tokenResetPassword = await _authDbCacheService.GetTokenPasswordResetAttempByUserIdAsync(user.Id);
@@ -212,7 +199,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
                     new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_TOKEN_NOT_FOUND_IN_CACHE.GetDescription() }
             ));
 
-        var validateToken = await _authDbCacheService.ValidateTokenAsync(int.Parse(request.PinToken), tokenResetPassword.PinToken);
+        var validateToken = await _authDbCacheService.ValidateTokenAsync(request.PinToken, tokenResetPassword.PinToken);
         if (!validateToken)
             return BadRequest(new ResponseApiError(
                     new List<string>() { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_TOKEN_INVALID.GetDescription() }
@@ -234,4 +221,52 @@ public class AuthenticatorService : Controller, IAuthenticatorService
             EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED.GetDescription()
         ));
     }
+
+    /// <summary>
+    /// Completes the validate email process by validating the token and updating the user status in the database.
+    /// </summary>
+    /// <param name="request">The request containing the email and token.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the process.</returns>
+    public async Task<IActionResult> PostValidateEmailAsync(PostValidateEmailRequest request)
+    {
+        var validationResult = await new PostValidateEmailValidator().ValidateAsync(request);
+        if (!validationResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        var user = await _userModel.GetUserAllByEmailAsync(request.Email);
+        if (user == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }
+            ));
+
+        if (user.StatusId == (int)EnumUserStatus.ACTIVE || user.StatusId == (int)EnumUserStatus.INACTIVE)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED.GetDescription() }
+            ));
+
+        var tokenResetPassword = await _authDbCacheService.GetTokenEmailValidateAsync(user.Email);
+        if (tokenResetPassword == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_TOKEN_NOTFOUND_IN_CACHE.GetDescription() }
+            ));
+
+        var validateToken = await _authDbCacheService.ValidateTokenAsync(request.PinToken, tokenResetPassword.PinToken);
+        if (!validateToken)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_WRONG_TOKEN.GetDescription() }
+            ));
+
+        var updateStatus = await _userModel.UpdateUserStatusAsync(user.Id, (int)EnumUserStatus.ACTIVE);
+        if (updateStatus)
+            return Ok(new ResponseApiSucess(
+                EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_200_USER_VALIDATED.GetDescription()
+            ));
+        else
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_200_ERROR_VALIDATE_EMAIL.GetDescription() }
+            ));
+    }
+
 }

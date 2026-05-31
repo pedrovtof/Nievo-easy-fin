@@ -53,7 +53,13 @@ public enum EnumErrosApi
     POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID,
 
     /// <summary>
-    /// User already exist
+    /// Email is not valid, please try to validate it again
+    /// </summary>
+    [Description("Email is not valid, please try to validate it again")]
+    POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED,
+
+    /// <summary>
+    /// User created with sucess"
     /// </summary>
     [Description("User created with sucess")]
     POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED,
@@ -122,7 +128,7 @@ public enum EnumErrosApi
     POSTLOGINUSERASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL,
 
     /// <summary>
-    /// User not found
+    /// The user may not have an account or the password is incorrect
     /// </summary>
     [Description("The user may not have an account or the password is incorrect")]
     POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
@@ -219,7 +225,13 @@ public enum EnumErrosApi
     /// Email not found, validate if you typed it correctly
     /// </summary>
     [Description("Email not found, validate if you typed it correctly")]
-    PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND,
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// Invalid Token format, must be bigger than 0
+    /// </summary>
+    [Description("Invalid Token format, must be bigger than 0")]
+    PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_TOKEN_FORMAT,
 
     /// <summary>
     /// The user may not have an account or may need to request another token.
@@ -274,4 +286,54 @@ public enum EnumErrosApi
     PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED,
 
     #endregion ResetPasswordRequest
+
+    #region ValidateEmailRequest
+
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_400_EMPTY_EMAIL,
+
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Token is not valid
+    /// </summary>
+    [Description("The token is not valid")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_400_INVALID_TOKEN,
+
+    /// <summary>
+    /// The user may not have an account or email is incorrect
+    /// </summary>
+    [Description("The user may not have an account or email is incorrect")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// The user may have already been validated
+    /// </summary>
+    [Description("The user may have already been validated")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED,
+
+    /// <summary>
+    /// Was not possible to found one token for this email
+    /// </summary>
+    [Description("Was not possible to found one token for this email")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_TOKEN_NOTFOUND_IN_CACHE,
+
+    /// <summary>
+    /// Token does not match, please try again
+    /// </summary>
+    [Description("Token does not match, please try again")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_WRONG_TOKEN,
+
+    /// <summary>
+    /// Email validated.
+    /// </summary>
+    [Description("Email validated")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_200_USER_VALIDATED,
+
+    /// <summary>
+    /// There has an error during the process, pleasy try again latter
+    /// </summary>
+    [Description("There has an error during the process, pleasy try again latter")]
+    POSTVALIDATEEMAILASYNC_AUTHSERVICE_200_ERROR_VALIDATE_EMAIL,
+
+    #endregion ValidateEmailRequest
 }

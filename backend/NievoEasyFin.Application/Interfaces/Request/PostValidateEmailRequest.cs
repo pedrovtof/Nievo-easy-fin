@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 namespace NievoEasyFin.Application.Interfaces.Request;
 
 /// <summary>
-/// This class is a template for PatchResetPassword
+/// This class is a template for PostValidateEmail
 /// </summary>
-public class PatchResetPasswordRequest
+public class PostValidateEmailRequest
 {
     /// <summary>
     /// User email
@@ -14,14 +14,8 @@ public class PatchResetPasswordRequest
     public string Email { get; set; }
 
     /// <summary>
-    /// Token to reset
+    /// User token
     /// </summary>
     [JsonPropertyName("pin_token")]
     public int PinToken { get; set; }
-
-    /// <summary>
-    /// New Password
-    /// </summary>
-    [JsonPropertyName("password")]
-    public string Password { get; set; }
 }
