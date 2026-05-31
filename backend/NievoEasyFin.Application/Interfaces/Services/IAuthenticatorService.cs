@@ -41,13 +41,13 @@ public interface IAuthenticatorService
     /// Completes the verification of the user email.
     /// </summary>
     /// <param name="request">The request containing the email and token.</param>
-    /// <returns>An IActionResult indicating the result of the validation.</returns>
+    /// <returns>An IActionResult indicating the result of the password update.</returns>
     Task<IActionResult> PostValidateEmailAsync([FromBody] PostValidateEmailRequest request);
 
     /// <summary>
-    /// Sends a new email validation token to the user.
+    /// Send the validate email token to the user.
     /// </summary>
-    /// <param name="request">The request containing the user email.</param>
-    /// <returns>An IActionResult indicating the result of the send operation.</returns>
+    /// <param name="request">The request containing the email.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the process.</returns>
     Task<IActionResult> PostValidateEmailSendAsync([FromBody] PostValidateEmailSendRequest request);
 }

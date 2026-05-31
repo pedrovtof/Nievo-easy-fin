@@ -246,13 +246,13 @@ public class AuthenticatorService : Controller, IAuthenticatorService
                     new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED.GetDescription() }
             ));
 
-        var tokenResetPassword = await _authDbCacheService.GetTokenEmailValidateAsync(user.Email);
-        if (tokenResetPassword == null)
+        var tokenEmail = await _authDbCacheService.GetTokenEmailValidateAsync(user.Email);
+        if (tokenEmail == null)
             return NotFound(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_TOKEN_NOTFOUND_IN_CACHE.GetDescription() }
             ));
 
-        var validateToken = await _authDbCacheService.ValidateTokenAsync(request.PinToken, tokenResetPassword.PinToken);
+        var validateToken = await _authDbCacheService.ValidateTokenAsync(request.PinToken, tokenEmail.PinToken);
         if (!validateToken)
             return BadRequest(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_WRONG_TOKEN.GetDescription() }
@@ -269,12 +269,40 @@ public class AuthenticatorService : Controller, IAuthenticatorService
             ));
     }
 
-
-
     /// <summary>
-    /// Stub — implementation in progress.
+    /// Send the validate email token to the user.
     /// </summary>
-    public Task<IActionResult> PostValidateEmailSendAsync(PostValidateEmailSendRequest request)
-        => throw new NotImplementedException();
+    /// <param name="request">The request containing the email.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the process.</returns>
+    public async Task<IActionResult> PostValidateEmailSendAsync(PostValidateEmailSendRequest request)
+    {
+        var validationResult = await new PostValidateEmailSendValidator().ValidateAsync(request);
+        if (!validationResult.IsValid)
+            return BadRequest(
+                    new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
 
+        var user = await _userModel.GetUserAllByEmailAsync(request.Email);
+        if (user == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }
+            ));
+
+        if (user.StatusId == (int)EnumUserStatus.ACTIVE || user.StatusId == (int)EnumUserStatus.INACTIVE)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED.GetDescription() }
+            ));
+
+        var tokenEmail = await _authDbCacheService.GetTokenEmailValidateAsync(user.Email);
+        if (tokenEmail != null)
+            return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_TOKEN_FOUND_IN_CACHE.GetDescription() }
+            ));
+
+        var tk = await _authDbCacheService.CreateTokenSingupUser(request.Email, user.Name);
+
+        var smtp = await _smtpModel.SingUpUserTokenMailAsync(request.Email, tk.PinToken);
+
+        return Ok(new ResponseApiSucess(EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED.GetDescription()));
+    }
 }

@@ -121,5 +121,22 @@ public class AuthenticatorController : Controller
     public async Task<IActionResult> PostValidateEmailAsync([FromBody] PostValidateEmailRequest request)
         => await _authenticatorService.PostValidateEmailAsync(request);
 
-
+    /// <summary>
+    /// Endpoint to send the token for validate email
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST v1/Authenticator/send-validate:email
+    ///     {
+    ///        "email": "Joe.Black@example.com"
+    ///     }
+    /// </remarks>
+    /// <param name="request">request.email</param>
+    [HttpPost("send-validate:email")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostValidateEmailSendAsync([FromBody] PostValidateEmailSendRequest request)
+        => await _authenticatorService.PostValidateEmailSendAsync(request);
 }

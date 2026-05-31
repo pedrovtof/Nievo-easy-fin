@@ -55,7 +55,7 @@ public enum EnumErrosApi
     /// <summary>
     /// Email is not valid, please try to validate it again
     /// </summary>
-    [Description("Email is not valid, please try to validate it again")]
+    [Description("Email is not validated, please try to validate it again")]
     POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED,
 
     /// <summary>
@@ -336,4 +336,36 @@ public enum EnumErrosApi
     POSTVALIDATEEMAILASYNC_AUTHSERVICE_200_ERROR_VALIDATE_EMAIL,
 
     #endregion ValidateEmailRequest
+
+    #region SendValidateEmailRequest
+
+    POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_EMPTY_EMAIL,
+
+    POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// The user may not have an account or email is incorrect
+    /// </summary>
+    [Description("The user may not have an account or email is incorrect")]
+    POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// The user may have already been validated
+    /// </summary>
+    [Description("The user may have already been validated")]
+    POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED,
+
+    /// <summary>
+    /// Token already exists, please wait and try again later
+    /// </summary>
+    [Description("Token already exists, please wait and try again later")]
+    POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_TOKEN_FOUND_IN_CACHE,
+
+    /// <summary>
+    /// Token created.
+    /// </summary>
+    [Description("Token created.")]
+    POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED,
+
+    #endregion SendValidateEmailRequest
 }
