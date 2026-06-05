@@ -27,7 +27,7 @@ public class PostCreateUserAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(okResult));
 
         // Act
-        var result = await Controller.PostCreateUserAsync(request);
+        var result = await Controller.PostCreateUserAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(201);
@@ -49,6 +49,10 @@ public class PostCreateUserAsyncTest : UsersTestBase
         new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS, "Email já existe" },
         new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID, "Email inválido" },
         new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED, "Email com cadastro pendente de validação" },
+        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_HOST_NULL_OR_EMPTY, "Host vazio ou nulo" },
+        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_USER_AGENT_NULL_OR_EMPTY, "User-Agent vazio ou nulo" },
+        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_TERMS_NOT_ACCEPTED, "Termos não aceitos" },
+        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS, "Erro ao registrar aceite dos termos" },
     };
 
     [Theory(DisplayName = "Criação de usuário deverá retornar BadRequest para cenários de erro")]
@@ -63,7 +67,7 @@ public class PostCreateUserAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(badRequestResult));
 
         // Act
-        var result = await Controller.PostCreateUserAsync(request);
+        var result = await Controller.PostCreateUserAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -88,7 +92,7 @@ public class PostCreateUserAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(okResult));
 
         // Act
-        await Controller.PostCreateUserAsync(request);
+        await Controller.PostCreateUserAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         await MockService.Received(1).PostCreateUserAsync(Arg.Any<PostCreateUserRequest>());

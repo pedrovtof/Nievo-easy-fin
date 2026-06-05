@@ -42,6 +42,7 @@ public class UsersServiceTests : IDisposable
         Environment.SetEnvironmentVariable("PASSWORD_CRYPTO_SALT", "4142434445464748494A4B4C4D4E4F505152535455565758595A6162636465666768696A6B6C6D6E6F707172737475767778797A31323334353637383930");
 
         Environment.SetEnvironmentVariable("GOOGLE_ID_CLIENT", googleId);
+        Environment.SetEnvironmentVariable("CODE_SINGUP_TERMS", "SINGUP_TERMS_V1");
     }
 
     public UsersServiceTests(WireMockFixture fixture)
@@ -61,6 +62,8 @@ public class UsersServiceTests : IDisposable
         var userModel = new UserModel(authOrigin, authReplica);
         var userProviderSsoModel = new UserProviderSsoModel(authOrigin, authReplica);
         var ssoProviderAuth = new SSoProviderAuth(authReplica);
+        var acceptTermsModel = new AcceptTermsModel(authOrigin, authReplica);
+        var usersAcceptedTermsModel = new UsersAcceptedTermsModel(authOrigin, authReplica);
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
@@ -76,9 +79,15 @@ public class UsersServiceTests : IDisposable
             userProviderSsoModel,
             ssoProviderAuth,
             smtpMock ?? new SmtpModelMock(),
-            cacheService
+            cacheService,
+            acceptTermsModel,
+            usersAcceptedTermsModel
         );
     }
+
+    // ──────────────────────────────────────────────────────────────
+    // PostCreateUserAsync — Standard Signup
+    // ──────────────────────────────────────────────────────────────
 
     [Fact]
     public async Task PostCreateUserAsync_WithValidRequest_ReturnsCreated()
@@ -101,8 +110,7 @@ public class UsersServiceTests : IDisposable
         {
             // SMTP is not available in this test environment.
             // The exception occurs at SingUpUserTokenMailAsync, before CreateUserAsync is called —
-            // this is expected behaviour. Validate the Redis token was created (cache mock returns true)
-            // and return early, same pattern as PostResetPasswordAsync tests.
+            // this is expected behaviour.
             return;
         }
         catch (Exception ex) when (ex.Message.Contains("Connection refused"))
@@ -179,10 +187,78 @@ public class UsersServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task PostCreateUserAsync_WhenTermsNotAccepted_ReturnsBadRequest()
+    {
+        // Arrange — validator rejects the request before any DB call
+        var request = PostCreateUserRequestFaker.Create().Generate();
+        request.Password = "Strong@123";
+        request.AcceptTerms = false; // Simulate user not accepting terms
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserAsync(request);
+
+        // Assert — the validator rejects AcceptTerms=false, any BadRequest is correct
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task PostCreateUserAsync_WhenHostIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange — validator rejects if Host header is missing
+        var request = PostCreateUserRequestFaker.Create().Generate();
+        request.Password = "Strong@123";
+        request.SetHost(string.Empty);
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Fact]
+    public async Task PostCreateUserAsync_WhenUserAgentIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange — validator rejects if UserAgent header is missing
+        var request = PostCreateUserRequestFaker.Create().Generate();
+        request.Password = "Strong@123";
+        request.SetUserAgent(string.Empty);
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // PostCreateUserSsoAsync — SSO Signup
+    // ──────────────────────────────────────────────────────────────
+
+    [Fact]
     public async Task PostCreateUserSsoAsync_WhenProviderNotFound_ReturnsBadRequest()
     {
         // Arrange
-        var request = new PostCreateUserSsoRequest { Provider = "unknown", ProviderAccessToken = "token" };
+        var request = new PostCreateUserSsoRequest
+        {
+            Provider = "unknown",
+            ProviderAccessToken = "token",
+            AcceptTerms = true
+        };
+        request.SetHost("localhost");
+        request.SetUserAgent("TestAgent/1.0");
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
         var service = CreateService(authOrigin, authReplica);
@@ -198,10 +274,89 @@ public class UsersServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task PostCreateUserSsoAsync_WhenTermsNotAccepted_ReturnsBadRequest()
+    {
+        // Arrange — validator rejects before any provider lookup
+        var request = new PostCreateUserSsoRequest
+        {
+            Provider = "google",
+            ProviderAccessToken = "valid-token",
+            AcceptTerms = false
+        };
+        request.SetHost("localhost");
+        request.SetUserAgent("TestAgent/1.0");
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserSsoAsync(request);
+
+        // Assert — the validator rejects AcceptTerms=false, any BadRequest is correct
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task PostCreateUserSsoAsync_WhenHostIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new PostCreateUserSsoRequest
+        {
+            Provider = "google",
+            ProviderAccessToken = "valid-token",
+            AcceptTerms = true
+        };
+        request.SetHost(string.Empty);
+        request.SetUserAgent("TestAgent/1.0");
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserSsoAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Fact]
+    public async Task PostCreateUserSsoAsync_WhenUserAgentIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new PostCreateUserSsoRequest
+        {
+            Provider = "google",
+            ProviderAccessToken = "valid-token",
+            AcceptTerms = true
+        };
+        request.SetHost("localhost");
+        request.SetUserAgent(string.Empty);
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserSsoAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Fact]
     public async Task PostCreateUserSsoAsync_WhenUserAlreadyExists_ReturnsOk()
     {
         // Arrange
-        var request = new PostCreateUserSsoRequest { Provider = "google", ProviderAccessToken = "valid-token" };
+        var request = new PostCreateUserSsoRequest
+        {
+            Provider = "google",
+            ProviderAccessToken = "valid-token",
+            AcceptTerms = true
+        };
+        request.SetHost("localhost");
+        request.SetUserAgent("TestAgent/1.0");
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -245,7 +400,14 @@ public class UsersServiceTests : IDisposable
     public async Task PostCreateUserSsoAsync_WhenNewUser_ReturnsCreated()
     {
         // Arrange
-        var request = new PostCreateUserSsoRequest { Provider = "google", ProviderAccessToken = "new-token" };
+        var request = new PostCreateUserSsoRequest
+        {
+            Provider = "google",
+            ProviderAccessToken = "new-token",
+            AcceptTerms = true
+        };
+        request.SetHost("localhost");
+        request.SetUserAgent("TestAgent/1.0");
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -253,6 +415,15 @@ public class UsersServiceTests : IDisposable
         var provider = new SsoProviderEntity { Id = 1, Name = "google", Active = true };
         authOrigin.SsoProvider.Add(provider);
         await authOrigin.SaveChangesAsync();
+
+        // Seed accept_terms record directly into the attached journey schema so Dapper can read it
+        var code = Environment.GetEnvironmentVariable("CODE_SINGUP_TERMS") ?? "SINGUP_TERMS_V1";
+        var connection = authOrigin.Database.GetDbConnection();
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = $"INSERT INTO journey.accept_terms (code, name, version, active, created_at, updated_at) VALUES ('{code}', 'Terms of Service', 1, 1, datetime('now'), datetime('now'));";
+            cmd.ExecuteNonQuery();
+        }
 
         var subId = "google-sub-new";
         var userEmail = "new-sso-user@example.com";
