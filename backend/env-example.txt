@@ -60,3 +60,9 @@ SMTP_DEFAULT_PREFIX_MAIL_CONTENT = "Easy Fin - "
 # MAIL TEMPLATES envs
 PATH_MAIL_BODY_TEMPLATE_PASSWORD_RESET_TOKEN = "/full/path/file.txt"
 PATH_MAIL_BODY_TEMPLATE_SINGUP_USER_TOKEN = "/full/path/file.txt"
+
+# Terms code
+CODE_SINGUP_TERMS = 'xxxx-xxxx-xxxx-xxxx-xxxx' # -> Just generate some UUID, use the V7 because it is better for index page in database  -> https://www.uuidgenerator.net/version7
+DPO_CONTACT = "dpo@mail.com"
+SUPPORT_CONTACT = "suport@mail.com"
+APP_NAME="Nievo Easy Finance"

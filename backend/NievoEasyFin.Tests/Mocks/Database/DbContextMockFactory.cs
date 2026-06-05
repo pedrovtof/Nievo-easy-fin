@@ -137,6 +137,26 @@ public static class DbContextMockFactory
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE journey.accept_terms (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    code TEXT,
+                    name TEXT,
+                    description TEXT,
+                    version INTEGER,
+                    content TEXT,
+                    created_at TEXT,
+                    updated_at TEXT,
+                    active INTEGER
+                );
+                CREATE TABLE journey.users_accepted_terms (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    accept_id INTEGER,
+                    accepted INTEGER,
+                    request_details TEXT,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
             ";
             cmd.ExecuteNonQuery();
         }
@@ -182,6 +202,10 @@ public class AuthOriginTest : AuthOrigin
                 property.SetColumnType(null);
             }
         }
+
+        // SQLite does not support object/json columns — ignore RequestDetails
+        modelBuilder.Entity<NievoEasyFin.Application.Data.Entities.UsersAcceptedTermsEntity>()
+            .Ignore(e => e.RequestDetails);
     }
 }
 
@@ -204,5 +228,9 @@ public class AuthReplicaTest : AuthReplica
                 property.SetColumnType(null);
             }
         }
+
+        // SQLite does not support object/json columns — ignore RequestDetails
+        modelBuilder.Entity<NievoEasyFin.Application.Data.Entities.UsersAcceptedTermsEntity>()
+            .Ignore(e => e.RequestDetails);
     }
 }

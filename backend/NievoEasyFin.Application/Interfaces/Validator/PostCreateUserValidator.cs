@@ -2,6 +2,7 @@ using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Helper;
 using FluentValidation;
+using NievoEasyFin.Application.Extensions.Enum;
 
 namespace NievoEasyFin.Application.Interfaces.Validator;
 
@@ -35,5 +36,17 @@ public class PostCreateUserValidator : AbstractValidator<PostCreateUserRequest>
                 .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL.ToString())
             .EmailAddress()
                 .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID.ToString());
+
+        RuleFor(x => x.GetHost())
+            .NotEmpty()
+                .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_HOST_NULL_OR_EMPTY.ToString());
+
+        RuleFor(x => x.GetUserAgent())
+            .NotEmpty()
+                .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_USER_AGENT_NULL_OR_EMPTY.ToString());
+
+        RuleFor(x => x.AcceptTerms)
+            .Must(x => x == true)
+                .WithErrorCode(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_TERMS_NOT_ACCEPTED.GetDescription());
     }
 }

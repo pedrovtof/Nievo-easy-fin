@@ -27,7 +27,7 @@ public class PostCreateUserSsoAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(createdResult));
 
         // Act
-        var result = await Controller.PostCreateUserSsoAsync(request);
+        var result = await Controller.PostCreateUserSsoAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(201);
@@ -45,7 +45,7 @@ public class PostCreateUserSsoAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(okResult));
 
         // Act
-        var result = await Controller.PostCreateUserSsoAsync(request);
+        var result = await Controller.PostCreateUserSsoAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         var objectResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -66,6 +66,10 @@ public class PostCreateUserSsoAsyncTest : UsersTestBase
         new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_NOT_200_RESPONSE, "Provedor não retornou 200" },
         new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY, "Token de acesso nulo ou vazio" },
         new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_INVALID, "Token de acesso inválido" },
+        new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_HOST_NULL_OR_EMPTY, "Host vazio ou nulo" },
+        new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_USER_AGENT_NULL_OR_EMPTY, "User-Agent vazio ou nulo" },
+        new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_TERMS_NOT_ACCEPTED, "Termos não aceitos" },
+        new object[] { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS, "Erro ao registrar aceite dos termos" },
     };
 
     [Theory(DisplayName = "Criação de usuário SSO deverá retornar BadRequest para cenários de erro")]
@@ -80,7 +84,7 @@ public class PostCreateUserSsoAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(badRequestResult));
 
         // Act
-        var result = await Controller.PostCreateUserSsoAsync(request);
+        var result = await Controller.PostCreateUserSsoAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -105,7 +109,7 @@ public class PostCreateUserSsoAsyncTest : UsersTestBase
                    .Returns(Task.FromResult<IActionResult>(okResult));
 
         // Act
-        await Controller.PostCreateUserSsoAsync(request);
+        await Controller.PostCreateUserSsoAsync("TestAgent/1.0", "localhost", request);
 
         // Assert
         await MockService.Received(1).PostCreateUserSsoAsync(Arg.Any<PostCreateUserSsoRequest>());

@@ -92,6 +92,8 @@ public class Startup
         services.AddScoped<UserModel>();
         services.AddScoped<UserProviderSsoModel>();
         services.AddScoped<UserProviderSsoModel>();
+        services.AddScoped<UsersAcceptedTermsModel>();
+        services.AddScoped<AcceptTermsModel>();
 
         // Service 
         services.AddScoped<CryptoPasswordService>();

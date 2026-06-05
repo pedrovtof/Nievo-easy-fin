@@ -10,6 +10,12 @@ public static class PostCreateUserRequestFaker
         return new Faker<PostCreateUserRequest>()
             .RuleFor(r => r.Name, f => f.Person.FullName)
             .RuleFor(r => r.Email, f => f.Person.Email)
-            .RuleFor(r => r.Password, f => f.Internet.Password(8));
+            .RuleFor(r => r.Password, f => f.Internet.Password(8))
+            .RuleFor(r => r.AcceptTerms, _ => true)
+            .FinishWith((f, r) =>
+            {
+                r.SetHost("localhost");
+                r.SetUserAgent("TestAgent/1.0");
+            });
     }
 }

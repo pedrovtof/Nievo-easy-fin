@@ -17,6 +17,14 @@ Os endpoints são categorizados por visibilidade e versão:
 Destinados ao fluxo de acesso inicial, onde o usuário ainda não possui uma sessão ativa ou precisa realizar ações de recuperação.
 *   **Autenticação:** Login tradicional e SSO (Google, etc).
 *   **Gestão de Senha:** Solicitação de reset e atualização via token.
+*   **Cadastro de Usuário (`POST /singup`):** Cria um novo usuário com e-mail e senha.
+    *   **Headers obrigatórios:** `User-Agent`, `Host`
+    *   **Body obrigatório:** `name`, `email`, `password`, `accept_terms: true`
+    *   **Respostas:** `201 Created` (sucesso) | `400 Bad Request` (validação, e-mail duplicado, termos não aceitos, erro ao registrar aceite)
+*   **Cadastro de Usuário SSO (`POST /singup-sso`):** Cria ou vincula um usuário via provedor SSO.
+    *   **Headers obrigatórios:** `User-Agent`, `Host`
+    *   **Body obrigatório:** `provider_name`, `provider_access_token`, `accept_terms: true`
+    *   **Respostas:** `201 Created` (novo usuário) | `200 OK` (usuário já existe) | `400 Bad Request` (provedor inválido, token inválido, termos não aceitos)
 
 ### Endpoints Privados (`/api/private/v1/...`)
 Exigem um token JWT válido. O Kong valida a assinatura do token antes de encaminhar a requisição.
