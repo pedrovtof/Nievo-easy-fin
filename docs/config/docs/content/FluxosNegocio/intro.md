@@ -6,8 +6,9 @@ Os fluxos de negócio do Nievo Easy Fin foram desenhados para serem intuitivos, 
 
 O primeiro contato do usuário com a plataforma ocorre através do registro.
 
-*   **Registro Tradicional:** O usuário fornece Nome, Email e Senha. O sistema valida a complexidade da senha e a unicidade do e-mail antes de criar a conta no banco de dados relacional (Postgres).
-*   **Registro via SSO (Google):** O usuário pode optar por utilizar sua conta Google. O sistema valida o token enviado pelo frontend, recupera os dados básicos e vincula a conta, facilitando o acesso futuro sem necessidade de senha local.
+*   **Registro Tradicional:** O usuário fornece Nome, Email, Senha e deve **aceitar os Termos de Uso** (`accept_terms: true`). O sistema valida a complexidade da senha, a unicidade do e-mail e o aceite dos termos antes de criar a conta. Os headers `Host` e `User-Agent` são obrigatórios e ficam registrados junto ao aceite de termos para fins de auditoria e compliance.
+*   **Registro via SSO (Google):** O usuário pode optar por utilizar sua conta Google. O sistema valida o token enviado pelo frontend, recupera os dados básicos e vincula a conta. O aceite dos Termos de Uso (`accept_terms: true`) também é **obrigatório** neste fluxo, e os headers `Host` e `User-Agent` são igualmente registrados.
+*   **Registro de Aceite de Termos:** Para cada cadastro bem-sucedido, o sistema persiste um registro na tabela `journey.users_accepted_terms`, associando o usuário ao termo vigente (`journey.accept_terms`) no momento do cadastro, incluindo a versão do termo, data, IP de origem (via Host) e agente do navegador.
 
 ## 2. Fluxo de Autenticação e Segurança
 
