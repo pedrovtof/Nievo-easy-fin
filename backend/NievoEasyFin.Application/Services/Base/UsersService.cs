@@ -29,13 +29,19 @@ public class UsersService : Controller, IUsersService
 
     private readonly AuthDbCacheService _authDbCacheService;
 
+    private readonly AcceptTermsModel _acceptTermsmodel;
+
+    private readonly UsersAcceptedTermsModel _usersAcceptedTermsModel;
+
     public UsersService(
         CryptoPasswordService cryptoPasswordService,
         UserModel userModel,
         UserProviderSsoModel userProviderSsoModel,
         SSoProviderAuth ssoProviderAuth,
         SmtpModel smtpModel,
-        AuthDbCacheService authDbCacheService
+        AuthDbCacheService authDbCacheService,
+        AcceptTermsModel acceptTermsmodel,
+        UsersAcceptedTermsModel usersAcceptedTermsModel
     )
     {
         _cryptoPasswordService = cryptoPasswordService;
@@ -44,6 +50,8 @@ public class UsersService : Controller, IUsersService
         _ssoProviderAuth = ssoProviderAuth;
         _smtpModel = smtpModel;
         _authDbCacheService = authDbCacheService;
+        _acceptTermsmodel = acceptTermsmodel;
+        _usersAcceptedTermsModel = usersAcceptedTermsModel;
     }
 
     /// <summary>
@@ -62,7 +70,7 @@ public class UsersService : Controller, IUsersService
         var userEmail = await _userModel.GetUserByEmailWithAnyStatusAsync(request.Email);
         if (userEmail != null)
         {
-            if(userEmail.StatusId == (int)EnumUserStatus.INVALID)
+            if (userEmail.StatusId == (int)EnumUserStatus.INVALID)
                 return BadRequest(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED.GetDescription() }
                 ));
@@ -79,6 +87,12 @@ public class UsersService : Controller, IUsersService
         string hash = await _cryptoPasswordService.HashPasswordAsync(request.Password);
 
         var user = await _userModel.CreateUserAsync(request.Name, hash, request.Email, (int)EnumUserStatus.INVALID);
+
+        bool createdAcceptTerms = await CreateAcceptTermsUsers(request.GetHost(), request.GetUserAgent(), request.AcceptTerms, user.Id);
+        if (!createdAcceptTerms)
+            return BadRequest(new ResponseApiError(
+            new List<string>() { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS.GetDescription() }
+        ));
 
         return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
     }
@@ -119,9 +133,36 @@ public class UsersService : Controller, IUsersService
                 user = await _userModel.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
 
             var userProviderSso = await _userProviderSsoModel.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
+
+            bool createdAcceptTerms = await CreateAcceptTermsUsers(request.GetHost(), request.GetUserAgent(), request.AcceptTerms, user.Id);
+            if (!createdAcceptTerms)
+                return BadRequest(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS.GetDescription() }
+            ));
+
             return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_201_CREATED.GetDescription()));
         }
         else
             return Ok(new ResponseApiSucess(EnumErrosApi.POSTCREATEUSERSSOASYNC_AUTHSERVICE_200_USER_ALREADY_EXISTS.GetDescription()));
+    }
+
+    /// <summary>
+    /// Method to create accept terms users
+    /// </summary>
+    /// <returns>true or false</returns>
+    public async Task<bool> CreateAcceptTermsUsers(string host, string userAgent, bool acceptedTerms, int userId)
+    {
+        if (!acceptedTerms)
+            return false;
+
+        var acceptTermsEntity = await _acceptTermsmodel.GetAcceptTermsWithCodeAsync(_acceptTermsmodel.GetCodeSingupTerms());
+        if (acceptTermsEntity == null)
+            return false;
+
+        var usersAcceptedTerms = await _usersAcceptedTermsModel.CreateUsersAcceptedTermsEntityAsync(acceptTermsEntity.Id, host, userAgent, acceptedTerms, userId);
+        if (usersAcceptedTerms == null)
+            return false;
+
+        return true;
     }
 }

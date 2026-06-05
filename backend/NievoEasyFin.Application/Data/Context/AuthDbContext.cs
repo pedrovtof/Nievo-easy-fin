@@ -22,6 +22,8 @@ public abstract class AuthDbContext : DbContext
     public DbSet<UserTypeEntity> UserTypes { get; set; }
     public DbSet<SsoProviderEntity> SsoProvider { get; set; }
     public DbSet<UserProviderSsoEntity> UserProvider { get; set; }
+    public DbSet<UsersAcceptedTermsEntity> UsersAcceptedTerms { get; set; }
+    public DbSet<AcceptTermsEntity> AcceptTerms { get; set; }
 
     protected AuthDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {

@@ -27,9 +27,12 @@ public class UsersController : Controller
     ///     {
     ///        "name": "Joe Black",
     ///        "password": "1Meet-Death",
-    ///        "email": "Joe.Black@example.com"
+    ///        "email": "Joe.Black@example.com",
+    ///        "accept_terms":true
     ///     }
     /// </remarks>
+    /// <param name="UserAgent">User agent header</param> 
+    /// <param name="Host">Host header</param> 
     /// <param name="request">Data from user (Name, Password, Email)</param>
     /// <response code="201">Create with sucess</response>
     /// <response code="400">Invalid request</response>
@@ -38,8 +41,13 @@ public class UsersController : Controller
     [AllowAnonymous]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostCreateUserAsync([FromBody] PostCreateUserRequest request)
-        => await _usersService.PostCreateUserAsync(request);   
+    public async Task<IActionResult> PostCreateUserAsync([FromHeader(Name = "User-Agent")] string UserAgent, [FromHeader(Name = "Host")] string Host, [FromBody] PostCreateUserRequest request)
+    {
+        request.SetUserAgent(UserAgent);
+        request.SetHost(Host);
+
+        return await _usersService.PostCreateUserAsync(request);
+    }
 
     /// <summary>
     /// Endpoint to create user with SSO login
@@ -50,15 +58,23 @@ public class UsersController : Controller
     ///     POST v1/Users/singup/sso
     ///     {
     ///        "provider_name": "google",
-    ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj..."
+    ///        "provider_access_token": "yc29.aJKASDJLASD_jasdkasASJSAD-askldaj...",
+    ///        "accept_terms":true
     ///     }
     /// </remarks>
+    /// <param name="UserAgent">User agent header</param> 
+    /// <param name="Host">Host header</param> 
     /// <param name="request">request.provider_name and request.provider_access_token</param>
     [HttpPost("singup-sso")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostCreateUserSsoAsync([FromBody] PostCreateUserSsoRequest request)
-        => await _usersService.PostCreateUserSsoAsync(request);
+    public async Task<IActionResult> PostCreateUserSsoAsync([FromHeader(Name = "User-Agent")] string UserAgent, [FromHeader(Name = "Host")] string Host, [FromBody] PostCreateUserSsoRequest request)
+    {
+        request.SetUserAgent(UserAgent);
+        request.SetHost(Host);
+
+        return await _usersService.PostCreateUserSsoAsync(request);
+    }
 }

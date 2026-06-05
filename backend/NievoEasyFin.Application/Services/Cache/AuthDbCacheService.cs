@@ -35,7 +35,7 @@ namespace NievoEasyFin.Application.Services.Cache
         /// <summary>
         /// Method to Get Token validate email by user email
         /// </summary>
-        /// <param name="userId">int</param>
+        /// <param name="email">string</param>
         /// <returns>Null/Value from redis</returns>
         public async Task<TokenEmailValidateView?> GetTokenEmailValidateAsync(string email)
         {
@@ -74,7 +74,6 @@ namespace NievoEasyFin.Application.Services.Cache
         /// Method to create Token singup in redis
         /// </summary>
         /// <param name="email">email of the user</param>
-        /// <param name="password">password of the user</param>
         /// <param name="name">name of the user</param>
         /// <returns>TokenSingupUserEntity</returns>
         public async Task<TokenSingupUserEntity> CreateTokenSingupUser(string email, string name)

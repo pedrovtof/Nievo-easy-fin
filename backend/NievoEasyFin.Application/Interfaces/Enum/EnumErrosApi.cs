@@ -53,6 +53,27 @@ public enum EnumErrosApi
     POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID,
 
     /// <summary>
+    /// The user most provider the host
+    /// </summary>
+    POSTCREATEUSERASYNC_AUTHSERVICE_400_HOST_NULL_OR_EMPTY,
+
+    /// <summary>
+    /// The user most provider the AGENT
+    /// </summary>
+    POSTCREATEUSERASYNC_AUTHSERVICE_400_USER_AGENT_NULL_OR_EMPTY,
+
+    /// <summary>
+    /// The user most accept the terms
+    /// </summary>
+    POSTCREATEUSERASYNC_AUTHSERVICE_400_TERMS_NOT_ACCEPTED,
+
+    /// <summary>
+    /// Unfortunately an error happened during the process confirming the terms, please try again later
+    /// </summary>
+    [Description("Unfortunately an error happened during the process confirming the terms, please try again later")]
+    POSTCREATEUSERASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS,
+
+    /// <summary>
     /// Email is not valid, please try to validate it again
     /// </summary>
     [Description("Email is not validated, please try to validate it again")]
@@ -95,6 +116,28 @@ public enum EnumErrosApi
     /// Provider name is null or empty
     /// </summary>
     POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_PROVIDER_ACCESS_TOKEN_ID_NULL_OR_EMPTY,
+
+    /// <summary>
+    /// The user most provider the host
+    /// </summary>
+    POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_HOST_NULL_OR_EMPTY,
+
+    /// <summary>
+    /// The user most provider the AGENT
+    /// </summary>
+    POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_USER_AGENT_NULL_OR_EMPTY,
+
+    /// <summary>
+    /// The user most accept the terms
+    /// </summary>
+    [Description("The user most accept the terms")]
+    POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_TERMS_NOT_ACCEPTED,
+
+    /// <summary>
+    /// Unfortunately an error happened during the process confirming the terms, please try again later
+    /// </summary>
+    [Description("Unfortunately an error happened during the process confirming the terms, please try again later")]
+    POSTCREATEUSERSSOASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS,
 
     /// <summary>
     /// Provider id is not valid
