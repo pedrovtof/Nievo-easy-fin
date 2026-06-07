@@ -130,7 +130,7 @@ public class UsersService : Controller, IUsersService
         {
             var user = await _userModel.GetUserByEmailWithAnyStatusAsync(validateProvider.Email);
             if (user == null)
-                user = await _userModel.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email);
+                user = await _userModel.CreateUserAsync($"{validateProvider.Name}", null, validateProvider.Email, (int)EnumUserStatus.ACTIVE);
 
             var userProviderSso = await _userProviderSsoModel.CreateUserProviderSsoEntityAsync(provider.Id, user.Id, validateProvider.Sub);
 
