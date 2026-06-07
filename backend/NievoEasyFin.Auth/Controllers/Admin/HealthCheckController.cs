@@ -54,7 +54,7 @@ public class HealthCheckController : ControllerBase
     public async Task<IActionResult> HealthCheckDatabasePgsqlMainNodeAsync()
     {
         var connection = _AuthMainNodeDatabase.Database.GetDbConnection();
-        var dataFrame = await connection.QueryFirstAsync(
+        var dataFrame = await connection.QueryFirstOrDefaultAsync(
             "select 1 as test_mainNode"
         );
 
@@ -74,7 +74,7 @@ public class HealthCheckController : ControllerBase
     public async Task<IActionResult> HealthCheckDatabasePgsqlReplicaNodeAsync()
     {
         var connection = _AuthReplicaNodeDatabase.Database.GetDbConnection();
-        var dataFrame = await connection.QueryFirstAsync(
+        var dataFrame = await connection.QueryFirstOrDefaultAsync(
             "select 1 as test_replicaNode"
         );
 

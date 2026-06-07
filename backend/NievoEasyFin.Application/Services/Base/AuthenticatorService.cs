@@ -132,7 +132,10 @@ public class AuthenticatorService : Controller, IAuthenticatorService
             var user = await _userModel.GetUserByProviderSubAndIdAsync(validateProvider.Sub, provider.Id);
             if (user == null)
                 return BadRequest(new ResponseApiError(
-                    new List<string>() { EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED.GetDescription() }
+                    new List<string>() {
+                        EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED.GetDescription(),
+                        EnumErrosApi.POSTLOGINUSERSSOASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription()
+                        }
                 ));
 
             var generateToken = await _jsonWebTokenService.GenerateTokenAsync(user.Email);
@@ -310,7 +313,6 @@ public class AuthenticatorService : Controller, IAuthenticatorService
 
         return Ok(new ResponseApiSucess(EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED.GetDescription()));
     }
-
 
     /// <summary>
     /// Return current avaliable accept terms for singup

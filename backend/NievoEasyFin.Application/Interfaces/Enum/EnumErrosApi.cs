@@ -44,7 +44,7 @@ public enum EnumErrosApi
     /// <summary>
     /// Email already exists
     /// </summary>
-    [Description("Email already exists in the system")]
+    [Description("User already exists or email is invalid")]
     POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS,
 
     /// <summary>
@@ -74,9 +74,9 @@ public enum EnumErrosApi
     POSTCREATEUSERASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS,
 
     /// <summary>
-    /// Email is not valid, please try to validate it again
+    /// User not exists, user is blocked or email is not validated
     /// </summary>
-    [Description("Email is not validated, please try to validate it again")]
+    [Description("User not exists, user is blocked or email is not validated")]
     POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED,
 
     /// <summary>
@@ -177,9 +177,9 @@ public enum EnumErrosApi
     POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
 
     /// <summary>
-    /// User blocked
+    /// The user may be blocked or invalidated
     /// </summary>
-    [Description("The user may be blocked")]
+    [Description("The user may be blocked or invalidated")]
     POSTLOGINUSERASYNC_AUTHSERVICE_404_USER_BLOCKED,
 
     /// <summary>
@@ -195,10 +195,16 @@ public enum EnumErrosApi
     POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_PROVIDERSSO_NOT_CONFIGURED,
 
     /// <summary>
-    /// User blocked
+    /// The user may not have an account
     /// </summary>
-    [Description("The user may be blocked")]
+    [Description("The user may not have an account")]
     POSTLOGINUSERSSOASYNC_AUTHSERVICE_400_USER_BLOCKED,
+
+    /// <summary>
+    /// The user may is blocked or the password is incorrect
+    /// </summary>
+    [Description("The user may is blocked or the password is incorrect")]
+    POSTLOGINUSERSSOASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
 
     /// <summary>
     /// Provider do not exists
@@ -243,9 +249,9 @@ public enum EnumErrosApi
     POSTRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTY,
 
     /// <summary>
-    /// Email not found, validate if you typed it correctly
+    /// The user may not have an account or may need to wait a bit longer for another token.
     /// </summary>
-    [Description("Email not found, validate if you typed it correctly")]
+    [Description("The user may not have an account or may need to wait a bit longer for another token.")]
     POSTRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUNND,
 
     [Description("The user may not have an account or may need to wait a bit longer for another token.")]
@@ -343,15 +349,15 @@ public enum EnumErrosApi
     POSTVALIDATEEMAILASYNC_AUTHSERVICE_400_INVALID_TOKEN,
 
     /// <summary>
-    /// The user may not have an account or email is incorrect
+    /// The user may not have an account, email is incorrect or The user may have already been validated
     /// </summary>
-    [Description("The user may not have an account or email is incorrect")]
+    [Description("The user may not have an account, email is incorrect or The user may have already been validated")]
     POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
 
     /// <summary>
     /// The user may have already been validated
     /// </summary>
-    [Description("The user may have already been validated")]
+    [Description("The user may not have an account, email is incorrect or The user may have already been validated")]
     POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED,
 
     /// <summary>
@@ -387,15 +393,15 @@ public enum EnumErrosApi
     POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_INVALID_EMAIL,
 
     /// <summary>
-    /// The user may not have an account or email is incorrect
+    /// "The user may have already been validated, not have an account or email is incorrect"
     /// </summary>
-    [Description("The user may not have an account or email is incorrect")]
+    [Description("The user may have already been validated, not have an account or email is incorrect")]
     POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_NOT_FOUND,
 
     /// <summary>
-    /// The user may have already been validated
+    /// "The user may have already been validated, not have an account or email is incorrect"
     /// </summary>
-    [Description("The user may have already been validated")]
+    [Description("The user may have already been validated, not have an account or email is incorrect")]
     POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED,
 
     /// <summary>

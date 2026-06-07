@@ -3,6 +3,7 @@ using NievoEasyFin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Dapper;
+using NievoEasyFin.Application.Interfaces.Enum;
 
 namespace NievoEasyFin.Application.Models;
 
@@ -30,7 +31,7 @@ public class UserModel : UserEntity
     /// <param name="statusId">User status Id</param>
     /// <param name="phone">User phone</param>
     /// <returns>UserView</returns>
-    public async Task<UserEntity> CreateUserAsync(string name, string password, string email, int statusId = 1, int? phone = null)
+    public async Task<UserEntity> CreateUserAsync(string name, string password, string email, int statusId = (int)EnumUserStatus.ACTIVE, int? phone = null)
     {
         UserEntity user = new UserEntity()
         {
@@ -58,7 +59,7 @@ public class UserModel : UserEntity
     /// <param name="statusId">User status Id</param>
     /// <param name="phone">User phone</param>
     /// <returns></returns>
-    public async Task<UserEntity> CreateUserSsoAsync(string name, string email, string sub, int statusId = 1, int? phone = null)
+    public async Task<UserEntity> CreateUserSsoAsync(string name, string email, string sub, int statusId = (int)EnumUserStatus.ACTIVE, int? phone = null)
     {
         UserEntity user = new UserEntity()
         {
@@ -83,7 +84,7 @@ public class UserModel : UserEntity
     /// <param name="email">string email</param>
     /// <param name="statusId">status number</param>
     /// <returns>UserEntity</returns>
-    public async Task<UserEntity> GetUserByEmailAsync(string email, int statusId = 1)
+    public async Task<UserEntity> GetUserByEmailAsync(string email, int statusId = (int)EnumUserStatus.ACTIVE)
         => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email && x.StatusId == statusId);
 
     /// <summary>
@@ -115,7 +116,7 @@ public class UserModel : UserEntity
         var query = new StringBuilder();
         var parameters = new DynamicParameters();
 
-        query.Append("""
+        query.Append($"""
             SELECT 
                 u.id, "name", email, phone, status_id, u.created_at, u.updated_at, password
             FROM
@@ -125,7 +126,7 @@ public class UserModel : UserEntity
             WHERE 1=1
                 and ups.sso_provider_id  = @providerId
                 and ups.sub = @subId
-                and u.status_id = 1
+                and u.status_id = {(int)EnumUserStatus.ACTIVE}
         """);
 
         parameters.Add("providerId", providerId);
@@ -133,7 +134,7 @@ public class UserModel : UserEntity
 
         var connection = _AuthReplicaNodeDatabase.Database.GetDbConnection();
 
-        var dataFrame = await connection.QueryFirstAsync<UserEntity>(
+        var dataFrame = await connection.QueryFirstOrDefaultAsync<UserEntity>(
             query.ToString(),
             parameters
         );

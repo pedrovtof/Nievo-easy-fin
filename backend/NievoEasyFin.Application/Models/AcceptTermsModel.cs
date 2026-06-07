@@ -64,7 +64,7 @@ public class AcceptTermsModel : AcceptTermsEntity
 
         var connection = _AuthReplicaNodeDatabase.Database.GetDbConnection();
 
-        var acceptTerms = await connection.QueryFirstAsync<AcceptTermsEntity>(
+        var acceptTerms = await connection.QueryFirstOrDefaultAsync<AcceptTermsEntity>(
             query.ToString(),
             parameters
         );
@@ -83,6 +83,6 @@ public class AcceptTermsModel : AcceptTermsEntity
     {
         return content
             .Replace("[VERSION]", version.ToString())
-            .Replace("[ENTITY_UPDATED_AT_COLUMN]", created_at.ToString().Substring(0, 10));
+            .Replace("[ENTITY_UPDATED_AT_COLUMN]", created_at.ToString().Substring(0, 9));
     }
 }
