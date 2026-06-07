@@ -24,13 +24,13 @@ public class AcceptTermsEntity
     public string? Description { get; set; }
 
     [Column("version", TypeName = "INT")]
-    public int? Version { get; set; }
+    public int Version { get; set; }
 
     [Column("content", TypeName = "TEXT")]
     public string? Content { get; set; }
 
     [Column("created_at", TypeName = "TIMESTAMP")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     [Column("updated_at", TypeName = "TIMESTAMP")]
     public DateTime? UpdatedAt { get; set; }

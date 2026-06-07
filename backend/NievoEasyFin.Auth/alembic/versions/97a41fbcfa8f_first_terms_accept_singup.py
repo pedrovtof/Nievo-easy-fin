@@ -287,6 +287,12 @@ def downgrade() -> None:
     """Downgrade schema."""
     variables = startup_vars()
     op.execute(f"""
-        DELETE FROM journey.accept_terms WHERE code IN ('{variables['CODE_SINGUP_TERMS']}')
+        DELETE FROM journey.users_accepted_terms a WHERE EXISTS (
+            SELECT 1 FROM journey.accept_terms b
+            WHERE a.accept_id = b.id
+            LIMIT 1
+        );
+
+        DELETE FROM journey.accept_terms WHERE code IN ('{variables['CODE_SINGUP_TERMS']}');
     """)
     pass

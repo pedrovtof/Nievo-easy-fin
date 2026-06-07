@@ -10,6 +10,7 @@ using NievoEasyFin.Application.Services.Cache;
 using NievoEasyFin.Application.Services.Security;
 
 using NievoEasyFin.Application.Interfaces.Services;
+using NievoEasyFin.Application.Data.Views;
 
 namespace NievoEasyFin.Application.Services.Base.Authenticator;
 
@@ -32,6 +33,8 @@ public class AuthenticatorService : Controller, IAuthenticatorService
 
     private readonly SmtpModel _smtpModel;
 
+    private readonly AcceptTermsModel _acceptTermsmodel;
+
     public AuthenticatorService(
         CryptoPasswordService cryptoPasswordService,
         AuthDbCacheService authDbCacheService,
@@ -40,7 +43,8 @@ public class AuthenticatorService : Controller, IAuthenticatorService
         JsonWebTokenService jsonWebTokenService,
         SSoProviderAuth ssoProviderAuth,
         SmtpProvider smtpProvider,
-        SmtpModel smtpModel
+        SmtpModel smtpModel,
+        AcceptTermsModel acceptTermsmodel
     )
     {
         _cryptoPasswordService = cryptoPasswordService;
@@ -50,6 +54,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
         _jsonWebTokenService = jsonWebTokenService;
         _ssoProviderAuth = ssoProviderAuth;
         _smtpModel = smtpModel;
+        _acceptTermsmodel = acceptTermsmodel;
     }
 
     /// <summary>
@@ -304,5 +309,25 @@ public class AuthenticatorService : Controller, IAuthenticatorService
         var smtp = await _smtpModel.SingUpUserTokenMailAsync(request.Email, tk.PinToken);
 
         return Ok(new ResponseApiSucess(EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED.GetDescription()));
+    }
+
+
+    /// <summary>
+    /// Return current avaliable accept terms for singup
+    /// </summary>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the process.</returns>
+    public async Task<IActionResult> GetAcceptTermsSingupAsync()
+    {
+        var acceptTermsEntity = await _acceptTermsmodel.GetAcceptTermsWithCodeAsync(_acceptTermsmodel.GetCodeSingupTerms());
+        if (acceptTermsEntity == null)
+            return BadRequest(new ResponseApiError(
+                new List<string>() { EnumErrosApi.GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND.GetDescription() }
+            ));
+
+        acceptTermsEntity.Content = await _acceptTermsmodel.ReplaceAcceptTermsSingupVariables(acceptTermsEntity.Content, acceptTermsEntity.Version, acceptTermsEntity.CreatedAt);
+
+        AcceptTermsViews viewAcceptTerms = new(acceptTermsEntity);
+
+        return Ok(new ResponseApiSucess(viewAcceptTerms));
     }
 }
