@@ -411,4 +411,14 @@ public enum EnumErrosApi
     POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED,
 
     #endregion SendValidateEmailRequest
+
+    #region GetAcceptTerms
+
+    /// <summary>
+    /// Terms not found
+    /// </summary>
+    [Description("Terms not found")]
+    GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND
+
+    #endregion GetAcceptTerms
 }

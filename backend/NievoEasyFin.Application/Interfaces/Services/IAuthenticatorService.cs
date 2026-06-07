@@ -50,4 +50,10 @@ public interface IAuthenticatorService
     /// <param name="request">The request containing the email.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the process.</returns>
     Task<IActionResult> PostValidateEmailSendAsync([FromBody] PostValidateEmailSendRequest request);
+
+    /// <summary>
+    /// Endpoint to get accept terms
+    /// </summary>
+    /// <returns>Terms accept entity</returns>
+    Task<IActionResult> GetAcceptTermsSingupAsync();
 }

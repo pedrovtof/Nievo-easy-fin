@@ -50,7 +50,7 @@ public class AcceptTermsModel : AcceptTermsEntity
         var parameters = new DynamicParameters();
 
         query.Append("""
-            SELECT id, code, "name", description, "version", "content", created_at, updated_at, active
+            SELECT id, code, "name", description, "version", "content", created_at as CreatedAt, updated_at as UpdatedAt, active
             FROM journey.accept_terms
             """);
 
@@ -70,5 +70,19 @@ public class AcceptTermsModel : AcceptTermsEntity
         );
 
         return acceptTerms;
+    }
+
+    /// <summary>
+    /// Replace the content variables from AcceptTerms singup
+    /// </summary>
+    /// <param name="content">content of the accept</param>
+    /// <param name="version">version of the accept</param>
+    /// <param name="created_at">created at of accept</param>
+    /// <returns>Replaced content</returns>
+    public async Task<string> ReplaceAcceptTermsSingupVariables(string content, int version, DateTime created_at)
+    {
+        return content
+            .Replace("[VERSION]", version.ToString())
+            .Replace("[ENTITY_UPDATED_AT_COLUMN]", created_at.ToString().Substring(0, 10));
     }
 }

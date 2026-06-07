@@ -139,4 +139,15 @@ public class AuthenticatorController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostValidateEmailSendAsync([FromBody] PostValidateEmailSendRequest request)
         => await _authenticatorService.PostValidateEmailSendAsync(request);
+
+    /// <summary>
+    /// Endpoint to get accept terms
+    /// </summary>
+    /// <returns>Terms accept entity</returns>
+    [HttpGet("accept-terms:singup")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetAcceptTermsSingupAsync()
+        => await _authenticatorService.GetAcceptTermsSingupAsync();
 }

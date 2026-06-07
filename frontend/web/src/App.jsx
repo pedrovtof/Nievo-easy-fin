@@ -8,6 +8,8 @@ import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword/index';
 import Settings from './pages/Settings';
 import Register from './pages/Register';
+import Terms from './pages/Terms';
+import ConfirmEmail from './pages/ConfirmEmail';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 
@@ -25,6 +27,8 @@ function App() {
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        <Route path="/confirm-email" element={<PublicRoute><ConfirmEmail /></PublicRoute>} />
+        <Route path="/terms" element={<Terms />} />
 
         {/* Protected Routes (Wrapped in Layout and ProtectedRoute) */}
         <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
