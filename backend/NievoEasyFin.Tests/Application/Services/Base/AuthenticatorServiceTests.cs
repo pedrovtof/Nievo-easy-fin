@@ -64,6 +64,7 @@ public class AuthenticatorServiceTests : IDisposable
         var userModel = new UserModel(origin, replica);
         var userProviderSsoModel = new UserProviderSsoModel(origin, replica);
         var ssoProviderAuth = new SSoProviderAuth(replica);
+        var acceptTerms = new AcceptTermsModel(origin, replica);
 
         return new AuthenticatorService(
             _cryptoPasswordService,
@@ -73,7 +74,8 @@ public class AuthenticatorServiceTests : IDisposable
             _jsonWebTokenService,
             ssoProviderAuth,
             new SmtpProvider(),
-            smtp ?? new SmtpModel()
+            smtp ?? new SmtpModel(),
+            acceptTerms
         );
     }
     [Fact]

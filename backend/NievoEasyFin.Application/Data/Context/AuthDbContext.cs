@@ -16,7 +16,7 @@ namespace NievoEasyFin.Application.Data.Context;
 public abstract class AuthDbContext : DbContext
 {
     private IConfiguration _configuration;
-    protected abstract string PGSQL_DATABASE_AUTH_CONNECTION_STRING { get; }
+    protected abstract string PGSQL_DATABASE_CONNECTION_STRING { get; }
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<UserStatusEntity> UserStatuses { get; set; }
     public DbSet<UserTypeEntity> UserTypes { get; set; }
@@ -40,10 +40,10 @@ public abstract class AuthDbContext : DbContext
         if (optionsBuilder.IsConfigured)
             return;
 
-        string connectionString = PGSQL_DATABASE_AUTH_CONNECTION_STRING;
+        string connectionString = PGSQL_DATABASE_CONNECTION_STRING;
 
         if (string.IsNullOrEmpty(connectionString))
-            throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid connection string variable PGSQL_DATABASE_AUTH_CONNECTION_STRING is Null or Empty");
+            throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid connection string variable PGSQL_DATABASE_CONNECTION_STRING is Null or Empty");
 
         try
         {

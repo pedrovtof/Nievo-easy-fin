@@ -1,6 +1,6 @@
 using NievoEasyFin.Core;
 
-Console.WriteLine("Begin the Auth startup");
+Console.WriteLine("Begin the Core startup");
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Builded WebApplication");
