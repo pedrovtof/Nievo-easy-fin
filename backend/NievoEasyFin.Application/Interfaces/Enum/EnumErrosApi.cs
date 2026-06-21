@@ -424,7 +424,32 @@ public enum EnumErrosApi
     /// Terms not found
     /// </summary>
     [Description("Terms not found")]
-    GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND
+    GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND,
 
     #endregion GetAcceptTerms
+
+    #region GetAcceptTerms
+
+    /// <summary>
+    /// Empty name.
+    /// </summary>
+    POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_NAME,
+
+    /// <summary>
+    /// Empty bankType.
+    /// </summary>
+    POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_BANKTYPE,
+
+    /// <summary>
+    /// Bank type less than 0.
+    /// </summary>
+    POSTACCOUNTSBANKS_CORESERVICE_400_LESS_THAN_0_BANKTYPE,
+
+    /// <summary>
+    /// Created with sucess
+    /// </summary>
+    [Description("Created with sucess")]
+    POSTACCOUNTSBANKS_CORESERVICE_200_CREATED
+
+    #endregion
 }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
+using NievoEasyFin.Application.Services.Base;
 
 namespace NievoEasyFin.Core;
 
@@ -93,6 +94,7 @@ public class Startup
         services.AddScoped<UserModel>();
 
         // Service 
+        services.AddScoped<IAccountsService, AccountsService>();
     }
 
     // Use this method to configure the HTTP request pipeline.
