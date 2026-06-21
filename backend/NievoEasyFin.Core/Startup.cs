@@ -72,6 +72,8 @@ public class Startup
         Console.WriteLine("Creating Database services");
         services.AddDbContext<AuthOrigin>();
         services.AddDbContext<AuthReplica>();
+        services.AddDbContext<CoreOrigin>();
+        services.AddDbContext<CoreReplica>();
 
         Console.WriteLine("Creating Database Cache services");
         services.AddSingleton<AuthDbCacheService>();

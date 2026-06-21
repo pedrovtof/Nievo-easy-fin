@@ -9,7 +9,7 @@ namespace NievoEasyFin.Application.Data.Context.Database;
 /// </summary>
 public class AuthOrigin : AuthDbContext
 {
-    protected override string PGSQL_DATABASE_AUTH_CONNECTION_STRING => DotNetEnv.Env.GetString("PGSQL_DATABASE_AUTH_CONNECTION_STRING");
+    protected override string PGSQL_DATABASE_CONNECTION_STRING => DotNetEnv.Env.GetString("PGSQL_DATABASE_AUTH_CONNECTION_STRING");
 
     public AuthOrigin(DbContextOptions<AuthOrigin> options, IConfiguration configuration)
         : base(options, configuration)
