@@ -5,6 +5,8 @@ using NievoEasyFin.Application.Configuration;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Cache.Views;
+using NievoEasyFin.Application.Data.Views;
+using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
@@ -546,5 +548,62 @@ public class AuthenticatorServiceTests : IDisposable
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
+    }
+
+    [Fact]
+    public async Task GetAcceptTermsSingupAsync_WhenTermsExist_ReturnsOkWithAcceptTermsViews()
+    {
+        // Arrange
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var codeSingupTerms = Environment.GetEnvironmentVariable("CODE_SINGUP_TERMS") ?? "SINGUP_TERMS";
+
+        // Insert accept_terms record via raw SQL (Dapper reads from the attached 'journey' schema)
+        var connection = replica.Database.GetDbConnection();
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = $@"
+                INSERT INTO journey.accept_terms (code, name, description, version, content, created_at, updated_at, active)
+                VALUES ('{codeSingupTerms}', 'Termos de Uso', 'Termos de uso do sistema', 1, 'Conteúdo dos termos versão [VERSION] atualizado em [ENTITY_UPDATED_AT_COLUMN]', datetime('now'), datetime('now'), 1);
+            ";
+            cmd.ExecuteNonQuery();
+        }
+
+        var service = CreateService(origin, replica);
+
+        // Act
+        var result = await service.GetAcceptTermsSingupAsync();
+
+        // Assert
+        if (result is BadRequestObjectResult badReq)
+        {
+            var err = (ResponseApiError)badReq.Value!;
+            throw new Exception($"GetAcceptTermsSingupAsync failed with: {string.Join(", ", err.Messages)}");
+        }
+
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        var response = okResult.Value.Should().BeOfType<ResponseApiSucess>().Subject;
+        response.Data.Should().BeOfType<AcceptTermsViews>();
+    }
+
+    [Fact]
+    public async Task GetAcceptTermsSingupAsync_WhenTermsNotFound_ReturnsBadRequest()
+    {
+        // Arrange — empty database, no accept_terms records
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var service = CreateService(origin, replica);
+
+        // Act
+        var result = await service.GetAcceptTermsSingupAsync();
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = badRequest.Value.Should().BeOfType<ResponseApiError>().Subject;
+        response.Messages.Should().Contain(
+            EnumErrosApi.GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND.GetDescription()
+        );
     }
 }
