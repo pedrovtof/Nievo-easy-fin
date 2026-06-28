@@ -12,7 +12,7 @@ namespace NievoEasyFin.Application.Services.Security;
 /// </summary>
 public class JsonWebTokenService
 {
-    private static JsonWebTokenConfiguration _jsonWebTokenConfiguration;
+    private readonly JsonWebTokenConfiguration _jsonWebTokenConfiguration;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JsonWebTokenService"/> class.
@@ -58,10 +58,35 @@ public class JsonWebTokenService
     /// <returns>A task representing the asynchronous operation, containing the created <see cref="ClaimsIdentity"/>.</returns>
     private async Task<ClaimsIdentity> ClaimsIdentityTokenAsync(string email)
     {
-        var ci = new ClaimsIdentity();
+        ClaimsIdentity ci = new();
 
-        ci.AddClaim(await ci.AddClaimToATokenAsync("Email", email));
+        ci.AddClaim(await ci.AddClaimToATokenAsync("email", email));
+        ci.AddClaim(await ci.AddClaimToATokenAsync("iss", _jsonWebTokenConfiguration.GetIssuer()));
+        ci.AddClaim(await ci.AddClaimToATokenAsync("aud", _jsonWebTokenConfiguration.GetAudience()));
 
         return ci;
+    }
+
+    public async Task<string> GetClaimValue(string token, string claimName)
+    {
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(claimName))
+            return null;
+
+
+        token = token.Replace("Bearer ", "");
+
+        JwtSecurityTokenHandler tokenHandler = new();
+
+        if (!tokenHandler.CanReadToken(token))
+            return null;
+
+        var jwtToken = tokenHandler.ReadJwtToken(token);
+
+        var claim = jwtToken.Claims.FirstOrDefault(c => c.Type == claimName);
+
+        if (claim == null)
+            return null;
+
+        return claim.Value;
     }
 }

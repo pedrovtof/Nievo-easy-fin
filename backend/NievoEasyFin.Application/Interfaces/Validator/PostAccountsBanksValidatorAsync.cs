@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
+using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
 
@@ -27,6 +29,10 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_BANKTYPE.ToString())
                 .GreaterThanOrEqualTo(1)
                     .WithErrorCode(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_LESS_THAN_0_BANKTYPE.ToString());
+
+            RuleFor(x => x.GetUserMail())
+                .NotEmpty()
+                    .WithErrorCode(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_USERMAIL.GetDescription());
         }
     }
 }

@@ -51,6 +51,8 @@ public class Startup
         Console.WriteLine("Configuring JWT authentication");
         var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
         var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
+        var jwtIssuer = JsonWebTokenConfiguration.Issuer;
+        var jwtAudience = JsonWebTokenConfiguration.Audience;
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
@@ -59,11 +61,13 @@ public class Startup
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
                 ValidateLifetime = true,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
                 ClockSkew = TimeSpan.FromMinutes(5)
             };
         });

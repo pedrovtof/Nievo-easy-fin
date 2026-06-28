@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
+using NievoEasyFin.Application.Services.Security;
 
 namespace NievoEasyFin.Core.Controllers.Private;
 
@@ -15,9 +16,12 @@ public class AccountsController : Controller
 {
     private readonly IAccountsService _accountsService;
 
-    public AccountsController(IAccountsService accountsService)
+    private readonly JsonWebTokenService _jsonWebTokenService;
+
+    public AccountsController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
     {
         _accountsService = accountsService;
+        _jsonWebTokenService = jsonWebTokenService;
     }
 
 
@@ -34,8 +38,7 @@ public class AccountsController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostAccountsBanks([FromHeader(Name = "Authorization")] string authorization, [FromBody] PostAccountsBanksRequest request)
     {
-        // TODO: quebrar aa chain do json
-        var userMail = authorization;
+        string? userMail = await _jsonWebTokenService.GetClaimValue(authorization, "email");
         request.SetUserMail(userMail);
         return await _accountsService.PostAccountsBanks(request);
     }

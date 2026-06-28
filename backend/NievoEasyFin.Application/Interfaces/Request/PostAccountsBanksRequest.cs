@@ -7,7 +7,10 @@ namespace NievoEasyFin.Application.Interfaces.Request
     /// </summary>
     public class PostAccountsBanksRequest
     {
-        private string UserMail;
+        /// <summary>
+        /// User email
+        /// </summary>
+        private string UserMail { get; set; }
 
         /// <summary>
         /// Name
