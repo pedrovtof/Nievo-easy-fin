@@ -5,8 +5,8 @@ using System.Text.Json.Serialization;
 
 namespace NievoEasyFin.Application.Data.Entities;
 
-[Table("bank", Schema = "accounts")]
-public class BankEntity
+[Table("bank_type", Schema = "accounts")]
+public class BankTypeEntity
 {
     [JsonPropertyName("id")]
     [Key]
@@ -17,9 +17,9 @@ public class BankEntity
     [Column("name", TypeName = "VARCHAR(150)")]
     public string Name { get; set; }
 
-    [JsonPropertyName("bank_type")]
-    [Column("bank_type", TypeName = "INT")]
-    public int BankType { get; set; }
+    [JsonPropertyName("description")]
+    [Column("description", TypeName = "VARCHAR(255)")]
+    public string Description { get; set; }
 
     [JsonPropertyName("active")]
     [Column("active", TypeName = "BOOLEAN")]

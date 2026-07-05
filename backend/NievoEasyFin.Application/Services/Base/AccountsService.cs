@@ -1,11 +1,14 @@
 
 using Microsoft.AspNetCore.Mvc;
+using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Interfaces.Validator;
+using NievoEasyFin.Application.Models;
+using NievoEasyFin.Application.Services.Cache;
 
 namespace NievoEasyFin.Application.Services.Base
 {
@@ -14,9 +17,38 @@ namespace NievoEasyFin.Application.Services.Base
     /// </summary>
     public class AccountsService : Controller, IAccountsService
     {
-        public AccountsService()
-        {
 
+        private readonly BankModel _bankModel;
+
+        private readonly AuthDbCacheService _authDbCacheService;
+
+        public AccountsService(
+            BankModel bankModel,
+            AuthDbCacheService authDbCacheService
+        )
+        {
+            _bankModel = bankModel;
+            _authDbCacheService = authDbCacheService;
+        }
+
+        /// <summary>
+        /// Search the entity bank in the redis or database
+        /// may create a value in redis 
+        /// </summary>
+        /// <param name="name">Bank name</param>
+        /// <param name="bankType">Bank type</param>
+        /// <returns>BankEntity</returns>
+        public async Task<BankEntity> GetBankByNameAndTypeAsync(string name, int bankType)
+        {
+            var resultCache = await _authDbCacheService.GetBankByNameAndTypeAsync(name, bankType);
+            if (resultCache != null)
+                return resultCache;
+
+            var resultDatabase = await _bankModel.GetBankByNameAndTypeAsync(name, bankType);
+            if (resultDatabase != null)
+                await _authDbCacheService.CreateBankAsync(resultDatabase);
+
+            return resultDatabase;
         }
 
         /// <summary>
@@ -31,6 +63,15 @@ namespace NievoEasyFin.Application.Services.Base
                 return BadRequest(
                     new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
+
+            var bank = await GetBankByNameAndTypeAsync(request.Name, request.BankType);
+            if (bank != null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_BANK_ALREADY_EXISTS.GetDescription() }
+                ));
+
+            // validadar tipo
+            // criar
 
             return Ok(
                 new ResponseApiSucess(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_200_CREATED.GetDescription())

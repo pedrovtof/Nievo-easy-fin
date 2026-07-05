@@ -2,6 +2,7 @@ using NievoEasyFin.Application.Data.Context.Cache;
 using NievoEasyFin.Application.Data.Cache.Views;
 using NievoEasyFin.Application.Data.Entities.Cache;
 using System.Text.Json;
+using NievoEasyFin.Application.Data.Entities;
 
 namespace NievoEasyFin.Application.Services.Cache
 {
@@ -10,6 +11,10 @@ namespace NievoEasyFin.Application.Services.Cache
         private const string PATH_TOKEN_RESET_PASSWORD = "User:TokenPasswordReset";
 
         private const string PATH_TOKEN_SINGUP_USER = "User:SingupUser";
+
+        private const string PATH_CORE_BANK = "Core:accounts:bank";
+
+        private const string PATH_CORE_BANK_TYPE = "Core:accounts:bankType";
 
         private readonly Random rnd = new Random();
 
@@ -102,6 +107,64 @@ namespace NievoEasyFin.Application.Services.Cache
         public async Task<bool> ValidateTokenAsync(int requestToken, int cachetoken)
             => requestToken == cachetoken ? true : false;
 
+        /// <summary>
+        /// Create bank type entity in redis
+        /// </summary>
+        /// <param name="bankType">BankTypeEntity</param>
+        /// <returns>BankTypeEntity</returns>
+        public async Task<BankTypeEntity> CreateBankTypeAsync(BankTypeEntity bankType)
+        {
+            BankTypeCacheEntity redisEntity = new(bankType);
+            var key = $"{PATH_CORE_BANK_TYPE}:{redisEntity.Id}";
+            var serialized = JsonSerializer.Serialize(redisEntity);
+            await Conn.StringSetAsync(key, serialized, TimeSpan.FromSeconds(CACHE_DATABASE_DEFAULT_TTL));
+
+            return redisEntity;
+        }
+
+        /// <summary>
+        /// Create bank entity in redis
+        /// </summary>
+        /// <param name="bank">BankEntity</param>
+        /// <returns>BankEntity</returns>
+        public async Task<BankEntity> CreateBankAsync(BankEntity bank)
+        {
+            BankCacheEntity redisEntity = new(bank);
+            var key = $"{PATH_CORE_BANK}:{redisEntity.Name}-{redisEntity.BankType}";
+            var serialized = JsonSerializer.Serialize(redisEntity);
+            await Conn.StringSetAsync(key, serialized, TimeSpan.FromSeconds(CACHE_DATABASE_DEFAULT_TTL));
+
+            return redisEntity;
+        }
+
+        /// <summary>
+        ///  Search for bank type in redis database
+        /// </summary>
+        /// <param name="id">Identifier</param>
+        /// <returns>BankCacheEntity</returns>
+        public async Task<BankTypeEntity> GetBankTypeByIdAsync(int id)
+        {
+            string? redisData = await Conn.StringGetAsync($"{PATH_CORE_BANK_TYPE}:{id}");
+            if (string.IsNullOrEmpty(redisData))
+                return null;
+
+            return JsonSerializer.Deserialize<BankTypeCacheEntity>(redisData);
+        }
+
+        /// <summary>
+        /// Search for bank in redis database
+        /// </summary>
+        /// <param name="name">name of the bank</param>
+        /// <param name="bankType">name of the bank</param>
+        /// <returns>BankTypeCacheEntity</returns>
+        public async Task<BankEntity> GetBankByNameAndTypeAsync(string name, int bankType)
+        {
+            string? redisData = await Conn.StringGetAsync($"{PATH_CORE_BANK}:{name}-{bankType}");
+            if (string.IsNullOrEmpty(redisData))
+                return null;
+
+            return JsonSerializer.Deserialize<BankCacheEntity>(redisData);
+        }
 
         /// <summary>
         /// Method to check redis
