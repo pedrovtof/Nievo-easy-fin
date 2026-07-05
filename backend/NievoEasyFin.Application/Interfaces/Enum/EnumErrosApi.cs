@@ -445,11 +445,8 @@ public enum EnumErrosApi
     /// </summary>
     POSTACCOUNTSBANKS_CORESERVICE_400_LESS_THAN_0_BANKTYPE,
 
-    /// <summary>
-    /// Empty userMail.
-    /// </summary>
-    [Description("Invalid user email")]
-    POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_USERMAIL,
+    [Description("There is already a bank with this configuration")]
+    POSTACCOUNTSBANKS_CORESERVICE_400_BANK_ALREADY_EXISTS,
 
     /// <summary>
     /// Created with sucess

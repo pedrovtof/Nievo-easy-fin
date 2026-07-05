@@ -96,6 +96,7 @@ public class Startup
         services.AddScoped<SmtpModel>();
         services.AddScoped<AuthDbCacheService>();
         services.AddScoped<UserModel>();
+        services.AddScoped<BankModel>();
 
         // Service 
         services.AddScoped<IAccountsService, AccountsService>();

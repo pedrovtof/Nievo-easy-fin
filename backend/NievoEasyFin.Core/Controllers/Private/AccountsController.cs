@@ -24,7 +24,6 @@ public class AccountsController : Controller
         _jsonWebTokenService = jsonWebTokenService;
     }
 
-
     /// <summary>
     /// Creates a new bank account for the authenticated user.
     /// </summary>
@@ -37,10 +36,5 @@ public class AccountsController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostAccountsBanks([FromHeader(Name = "Authorization")] string authorization, [FromBody] PostAccountsBanksRequest request)
-    {
-        string? userMail = await _jsonWebTokenService.GetClaimValue(authorization, "email");
-        request.SetUserMail(userMail);
-        return await _accountsService.PostAccountsBanks(request);
-    }
+        => await _accountsService.PostAccountsBanks(request);
 }
-

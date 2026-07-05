@@ -43,7 +43,10 @@ CACHE_DATABASE_ABORT_ON_CONNECT_FAIL = "false"
 # POSTGRES envs
 PGSQL_DATABASE_AUTH_CONNECTION_READ_REPLICA_STRING = "Host=localhost;Port=5433;Database=signup;Username=app_signup_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Auth;"
 PGSQL_DATABASE_AUTH_CONNECTION_STRING = "Host=localhost;Port=5432;Database=signup;Username=app_signup_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Auth;"
- 
+
+PGSQL_DATABASE_CORE_CONNECTION_READ_REPLICA_STRING = "Host=localhost;Port=5433;Database=core;Username=app_core_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Core;"
+PGSQL_DATABASE_CORE_CONNECTION_STRING = "Host=localhost;Port=5432;Database=core;Username=app_core_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Core;"
+
 # Migration Python
 PGSQL_DATABASE_AUTH_MIGRATION_CONNECTION_STRING = "postgresql://app_migration_service_efn:senhasegUr@127.0.0.1:5432/signup"
 PGSQL_DATABASE_CORE_MIGRATION_CONNECTION_STRING = "postgresql://app_migration_service_efn:senhasegUr@127.0.0.1:5432/core"

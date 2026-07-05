@@ -7,7 +7,7 @@ namespace NievoEasyFin.Application.Data.Context.Database;
 /// This context create connection only for ORIGIN, were we can use CRUD.
 /// <returns>Connectio to Core database PGSQL in main node</returns>
 /// </summary>
-public class CoreOrigin : AuthDbContext
+public class CoreOrigin : EasyFinDbContext
 {
     protected override string PGSQL_DATABASE_CONNECTION_STRING => DotNetEnv.Env.GetString("PGSQL_DATABASE_CORE_CONNECTION_STRING");
 
