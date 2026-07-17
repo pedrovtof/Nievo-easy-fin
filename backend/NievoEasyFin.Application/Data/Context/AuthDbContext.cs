@@ -8,12 +8,12 @@ namespace NievoEasyFin.Application.Data.Context;
 /// Class for create a contex with database
 /// This class is abstract and must be inherited by other classes
 /// Can only use the database types defined in the configuration
-/// Can only login on AUTH databases
+/// Can only login on AUTH/CORE databases
 /// </summary>
 /// <exception cref="ArgumentNullException">Thrown when the configuration is null</exception>
 /// <exception cref="ArgumentException">Thrown when the database type is invalid</exception>
 /// <returns>A new instance of the database context</returns>
-public abstract class AuthDbContext : DbContext
+public abstract class EasyFinDbContext : DbContext
 {
     private IConfiguration _configuration;
     protected abstract string PGSQL_DATABASE_CONNECTION_STRING { get; }
@@ -24,8 +24,10 @@ public abstract class AuthDbContext : DbContext
     public DbSet<UserProviderSsoEntity> UserProvider { get; set; }
     public DbSet<UsersAcceptedTermsEntity> UsersAcceptedTerms { get; set; }
     public DbSet<AcceptTermsEntity> AcceptTerms { get; set; }
+    public DbSet<BankEntity> Bank { get; set; }
+    public DbSet<BankTypeEntity> BankType { get; set; }
 
-    protected AuthDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
+    protected EasyFinDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
@@ -43,7 +45,7 @@ public abstract class AuthDbContext : DbContext
         string connectionString = PGSQL_DATABASE_CONNECTION_STRING;
 
         if (string.IsNullOrEmpty(connectionString))
-            throw new ArgumentException("[AuthDbContext][OnConfiguring] Invalid connection string variable PGSQL_DATABASE_CONNECTION_STRING is Null or Empty");
+            throw new ArgumentException("[EasyFinDbContext][OnConfiguring] Invalid connection string variable PGSQL_DATABASE_CONNECTION_STRING is Null or Empty");
 
         try
         {
@@ -52,7 +54,7 @@ public abstract class AuthDbContext : DbContext
         }
         catch
         {
-            throw new ArgumentException($"[AuthDbContext][OnConfiguring] connection string");
+            throw new ArgumentException($"[EasyFinDbContext][OnConfiguring] connection string");
         }
     }
 }

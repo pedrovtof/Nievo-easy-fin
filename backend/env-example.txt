@@ -14,9 +14,11 @@ GOOGLE_API_USER_INFO = "https://www.googleapis.com/oauth2/v3/userinfo"
 GOOGLE_API_TOKEN_INFO = "https://oauth2.googleapis.com/tokeninfo"
 
 # JWT envs
-# ALWAYS CHANGE THE CONTRACT STRINGS DURING THE FIRST DEPLOY
+# ALWAYS CHANGE THE CONTRACT, ISSUER AND AUDIENCE STRINGS DURING THE FIRST DEPLOY
 JWT_PRIVATE_CONTRACT_STRING = "fbce94f66af240097e414ef5265ade77e6716222adf0b34aacbb6d72ac22772d" # use this => 256bits https://jwtsecrets.com/
 JWT_PUBLIC_CONTRACT_STRING = "1b5f95572c1555999355f3b1c618a9ceb1f0d9e2a1c1e533fea751879254bdf1"
+JWT_ISSUER = "YOUR_COMPANY_NAME"
+JWT_AUDIENCE = "YOUR_PRODUCT_NAME"
 
 # Redis envs
 CACHE_DATABASE_HOST = "127.0.0.1"
@@ -41,7 +43,10 @@ CACHE_DATABASE_ABORT_ON_CONNECT_FAIL = "false"
 # POSTGRES envs
 PGSQL_DATABASE_AUTH_CONNECTION_READ_REPLICA_STRING = "Host=localhost;Port=5433;Database=signup;Username=app_signup_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Auth;"
 PGSQL_DATABASE_AUTH_CONNECTION_STRING = "Host=localhost;Port=5432;Database=signup;Username=app_signup_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Auth;"
- 
+
+PGSQL_DATABASE_CORE_CONNECTION_READ_REPLICA_STRING = "Host=localhost;Port=5433;Database=core;Username=app_core_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Core;"
+PGSQL_DATABASE_CORE_CONNECTION_STRING = "Host=localhost;Port=5432;Database=core;Username=app_core_service_efn;Password=senhaSuperSegura;Pooling=true;MinPoolSize=5;MaxPoolSize=25;Application Name=NievoEasyFin.Core;"
+
 # Migration Python
 PGSQL_DATABASE_AUTH_MIGRATION_CONNECTION_STRING = "postgresql://app_migration_service_efn:senhasegUr@127.0.0.1:5432/signup"
 PGSQL_DATABASE_CORE_MIGRATION_CONNECTION_STRING = "postgresql://app_migration_service_efn:senhasegUr@127.0.0.1:5432/core"

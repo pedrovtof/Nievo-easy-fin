@@ -424,7 +424,44 @@ public enum EnumErrosApi
     /// Terms not found
     /// </summary>
     [Description("Terms not found")]
-    GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND
+    GETACCEPTTERMSASYNC_AUTHSERVICE_400_TERMS_NOT_FOUND,
 
     #endregion GetAcceptTerms
+
+    #region PostAccountsBanks
+
+    /// <summary>
+    /// Empty name.
+    /// </summary>
+    POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_NAME,
+
+    /// <summary>
+    /// Empty bankType.
+    /// </summary>
+    POSTACCOUNTSBANKS_CORESERVICE_400_EMPTY_BANKTYPE,
+
+    /// <summary>
+    /// Bank type less than 0.
+    /// </summary>
+    POSTACCOUNTSBANKS_CORESERVICE_400_LESS_THAN_0_BANKTYPE,
+
+    /// <summary>
+    /// There is already a bank with this configuration
+    /// </summary>
+    [Description("There is already a bank with this configuration")]
+    POSTACCOUNTSBANKS_CORESERVICE_400_BANK_ALREADY_EXISTS,
+
+    /// <summary>
+    /// Unfortunately, the specified type is invalid
+    /// </summary>
+    [Description("Unfortunately, the specified type is invalid")]
+    POSTACCOUNTSBANKS_CORESERVICE_400_BANKTYPE_INVALID,
+
+    /// <summary>
+    /// Created with sucess
+    /// </summary>
+    [Description("Created with sucess")]
+    POSTACCOUNTSBANKS_CORESERVICE_200_CREATED
+
+    #endregion
 }

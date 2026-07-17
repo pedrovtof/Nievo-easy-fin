@@ -12,6 +12,10 @@ public class JsonWebTokenConfiguration
 
     public static string PublicteKey { get; } = DotNetEnv.Env.GetString("JWT_PUBLIC_CONTRACT_STRING");
 
+    public static string Issuer { get; } = DotNetEnv.Env.GetString("JWT_ISSUER");
+
+    public static string Audience { get; } = DotNetEnv.Env.GetString("JWT_AUDIENCE");
+
     private const string AlgorithmToken = SecurityAlgorithms.HmacSha256Signature;
 
     /// <summary>
@@ -29,4 +33,18 @@ public class JsonWebTokenConfiguration
     /// <returns>string</returns>
     public async Task<string> GetAlgorithmTokenSignature()
         => AlgorithmToken;
+
+    /// <summary>
+    /// Method to returns Issuer
+    /// </summary>
+    /// <returns>string</returns>
+    public string GetIssuer()
+        => Issuer;
+
+    /// <summary>
+    /// Method to returns Audience
+    /// </summary>
+    /// <returns>string</returns>
+    public string GetAudience()
+        => Audience;
 }

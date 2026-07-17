@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
+using NievoEasyFin.Application.Services.Base;
 
 namespace NievoEasyFin.Core;
 
@@ -50,6 +51,8 @@ public class Startup
         Console.WriteLine("Configuring JWT authentication");
         var jwtSecret = JsonWebTokenConfiguration.PrivateKey;
         var jwtKey = Encoding.ASCII.GetBytes(jwtSecret);
+        var jwtIssuer = JsonWebTokenConfiguration.Issuer;
+        var jwtAudience = JsonWebTokenConfiguration.Audience;
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
@@ -58,11 +61,13 @@ public class Startup
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
                 ValidateLifetime = true,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
                 ClockSkew = TimeSpan.FromMinutes(5)
             };
         });
@@ -91,8 +96,12 @@ public class Startup
         services.AddScoped<SmtpModel>();
         services.AddScoped<AuthDbCacheService>();
         services.AddScoped<UserModel>();
+        services.AddScoped<BankModel>();
+        services.AddScoped<BankTypeModel>();
+
 
         // Service 
+        services.AddScoped<IAccountsService, AccountsService>();
     }
 
     // Use this method to configure the HTTP request pipeline.

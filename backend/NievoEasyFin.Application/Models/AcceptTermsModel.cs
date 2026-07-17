@@ -1,7 +1,7 @@
 using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Context.Database;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
+
 using Dapper;
 using System.Text;
 

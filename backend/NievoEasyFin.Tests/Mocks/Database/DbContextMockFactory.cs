@@ -164,7 +164,7 @@ public static class DbContextMockFactory
         return (origin, replica);
     }
 
-    public static async Task SyncToAttachedDatabasesAsync(AuthDbContext context)
+    public static async Task SyncToAttachedDatabasesAsync(EasyFinDbContext context)
     {
         var connection = context.Database.GetDbConnection();
         using (var cmd = connection.CreateCommand())
