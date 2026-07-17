@@ -445,8 +445,17 @@ public enum EnumErrosApi
     /// </summary>
     POSTACCOUNTSBANKS_CORESERVICE_400_LESS_THAN_0_BANKTYPE,
 
+    /// <summary>
+    /// There is already a bank with this configuration
+    /// </summary>
     [Description("There is already a bank with this configuration")]
     POSTACCOUNTSBANKS_CORESERVICE_400_BANK_ALREADY_EXISTS,
+
+    /// <summary>
+    /// Unfortunately, the specified type is invalid
+    /// </summary>
+    [Description("Unfortunately, the specified type is invalid")]
+    POSTACCOUNTSBANKS_CORESERVICE_400_BANKTYPE_INVALID,
 
     /// <summary>
     /// Created with sucess

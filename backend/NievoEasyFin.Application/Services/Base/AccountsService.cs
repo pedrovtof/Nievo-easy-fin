@@ -22,13 +22,17 @@ namespace NievoEasyFin.Application.Services.Base
 
         private readonly AuthDbCacheService _authDbCacheService;
 
+        private readonly BankTypeModel _bankTypeModel;
+
         public AccountsService(
             BankModel bankModel,
-            AuthDbCacheService authDbCacheService
+            AuthDbCacheService authDbCacheService,
+            BankTypeModel bankTypeModel
         )
         {
             _bankModel = bankModel;
             _authDbCacheService = authDbCacheService;
+            _bankTypeModel = bankTypeModel;
         }
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace NievoEasyFin.Application.Services.Base
         /// <param name="name">Bank name</param>
         /// <param name="bankType">Bank type</param>
         /// <returns>BankEntity</returns>
-        public async Task<BankEntity> GetBankByNameAndTypeAsync(string name, int bankType)
+        private async Task<BankEntity> GetBankByNameAndTypeAsync(string name, int bankType)
         {
             var resultCache = await _authDbCacheService.GetBankByNameAndTypeAsync(name, bankType);
             if (resultCache != null)
@@ -47,6 +51,19 @@ namespace NievoEasyFin.Application.Services.Base
             var resultDatabase = await _bankModel.GetBankByNameAndTypeAsync(name, bankType);
             if (resultDatabase != null)
                 await _authDbCacheService.CreateBankAsync(resultDatabase);
+
+            return resultDatabase;
+        }
+
+        private async Task<BankTypeEntity> GetBankTypeByIdAsync(int id)
+        {
+            var resultCache = await _authDbCacheService.GetBankTypeByIdAsync(id);
+            if (resultCache != null)
+                return resultCache;
+
+            var resultDatabase = await _bankTypeModel.GetBankTypeByNameAsync(id);
+            if (resultDatabase != null)
+                await _authDbCacheService.CreateBankTypeAsync(resultDatabase);
 
             return resultDatabase;
         }
@@ -70,8 +87,13 @@ namespace NievoEasyFin.Application.Services.Base
                     new List<string>() { EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_BANK_ALREADY_EXISTS.GetDescription() }
                 ));
 
-            // validadar tipo
-            // criar
+            var bankType = await GetBankTypeByIdAsync(request.BankType);
+            if (bankType == null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_BANKTYPE_INVALID.GetDescription() }
+                ));
+
+            BankEntity bankEntity = await _bankModel.CreateBankAsync(request.Name, request.BankType);
 
             return Ok(
                 new ResponseApiSucess(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_200_CREATED.GetDescription())

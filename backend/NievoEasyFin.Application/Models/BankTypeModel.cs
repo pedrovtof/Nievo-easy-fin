@@ -21,7 +21,7 @@ namespace NievoEasyFin.Application.Models
         /// </summary>
         public async Task<BankTypeEntity> GetBankTypeByNameAsync(int id)
         {
-            var entity = await _CoreReplicaNodeDatabase.BankType.FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await _CoreReplicaNodeDatabase.BankType.FirstOrDefaultAsync(x => x.Id == id && x.Active == true);
             return entity;
         }
     }
