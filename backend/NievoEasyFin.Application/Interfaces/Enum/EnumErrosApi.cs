@@ -428,7 +428,7 @@ public enum EnumErrosApi
 
     #endregion GetAcceptTerms
 
-    #region GetAcceptTerms
+    #region PostAccountsBanks
 
     /// <summary>
     /// Empty name.

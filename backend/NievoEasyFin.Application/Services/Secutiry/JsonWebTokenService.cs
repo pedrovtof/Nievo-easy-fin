@@ -72,7 +72,6 @@ public class JsonWebTokenService
         if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(claimName))
             return null;
 
-
         token = token.Replace("Bearer ", "");
 
         JwtSecurityTokenHandler tokenHandler = new();

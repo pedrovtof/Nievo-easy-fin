@@ -2,8 +2,15 @@ using System.Text.Json.Serialization;
 
 namespace NievoEasyFin.Application.Data.Entities.Cache
 {
+    /// <summary>
+    /// Bank cache entity
+    /// </summary>
     public class BankCacheEntity : BankEntity
     {
+        /// <summary>
+        /// Main constructor
+        /// </summary>
+        /// <param name="entity"></param>
         public BankCacheEntity(BankEntity entity)
         {
             Id = entity.Id;
@@ -14,6 +21,9 @@ namespace NievoEasyFin.Application.Data.Entities.Cache
             UpdatedAt = entity.UpdatedAt;
         }
 
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public BankCacheEntity() { }
     }
 }

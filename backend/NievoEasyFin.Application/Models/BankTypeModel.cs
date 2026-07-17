@@ -4,6 +4,9 @@ using NievoEasyFin.Application.Data.Entities;
 
 namespace NievoEasyFin.Application.Models
 {
+    /// <summary>
+    /// Bank Type model
+    /// </summary>
     public class BankTypeModel : BankTypeEntity
     {
         private readonly CoreOrigin _CoreMainNodeDatabase;
