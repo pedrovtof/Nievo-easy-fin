@@ -37,6 +37,21 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     op.execute("""
+        DELETE FROM accounts.bank WHERE EXISTS(
+            SELECT 1 FROM 
+            accounts.bank_type 
+            WHERE accounts.bank_type.id = accounts.bank.bank_type
+            AND "name" IN (
+            'Tradicional', 
+            'Digital', 
+            'Corretora', 
+            'Carteira Digital', 
+            'Conta Global', 
+            'Benefícios'
+            )
+            LIMIT 1 
+        );
+        
         DELETE FROM accounts.bank_type
         WHERE "name" IN (
             'Tradicional', 

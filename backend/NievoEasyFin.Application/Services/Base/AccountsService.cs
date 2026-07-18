@@ -99,5 +99,18 @@ namespace NievoEasyFin.Application.Services.Base
                 new ResponseApiSucess(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_200_CREATED.GetDescription())
             );
         }
+
+        public async Task<IActionResult> PostUserBanks(PostUserBanksRequest request)
+        {
+            var validatorResult = await new PostUserBanksValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                   new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+               );
+
+            return Ok(
+                new ResponseApiSucess(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_200_CREATED.GetDescription())
+            );
+        }
     }
 }

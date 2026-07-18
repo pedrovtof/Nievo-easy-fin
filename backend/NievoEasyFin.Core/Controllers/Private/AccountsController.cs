@@ -25,9 +25,8 @@ public class AccountsController : Controller
     }
 
     /// <summary>
-    /// Creates a new bank account for the authenticated user.
+    /// Creates a new bank account.
     /// </summary>
-    /// <param name="authorization">The authorization token from the request header.</param>
     /// <param name="request">The bank account creation request data.</param>
     /// <response code = "200">Return created with sucess</response>
     /// <response code = "400">BadRequest</response>
@@ -35,6 +34,24 @@ public class AccountsController : Controller
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostAccountsBanks([FromHeader(Name = "Authorization")] string authorization, [FromBody] PostAccountsBanksRequest request)
+    public async Task<IActionResult> PostAccountsBanks([FromBody] PostAccountsBanksRequest request)
         => await _accountsService.PostAccountsBanks(request);
+
+    /// <summary>
+    /// Creates a new user bank account.
+    /// </summary>
+    /// <param name="authorization">Token JWT</param>
+    /// <param name="request">PostUserBanksRequest</param>
+    /// <returns>IActionResult</returns>
+    [HttpPost("user-banks")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostUserBanks([FromHeader] string authorization, [FromBody] PostUserBanksRequest request)
+    {
+        request.SetEmail(
+            await _jsonWebTokenService.GetClaimValue(authorization, "email")
+        );
+        return await _accountsService.PostUserBanks(request);
+    }
 }

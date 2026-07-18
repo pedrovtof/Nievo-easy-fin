@@ -461,7 +461,31 @@ public enum EnumErrosApi
     /// Created with sucess
     /// </summary>
     [Description("Created with sucess")]
-    POSTACCOUNTSBANKS_CORESERVICE_200_CREATED
+    POSTACCOUNTSBANKS_CORESERVICE_200_CREATED,
 
+    #endregion
+
+    #region PostAccountsUserBanks
+
+    /// <summary>
+    /// Invalid bank id
+    /// </summary>
+    POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_BANK_ID,
+
+    /// <summary>
+    /// Null or empty email
+    /// </summary>
+    POSTUSERBANKSASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Created with sucess
+    /// </summary>
+    [Description("Created with sucess")]
+    POSTUSERBANKSASYNC_CORESERVICE_200_CREATED
     #endregion
 }
