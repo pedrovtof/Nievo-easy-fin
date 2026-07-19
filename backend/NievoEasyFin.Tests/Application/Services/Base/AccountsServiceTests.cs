@@ -179,7 +179,9 @@ public class AccountsServiceTests : IDisposable
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
         // Seed bank
-        var existingBank = new BankEntity { Name = request.Name, BankType = request.BankType, Active = true, CreatedAt = DateTime.UtcNow };
+        var existingBank = BankEntityFaker.Create().Generate();
+        existingBank.Name = request.Name;
+        existingBank.BankType = request.BankType;
         origin.Bank.Add(existingBank);
         await origin.SaveChangesAsync();
 
@@ -357,7 +359,8 @@ public class AccountsServiceTests : IDisposable
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
         // Seed user
-        var user = new UserEntity { Name = "Test", Email = "test@test.com", Phone = 123456789, StatusId = 2, Password = "password", CreatedAt = DateTime.UtcNow };
+        var user = UserEntityFaker.Create().Generate();
+        user.Email = "test@test.com";
         authOrigin.Users.Add(user);
         await authOrigin.SaveChangesAsync();
         await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
@@ -384,13 +387,16 @@ public class AccountsServiceTests : IDisposable
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
         // Seed user
-        var user = new UserEntity { Name = "Test", Email = "test@test.com", Phone = 123456789, StatusId = 2, Password = "password", CreatedAt = DateTime.UtcNow };
+        var user = UserEntityFaker.Create().Generate();
+        user.Email = "test@test.com";
         authOrigin.Users.Add(user);
         await authOrigin.SaveChangesAsync();
         await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
 
         // Seed bank
-        var existingBank = new BankEntity { Name = request.BankName, BankType = request.BankType, Active = true, CreatedAt = DateTime.UtcNow };
+        var existingBank = BankEntityFaker.Create().Generate();
+        existingBank.Name = request.BankName;
+        existingBank.BankType = request.BankType;
         origin.Bank.Add(existingBank);
         await origin.SaveChangesAsync();
 
