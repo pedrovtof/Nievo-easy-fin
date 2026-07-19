@@ -97,6 +97,8 @@ public class AuthenticatorServiceTests : IDisposable
         request.Email = user.Email!;
         request.Password = password;
 
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(origin);
+
         var service = CreateService(origin, replica);
 
         // Act
@@ -179,6 +181,8 @@ public class AuthenticatorServiceTests : IDisposable
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
         var smtpMock = new SmtpModelMock();
 
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(origin);
+
         var service = CreateService(origin, replica, cacheService, smtpMock);
 
         // Act
@@ -232,6 +236,8 @@ public class AuthenticatorServiceTests : IDisposable
             .ReturnsAsync(JsonSerializer.Serialize(cacheData));
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(origin);
 
         var service = CreateService(origin, replica, cacheService);
 

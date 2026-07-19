@@ -10,10 +10,17 @@ namespace NievoEasyFin.Application.Interfaces.Services
     public interface IAccountsService
     {
         /// <summary>
-        /// Creates a new bank account for the authenticated user.
+        /// Creates a new bank.
         /// </summary>
         /// <param name="request">The bank account creation request data.</param>
         /// <returns>An <see cref="IActionResult"/> indicating the result of the bank account creation.</returns>
         Task<IActionResult> PostAccountsBanks(PostAccountsBanksRequest request);
+
+        /// <summary>
+        /// Creates a new bank account for the authenticated user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the user bank account creation.</returns>
+        Task<IActionResult> PostUserBanks(PostUserBanksRequest request);
     }
 }

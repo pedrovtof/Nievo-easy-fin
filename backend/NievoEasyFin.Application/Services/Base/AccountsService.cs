@@ -17,22 +17,29 @@ namespace NievoEasyFin.Application.Services.Base
     /// </summary>
     public class AccountsService : Controller, IAccountsService
     {
-
         private readonly BankModel _bankModel;
 
         private readonly AuthDbCacheService _authDbCacheService;
 
         private readonly BankTypeModel _bankTypeModel;
 
+        private readonly UserModel _userModel;
+
+        private readonly UserBankModel _userBankModel;
+
         public AccountsService(
             BankModel bankModel,
             AuthDbCacheService authDbCacheService,
-            BankTypeModel bankTypeModel
+            BankTypeModel bankTypeModel,
+            UserModel userModel,
+            UserBankModel userBankModel
         )
         {
             _bankModel = bankModel;
             _authDbCacheService = authDbCacheService;
             _bankTypeModel = bankTypeModel;
+            _userModel = userModel;
+            _userBankModel = userBankModel;
         }
 
         /// <summary>
@@ -55,6 +62,12 @@ namespace NievoEasyFin.Application.Services.Base
             return resultDatabase;
         }
 
+        /// <summary>
+        /// Search the entity bank type in the redis or database
+        /// may create a value in redis 
+        /// </summary>
+        /// <param name="id">int</param>
+        /// <returns>BankTypeEntity</returns>
         private async Task<BankTypeEntity> GetBankTypeByIdAsync(int id)
         {
             var resultCache = await _authDbCacheService.GetBankTypeByIdAsync(id);
@@ -97,6 +110,38 @@ namespace NievoEasyFin.Application.Services.Base
 
             return Ok(
                 new ResponseApiSucess(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_200_CREATED.GetDescription())
+            );
+        }
+
+        /// <summary>
+        /// Create a link between User and a Bank
+        /// </summary>
+        /// <param name="request">PostUserBanksRequest</param>
+        /// <returns>IActionResult</returns>
+        public async Task<IActionResult> PostUserBanks(PostUserBanksRequest request)
+        {
+            var validatorResult = await new PostUserBanksValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                   new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+               );
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var bank = await GetBankByNameAndTypeAsync(request.BankName, request.BankType);
+            if (bank == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_BANK_NOT_FOUND.GetDescription() }
+                ));
+
+            var userBank = await _userBankModel.CreateUserBankAsync(user.Id, request.NickName, bank.Id);
+
+            return Ok(
+                new ResponseApiSucess(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_200_CREATED.GetDescription())
             );
         }
     }

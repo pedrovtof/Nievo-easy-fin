@@ -10,6 +10,8 @@ using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base;
+using NievoEasyFin.Tests.Mocks.Database;
+using NievoEasyFin.Tests.Mocks.Fakers;
 using NievoEasyFin.Tests.Mocks.Helpers;
 using StackExchange.Redis;
 using System;
@@ -112,6 +114,15 @@ public class AccountsServiceTests : IDisposable
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS accounts.user_bank (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nick_name TEXT,
+                    user_id INTEGER,
+                    bank_id INTEGER,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
             ";
             cmd.ExecuteNonQuery();
         }
@@ -119,10 +130,12 @@ public class AccountsServiceTests : IDisposable
         return (origin, replica);
     }
 
-    private AccountsService CreateService(CoreOrigin origin, CoreReplica replica)
+    private AccountsService CreateService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
     {
         var bankModel = new BankModel(origin, replica);
         var bankTypeModel = new BankTypeModel(origin, replica);
+        var userModel = new UserModel(authOrigin, authReplica);
+        var userBankModel = new UserBankModel(origin, replica);
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
@@ -132,16 +145,19 @@ public class AccountsServiceTests : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new AccountsService(bankModel, cacheService, bankTypeModel);
+        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel);
     }
 
     [Fact]
     public async Task PostAccountsBanks_WithInvalidRequest_ReturnsBadRequest()
     {
         // Arrange
-        var request = new PostAccountsBanksRequest { Name = "", BankType = 0 };
+        var request = PostAccountsBanksRequestFaker.Create().Generate();
+        request.Name = "";
+        request.BankType = 0;
         var (origin, replica) = CreateSharedCoreContexts();
-        var service = CreateService(origin, replica);
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -158,15 +174,18 @@ public class AccountsServiceTests : IDisposable
     public async Task PostAccountsBanks_WhenBankAlreadyExists_ReturnsBadRequest()
     {
         // Arrange
-        var request = new PostAccountsBanksRequest { Name = "Nubank", BankType = 1 };
+        var request = PostAccountsBanksRequestFaker.Create().Generate();
         var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
         // Seed bank
-        var existingBank = new BankEntity { Name = "Nubank", BankType = 1, Active = true, CreatedAt = DateTime.UtcNow };
+        var existingBank = BankEntityFaker.Create().Generate();
+        existingBank.Name = request.Name;
+        existingBank.BankType = request.BankType;
         origin.Bank.Add(existingBank);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica);
+        var service = CreateService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -182,9 +201,11 @@ public class AccountsServiceTests : IDisposable
     public async Task PostAccountsBanks_WhenBankTypeInvalid_ReturnsBadRequest()
     {
         // Arrange
-        var request = new PostAccountsBanksRequest { Name = "Nubank", BankType = 99 };
+        var request = PostAccountsBanksRequestFaker.Create().Generate();
+        request.BankType = 99;
         var (origin, replica) = CreateSharedCoreContexts();
-        var service = CreateService(origin, replica);
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -200,15 +221,16 @@ public class AccountsServiceTests : IDisposable
     public async Task PostAccountsBanks_WithValidRequest_ReturnsCreated()
     {
         // Arrange
-        var request = new PostAccountsBanksRequest { Name = "Nubank", BankType = 1 };
+        var request = PostAccountsBanksRequestFaker.Create().Generate();
         var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
         // Seed bank type
-        var existingBankType = new BankTypeEntity { Id = 1, Name = "Conta Corrente", Description = "Conta Corrente", Active = true, CreatedAt = DateTime.UtcNow };
+        var existingBankType = new BankTypeEntity { Id = request.BankType, Name = "Conta Corrente", Description = "Conta Corrente", Active = true, CreatedAt = DateTime.UtcNow };
         origin.BankType.Add(existingBankType);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica);
+        var service = CreateService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -217,13 +239,183 @@ public class AccountsServiceTests : IDisposable
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
-        
+
         var response = (ResponseApiSucess)okResult.Value!;
         response.Data.Should().Be(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_200_CREATED.GetDescription());
 
         // Verify bank was created in database
-        var bankInDb = await replica.Bank.FirstOrDefaultAsync(b => b.Name == "Nubank" && b.BankType == 1);
+        var bankInDb = await replica.Bank.FirstOrDefaultAsync(b => b.Name == request.Name && b.BankType == request.BankType);
         bankInDb.Should().NotBeNull();
         bankInDb!.Active.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WhenBankTypeIsInvalid_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.BankType = 0;
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("'Bank Type' must be greater than or equal to '1'."));
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WhenBankNameIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.BankName = "";
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("'Bank Name' must not be empty."));
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WhenEmailIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.SetEmail("");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("must not be empty."));
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WhenEmailIsInvalid_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.SetEmail("invalid-email");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("is not a valid email address."));
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WhenUserNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.SetEmail("notfound@test.com");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(e => e.Contains(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription()));
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WhenBankNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.SetEmail("test@test.com");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        // Seed user
+        var user = UserEntityFaker.Create().Generate();
+        user.Email = "test@test.com";
+        authOrigin.Users.Add(user);
+        await authOrigin.SaveChangesAsync();
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
+
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(e => e.Contains(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_BANK_NOT_FOUND.GetDescription()));
+    }
+
+    [Fact]
+    public async Task PostUserBanks_WithValidRequest_ReturnsCreated()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.SetEmail("test@test.com");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        // Seed user
+        var user = UserEntityFaker.Create().Generate();
+        user.Email = "test@test.com";
+        authOrigin.Users.Add(user);
+        await authOrigin.SaveChangesAsync();
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
+
+        // Seed bank
+        var existingBank = BankEntityFaker.Create().Generate();
+        existingBank.Name = request.BankName;
+        existingBank.BankType = request.BankType;
+        origin.Bank.Add(existingBank);
+        await origin.SaveChangesAsync();
+
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        okResult.Value.Should().BeOfType<ResponseApiSucess>();
+
+        var response = (ResponseApiSucess)okResult.Value!;
+        response.Data.Should().Be(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_200_CREATED.GetDescription());
+
+        // Verify user bank was created
+        var userBankInDb = await origin.UserBank.FirstOrDefaultAsync(ub => ub.UserId == user.Id && ub.BankId == existingBank.Id);
+        userBankInDb.Should().NotBeNull();
+        userBankInDb!.NickName.Should().Be(request.NickName);
     }
 }

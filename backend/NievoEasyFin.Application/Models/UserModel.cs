@@ -92,18 +92,8 @@ public class UserModel : UserEntity
     /// </summary>
     /// <param name="email">string email</param>
     /// <returns>UserEntity</returns>
-    public async Task<UserEntity> GetUserAllByEmailAsync(string email)
-        => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
-
-
-    /// <summary>
-    /// Method to get user by email with any status
-    /// </summary>
-    /// <param name="email">string email</param>
-    /// <returns>UserEntity</returns>
     public async Task<UserEntity> GetUserByEmailWithAnyStatusAsync(string email)
         => await _AuthReplicaNodeDatabase.Users.FirstOrDefaultAsync<UserEntity>(x => x.Email == email);
-
 
     /// <summary>
     /// Method to get user by providerId and subId

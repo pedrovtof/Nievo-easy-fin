@@ -243,7 +243,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
                 new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        var user = await _userModel.GetUserAllByEmailAsync(request.Email);
+        var user = await _userModel.GetUserByEmailWithAnyStatusAsync(request.Email);
         if (user == null)
             return NotFound(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTVALIDATEEMAILASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }
@@ -290,7 +290,7 @@ public class AuthenticatorService : Controller, IAuthenticatorService
                     new ResponseApiError(validationResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
 
-        var user = await _userModel.GetUserAllByEmailAsync(request.Email);
+        var user = await _userModel.GetUserByEmailWithAnyStatusAsync(request.Email);
         if (user == null)
             return NotFound(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_NOT_FOUND.GetDescription() }

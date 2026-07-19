@@ -24,7 +24,6 @@ def upgrade() -> None:
         CREATE TABLE IF NOT EXISTS "accounts"."user_bank" (
             "id" SERIAL PRIMARY KEY,
             "nick_name" VARCHAR(150),
-            "amount" INTEGER,
             "active" boolean DEFAULT true NOT NULL,
             "bank_id" INTEGER,
             "user_id" INTEGER,
