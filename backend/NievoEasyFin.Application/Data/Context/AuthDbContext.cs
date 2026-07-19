@@ -26,6 +26,8 @@ public abstract class EasyFinDbContext : DbContext
     public DbSet<AcceptTermsEntity> AcceptTerms { get; set; }
     public DbSet<BankEntity> Bank { get; set; }
     public DbSet<BankTypeEntity> BankType { get; set; }
+    public DbSet<UserBankEntity> UserBank { get; set; }
+
 
     protected EasyFinDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {

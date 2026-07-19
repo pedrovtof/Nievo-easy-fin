@@ -470,7 +470,12 @@ public enum EnumErrosApi
     /// <summary>
     /// Invalid bank id
     /// </summary>
-    POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_BANK_ID,
+    POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_BANKTYPE,
+
+    /// <summary>
+    /// Empty Bank name
+    /// </summary>
+    POSTUSERBANKSASYNC_CORESERVICE_400_EMPTY_BANK_NAME,
 
     /// <summary>
     /// Null or empty email
@@ -481,6 +486,18 @@ public enum EnumErrosApi
     /// Invalid email
     /// </summary>
     POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// It was not possible to find any user to link to the bank.
+    /// </summary>
+    [Description("It was not possible to find any user to link to the bank.")]
+    POSTUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// Not found any bank with this identification
+    /// </summary>
+    [Description("Not found any bank with this identification")]
+    POSTUSERBANKSASYNC_CORESERVICE_400_BANK_NOT_FOUND,
 
     /// <summary>
     /// Created with sucess

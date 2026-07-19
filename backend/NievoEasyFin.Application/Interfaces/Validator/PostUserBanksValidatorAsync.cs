@@ -14,9 +14,13 @@ namespace NievoEasyFin.Application.Interfaces.Validator
         /// </summary>
         public PostUserBanksValidatorAsync()
         {
-            RuleFor(x => x.BankId)
+            RuleFor(x => x.BankType)
                 .GreaterThanOrEqualTo(1)
-                    .WithErrorCode(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_BANK_ID.ToString());
+                    .WithErrorCode(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_INVALID_BANKTYPE.ToString());
+
+            RuleFor(x => x.BankName)
+                .NotEmpty()
+                    .WithErrorCode(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_EMPTY_BANK_NAME.ToString());
 
             RuleFor(x => x.GetEmail())
                 .NotEmpty()

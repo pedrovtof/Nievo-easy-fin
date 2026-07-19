@@ -19,6 +19,9 @@ namespace NievoEasyFin.Application.Models
             _CoreReplicaNodeDatabase = coreReplicaNodeDatabase;
         }
 
+        public async Task<BankEntity> GetBankByIdAsync(int id)
+            => await _CoreReplicaNodeDatabase.Bank.FirstOrDefaultAsync(x => x.Id == id && x.Active == true);
+
         /// <summary>
         /// Return database entity
         /// </summary>

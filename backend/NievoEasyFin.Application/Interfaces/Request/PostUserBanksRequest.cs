@@ -16,8 +16,14 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// <summary>
         /// Bank identity
         /// </summary>
-        [JsonPropertyName("bank_id")]
-        public int BankId { get; set; }
+        [JsonPropertyName("bank_type")]
+        public int BankType { get; set; }
+
+        /// <summary>
+        /// Bank name
+        /// </summary>
+        [JsonPropertyName("bank_name")]
+        public string BankName { get; set; }
 
         /// <summary>
         /// User email
