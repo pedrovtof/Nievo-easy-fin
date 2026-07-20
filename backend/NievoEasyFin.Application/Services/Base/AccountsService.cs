@@ -138,7 +138,13 @@ namespace NievoEasyFin.Application.Services.Base
                     new List<string>() { EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_BANK_NOT_FOUND.GetDescription() }
                 ));
 
-            var userBank = await _userBankModel.CreateUserBankAsync(user.Id, request.NickName, bank.Id);
+            var userBank = await _userBankModel.GetUserBankByUserAndBankAsync(user.Id, bank.Id);
+            if (userBank != null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_ALREADY_EXISTS_USER_BANK.GetDescription() }
+                ));
+
+            UserBankEntity newUserBank = await _userBankModel.CreateUserBankAsync(user.Id, request.NickName, bank.Id);
 
             return Ok(
                 new ResponseApiSucess(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_200_CREATED.GetDescription())

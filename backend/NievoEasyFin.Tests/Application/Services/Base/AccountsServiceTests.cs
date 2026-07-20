@@ -378,6 +378,49 @@ public class AccountsServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task PostUserBanks_WhenUserBankAlreadyExists_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = PostUserBanksRequestFaker.Create().Generate();
+        request.SetEmail("test@test.com");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        // Seed user
+        var user = UserEntityFaker.Create().Generate();
+        user.Email = "test@test.com";
+        authOrigin.Users.Add(user);
+        await authOrigin.SaveChangesAsync();
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
+
+        // Seed bank
+        var existingBank = BankEntityFaker.Create().Generate();
+        existingBank.Name = request.BankName;
+        existingBank.BankType = request.BankType;
+        origin.Bank.Add(existingBank);
+        await origin.SaveChangesAsync();
+
+        // Seed user bank
+        var existingUserBank = UserBankEntityFaker.Create().Generate();
+        existingUserBank.UserId = user.Id;
+        existingUserBank.BankId = existingBank.Id;
+        existingUserBank.NickName = request.NickName;
+        origin.UserBank.Add(existingUserBank);
+        await origin.SaveChangesAsync();
+
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostUserBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_400_ALREADY_EXISTS_USER_BANK.GetDescription()));
+    }
+
+    [Fact]
     public async Task PostUserBanks_WithValidRequest_ReturnsCreated()
     {
         // Arrange
