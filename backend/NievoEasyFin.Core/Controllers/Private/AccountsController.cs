@@ -64,4 +64,22 @@ public class AccountsController : Controller
         );
         return await _accountsService.PostUserBanks(request);
     }
+
+    /// <summary>
+    /// Get user bank accounts.
+    /// </summary>
+    /// <param name="authorization">Token JWT</param>
+    /// <param name="request">GetUserBanksRequest</param>
+    /// <returns>IActionResult</returns>
+    [HttpGet("user-banks")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetUserBanks([FromHeader] string authorization, [FromBody] GetUserBanksRequest request)
+    {
+        request.SetEmail(
+            await _jsonWebTokenService.GetClaimValue(authorization, "email")
+        );
+        return await _accountsService.GetUserBanks(request);
+    }
 }

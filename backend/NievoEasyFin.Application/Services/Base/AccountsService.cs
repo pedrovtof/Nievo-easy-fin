@@ -189,5 +189,15 @@ namespace NievoEasyFin.Application.Services.Base
                 new ResponseApiSucess(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_200_CREATED.GetDescription())
             );
         }
+
+        /// <summary>
+        /// Get user bank accounts.
+        /// </summary>
+        /// <param name="request">GetUserBanksRequest</param>
+        /// <returns>IActionResult</returns>
+        public async Task<IActionResult> GetUserBanks(GetUserBanksRequest request)
+        {
+            return Ok(new ResponseApiSucess(null));
+        }
     }
 }

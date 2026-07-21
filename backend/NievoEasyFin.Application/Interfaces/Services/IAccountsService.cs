@@ -28,5 +28,11 @@ namespace NievoEasyFin.Application.Interfaces.Services
         /// </summary>
         /// <param name="request">GetBanksRequest</param>
         Task<IActionResult> GetBanks(GetBanksRequest request);
+
+        /// <summary>
+        /// Get list of user bank accounts
+        /// </summary>
+        /// <param name="request">GetUserBanksRequest</param>
+        Task<IActionResult> GetUserBanks(GetUserBanksRequest request);
     }
 }
