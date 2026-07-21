@@ -7,8 +7,15 @@ using NievoEasyFin.Application.Data.Views;
 
 namespace NievoEasyFin.Application.Interfaces.Response
 {
+    /// <summary>
+    /// Class for response in get banks
+    /// </summary>
     public class GetBanksResponse
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="view">BanksViews</param>
         public GetBanksResponse(BanksViews view)
         {
             Name = view.Name;
