@@ -461,4 +461,110 @@ public class AccountsServiceTests : IDisposable
         userBankInDb.Should().NotBeNull();
         userBankInDb!.NickName.Should().Be(request.NickName);
     }
+
+    [Fact]
+    public async Task GetBanks_WithInvalidPage_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = GetBanksRequestFaker.Create().Generate();
+        request.Page = 0;
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetBanks_WithInvalidPageSize_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = GetBanksRequestFaker.Create().Generate();
+        request.PageSize = 51;
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetBanks(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetBanks_WhenNoBanksExist_ReturnsOkWithEmptyList()
+    {
+        // Arrange
+        var request = GetBanksRequestFaker.Create().Generate();
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetBanks(request);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        okResult.Value.Should().BeOfType<ResponseApiSucess>();
+
+        var response = (ResponseApiSucess)okResult.Value!;
+        response.Data.Should().BeOfType<ResponsePaginationBase<GetBanksResponse>>();
+
+        var pagination = (ResponsePaginationBase<GetBanksResponse>)response.Data;
+        pagination.Items.Should().BeEmpty();
+        pagination.Records.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task GetBanks_WhenBanksExist_ReturnsOkWithBanksList()
+    {
+        // Arrange
+        var request = GetBanksRequestFaker.Create().Generate();
+        request.Page = 1;
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        // Seed data using SQL because Dapper queries accounts.bank but EF Core inserts into main.bank
+        using (var cmd = origin.Database.GetDbConnection().CreateCommand())
+        {
+            cmd.CommandText = @"
+                INSERT INTO accounts.bank_type (id, name, description, active, created_at, updated_at) 
+                VALUES (1, 'Conta Corrente', 'Desc', 1, '2023-01-01', '2023-01-01');
+
+                INSERT INTO accounts.bank (id, name, bank_type, active, created_at, updated_at) 
+                VALUES (1, 'Bank 1', 1, 1, '2023-01-01', '2023-01-01'),
+                       (2, 'Bank 2', 1, 1, '2023-01-01', '2023-01-01');
+            ";
+            cmd.ExecuteNonQuery();
+        }
+
+        var service = CreateService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetBanks(request);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        okResult.Value.Should().BeOfType<ResponseApiSucess>();
+
+        var response = (ResponseApiSucess)okResult.Value!;
+        response.Data.Should().BeOfType<ResponsePaginationBase<GetBanksResponse>>();
+
+        var pagination = (ResponsePaginationBase<GetBanksResponse>)response.Data;
+        pagination.Items.Should().NotBeEmpty();
+        pagination.Records.Should().BeGreaterThan(0);
+    }
 }

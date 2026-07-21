@@ -61,7 +61,7 @@ namespace NievoEasyFin.Application.Models
                 await connection.QueryAsync<BanksViews>(query.ToString(), parameters)
             );
 
-            int records = banks[0]?.Records ?? 0;
+            int records = banks.Any() ? banks.FirstOrDefault().Records : 0;
 
             return (banks, records);
         }
