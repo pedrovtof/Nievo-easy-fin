@@ -494,15 +494,36 @@ public enum EnumErrosApi
     POSTUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND,
 
     /// <summary>
-    /// Not found any bank with this identification
+    /// Not found any bank with this identification.
     /// </summary>
-    [Description("Not found any bank with this identification")]
+    [Description("Not found any bank with this identification.")]
     POSTUSERBANKSASYNC_CORESERVICE_400_BANK_NOT_FOUND,
+
+    /// <summary>
+    /// Already exists one user in this bank.
+    /// </summary>
+    [Description("Already exists one user in this bank.")]
+    POSTUSERBANKSASYNC_CORESERVICE_400_ALREADY_EXISTS_USER_BANK,
 
     /// <summary>
     /// Created with sucess
     /// </summary>
     [Description("Created with sucess")]
-    POSTUSERBANKSASYNC_CORESERVICE_200_CREATED
+    POSTUSERBANKSASYNC_CORESERVICE_200_CREATED,
+
+    #endregion
+
+    #region GetBanksRequest
+
+    /// <summary>
+    /// Invalid page.
+    /// </summary>
+    GETBANKSASYNC_AUTHSERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// Invalid page size.
+    /// </summary>
+    GETBANKSASYNC_AUTHSERVICE_400_INVALID_PAGE_SIZE
+
     #endregion
 }

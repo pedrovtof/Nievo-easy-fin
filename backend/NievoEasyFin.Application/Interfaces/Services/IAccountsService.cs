@@ -19,8 +19,14 @@ namespace NievoEasyFin.Application.Interfaces.Services
         /// <summary>
         /// Creates a new bank account for the authenticated user.
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">PostUserBanksRequest</param>
         /// <returns>An <see cref="IActionResult"/> indicating the result of the user bank account creation.</returns>
         Task<IActionResult> PostUserBanks(PostUserBanksRequest request);
+
+        /// <summary>
+        /// Get list of banks
+        /// </summary>
+        /// <param name="request">GetBanksRequest</param>
+        Task<IActionResult> GetBanks(GetBanksRequest request);
     }
 }

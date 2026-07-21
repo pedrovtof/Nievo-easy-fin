@@ -17,6 +17,15 @@ namespace NievoEasyFin.Application.Models
         }
 
         /// <summary>
+        /// Search for a User Bank active
+        /// </summary>
+        /// <param name="userId">int</param>
+        /// <param name="bankId">int</param>
+        /// <returns>UserBankEntity</returns>
+        public async Task<UserBankEntity> GetUserBankByUserAndBankAsync(int userId, int bankId)
+            => await _CoreReplicaNodeDatabase.UserBank.FirstOrDefaultAsync(x => x.UserId == userId && x.BankId == bankId && x.Active == true);
+
+        /// <summary>
         /// Method to create a new user linked to a bank
         /// </summary>
         /// <param name="userId">int</param>
