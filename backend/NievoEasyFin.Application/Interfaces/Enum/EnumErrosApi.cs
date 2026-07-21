@@ -509,6 +509,21 @@ public enum EnumErrosApi
     /// Created with sucess
     /// </summary>
     [Description("Created with sucess")]
-    POSTUSERBANKSASYNC_CORESERVICE_200_CREATED
+    POSTUSERBANKSASYNC_CORESERVICE_200_CREATED,
+
+    #endregion
+
+    #region GetBanksRequest
+
+    /// <summary>
+    /// Invalid page.
+    /// </summary>
+    GETBANKSASYNC_AUTHSERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// Invalid page size.
+    /// </summary>
+    GETBANKSASYNC_AUTHSERVICE_400_INVALID_PAGE_SIZE
+
     #endregion
 }

@@ -38,6 +38,16 @@ public class AccountsController : Controller
         => await _accountsService.PostAccountsBanks(request);
 
     /// <summary>
+    /// Get list of banks
+    /// </summary>
+    [HttpGet("banks")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetBanks([FromQuery] GetBanksRequest request)
+        => await _accountsService.GetBanks(request);
+
+    /// <summary>
     /// Creates a new user bank account.
     /// </summary>
     /// <param name="authorization">Token JWT</param>

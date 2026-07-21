@@ -114,6 +114,45 @@ namespace NievoEasyFin.Application.Services.Base
         }
 
         /// <summary>
+        /// Get banks list
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>IActionResult</returns>
+        public async Task<IActionResult> GetBanks(GetBanksRequest request)
+        {
+            var validatorResult = await new GetBanksValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var (banks, records) = await _bankModel.GetBanksAsync(request.Page, request.PageSize);
+
+            List<GetBanksResponse> items = new();
+
+            if (!banks.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new ResponsePaginationBase<GetBanksResponse>(
+                    request.Page,
+                    request.PageSize,
+                    0,
+                    items
+                    ))
+                );
+            }
+
+            var response = new ResponsePaginationBase<GetBanksResponse>(
+                request.Page,
+                request.PageSize,
+                records,
+                banks.Select(x => new GetBanksResponse(x)).ToList()
+            );
+
+            return Ok(new ResponseApiSucess(response));
+        }
+
+        /// <summary>
         /// Create a link between User and a Bank
         /// </summary>
         /// <param name="request">PostUserBanksRequest</param>
