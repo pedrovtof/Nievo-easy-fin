@@ -1,9 +1,7 @@
 using System.Reflection;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Services.Cache;
-using NievoEasyFin.Application.Services.Base.Users;
 using NievoEasyFin.Application.Models;
-using NievoEasyFin.Application.Services.Base.Authenticator;
 using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Services.Security;

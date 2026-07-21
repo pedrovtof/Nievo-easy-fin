@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using NievoEasyFin.Application.Data.Views;
 
 namespace NievoEasyFin.Application.Interfaces.Response

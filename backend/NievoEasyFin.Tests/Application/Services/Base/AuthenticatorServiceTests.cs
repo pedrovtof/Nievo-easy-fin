@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using NievoEasyFin.Application.Configuration;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
-using NievoEasyFin.Application.Data.Cache.Views;
 using NievoEasyFin.Application.Data.Views;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;

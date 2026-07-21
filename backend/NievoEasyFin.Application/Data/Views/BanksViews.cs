@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using NievoEasyFin.Application.Data.Entities;
 
 namespace NievoEasyFin.Application.Data.Views;
 
