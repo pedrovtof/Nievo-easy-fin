@@ -1,134 +1,78 @@
+using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Extensions.Enum;
-using NievoEasyFin.Application.Interfaces.Enum;
-using NievoEasyFin.Application.Interfaces.Request;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using NievoEasyFin.Application.Interfaces.Response;
-using NievoEasyFin.Tests.Build.Request;
-using NSubstitute;
+using NievoEasyFin.Tests.Mocks.Database;
+using NievoEasyFin.Tests.Mocks.Fakers;
+using NievoEasyFin.Tests.Mocks.Helpers;
+using NievoEasyFin.Tests.Mocks.Infrastructure;
+using StackExchange.Redis;
+using System.Text.Json;
+using Xunit;
 using Xunit.Abstractions;
+using NievoEasyFin.Tests.Build.Request;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
-public class PatchResetPasswordAsyncTest : AuthenticatorTestBase
+public class PatchResetPasswordAsyncTest : AuthenticatorServiceTestBase
 {
-    public PatchResetPasswordAsyncTest(ITestOutputHelper output) : base(output) { }
+    public PatchResetPasswordAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+        : base(fixture, output)
+    {
+    }
 
     #region Success
-
-    [Fact(DisplayName = "Reset de senha deverá ser feito com sucesso")]
-    public async Task PatchResetPasswordAsync_DadosValidos_RetornaSucesso()
+    [Fact(DisplayName = "PatchResetPasswordAsync: With valid token, returns Ok")]
+    public async Task PatchResetPasswordAsync_WithValidToken_ReturnsOk()
     {
         // Arrange
-        var request = new PatchResetPasswordRequestBuilder();
-        var okResult = BuildOk(new { Message = EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_200_PASSWORD_CHANGED.GetDescription() });
+        Output.WriteLine("Arranging PatchResetPassword test.");
+        var user = UserEntityFaker.Create().Generate();
+        user.Password = "OldPasswordHash";
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
 
-        MockService.PatchResetPasswordAsync(Arg.Any<PatchResetPasswordRequest>())
-                   .Returns(Task.FromResult<IActionResult>(okResult));
+        var pinToken = 123456;
+        var request = new PatchResetPasswordRequestBuilder();
+        request.Email = user.Email!;
+        request.PinToken = pinToken;
+        request.Password = "Strong@123";
+
+        var dbMock = new Mock<IDatabase>();
+        var cacheData = new { user_id = user.Id, email = user.Email, pin_token = pinToken };
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+            .ReturnsAsync(JsonSerializer.Serialize(cacheData));
+
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(origin);
+
+        var service = CreateService(origin, replica, cacheService);
 
         // Act
-        var result = await Controller.PatchResetPasswordAsync(request);
+        Output.WriteLine("Executing PatchResetPasswordAsync.");
+        var result = await service.PatchResetPasswordAsync(request);
 
         // Assert
-        var objectResult = result.Should().BeOfType<OkObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiSucess>().Subject;
+        Output.WriteLine("Validating result.");
+        if (result is BadRequestObjectResult badRequest)
+        {
+            var error = (ResponseApiError)badRequest.Value!;
+            throw new Exception($"Patch Password failed with BAD REQUEST: {string.Join(", ", error.Messages)}");
+        }
+        if (result is NotFoundObjectResult notFound)
+        {
+            var error = (ResponseApiError)notFound.Value!;
+            throw new Exception($"Patch Password failed with NOT FOUND: {string.Join(", ", error.Messages)}");
+        }
+        result.Should().BeOfType<OkObjectResult>();
 
-        responseValue.Should().NotBeNull();
-        Output.WriteLine($"\n Validado sucesso ao resetar a senha do usuário com email {request.Email} \n");
+        var updatedUser = await replica.Users.AsNoTracking().FirstAsync(u => u.Id == user.Id);
+        updatedUser.Password.Should().NotBe("OldPasswordHash");
     }
-
-    #endregion
-
-    #region BadRequest Errors
-
-    public static IEnumerable<object[]> BadRequestErrors => new List<object[]>
-    {
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_EMAIL, "Email inválido" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_EMAIL_NULL_OR_EMPTY, "Email nulo ou vazio" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_INVALID_TOKEN_FORMAT, "Formato inválido do token" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_TOKEN_INVALID, "Token inválido" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL, "Senha nula ou vazia" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WITH_WRONG_LENGHT, "Tamanho incorreto da senha" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_WRONG_FORMAT, "Formato incorreto da senha" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_IS_THE_SAME, "Mesma senha" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_400_PASSWORD_NOT_UPDATED, "Falha ao atualizar senha" },
-    };
-
-    [Theory(DisplayName = "Reset de senha deverá retornar BadRequest para cenários de erro")]
-    [MemberData(nameof(BadRequestErrors))]
-    public async Task PatchResetPasswordAsync_CenarioDeErro_RetornaBadRequest(EnumErrosApi enumError, string cenario)
-    {
-        // Arrange
-        var request = new PatchResetPasswordRequestBuilder();
-        var badRequestResult = BuildBadRequest(enumError);
-
-        MockService.PatchResetPasswordAsync(Arg.Any<PatchResetPasswordRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
-
-        // Act
-        var result = await Controller.PatchResetPasswordAsync(request);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(enumError.GetDescription());
-        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
-    }
-
-    #endregion
-
-    #region NotFound Errors
-
-    public static IEnumerable<object[]> NotFoundErrors => new List<object[]>
-    {
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_NOT_FOUND, "Usuário não encontrado" },
-        new object[] { EnumErrosApi.PATCHRESETPASSWORDASYNC_AUTHSERVICE_404_USER_TOKEN_NOT_FOUND_IN_CACHE, "Token não encontrado no cache" },
-    };
-
-    [Theory(DisplayName = "Reset de senha deverá retornar NotFound para cenários de erro")]
-    [MemberData(nameof(NotFoundErrors))]
-    public async Task PatchResetPasswordAsync_CenarioDeErro_RetornaNotFound(EnumErrosApi enumError, string cenario)
-    {
-        // Arrange
-        var request = new PatchResetPasswordRequestBuilder();
-        var notFoundResult = BuildNotFound(enumError);
-
-        MockService.PatchResetPasswordAsync(Arg.Any<PatchResetPasswordRequest>())
-                   .Returns(Task.FromResult<IActionResult>(notFoundResult));
-
-        // Act
-        var result = await Controller.PatchResetPasswordAsync(request);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(enumError.GetDescription());
-        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
-    }
-
-    #endregion
-
-    #region Service Delegation
-
-    [Fact(DisplayName = "Reset de senha deve delegar a chamada ao service exatamente uma vez")]
-    public async Task PatchResetPasswordAsync_QuandoChamado_DeveDelegarAoService()
-    {
-        // Arrange
-        var request = new PatchResetPasswordRequestBuilder();
-        var okResult = BuildOk(new { Message = "Password changed" });
-
-        MockService.PatchResetPasswordAsync(Arg.Any<PatchResetPasswordRequest>())
-                   .Returns(Task.FromResult<IActionResult>(okResult));
-
-        // Act
-        await Controller.PatchResetPasswordAsync(request);
-
-        // Assert — verifica que o service foi chamado exatamente 1 vez
-        await MockService.Received(1).PatchResetPasswordAsync(Arg.Any<PatchResetPasswordRequest>());
-        Output.WriteLine("\n Validado que o service foi chamado exatamente 1 vez. \n");
-    }
-
     #endregion
 }

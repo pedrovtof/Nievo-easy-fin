@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace NievoEasyFin.Application.Data.Entities.Cache
 {
     /// <summary>

@@ -523,7 +523,21 @@ public enum EnumErrosApi
     /// <summary>
     /// Invalid page size.
     /// </summary>
-    GETBANKSASYNC_AUTHSERVICE_400_INVALID_PAGE_SIZE
+    GETBANKSASYNC_AUTHSERVICE_400_INVALID_PAGE_SIZE,
+
+    #endregion
+
+    #region GetUserBanksRequest
+
+    GETUSERBANKSASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    GETUSERBANKSASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// It was not possible to find a user with your configuration.
+    /// </summary>
+    [Description("It was not possible to find a user with your configuration.")]
+    GETUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND,
 
     #endregion
 }

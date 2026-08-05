@@ -189,5 +189,35 @@ namespace NievoEasyFin.Application.Services.Base
                 new ResponseApiSucess(EnumErrosApi.POSTUSERBANKSASYNC_CORESERVICE_200_CREATED.GetDescription())
             );
         }
+
+        /// <summary>
+        /// Get user bank accounts.
+        /// </summary>
+        /// <param name="request">GetUserBanksRequest</param>
+        /// <returns>IActionResult</returns>
+        public async Task<IActionResult> GetUserBanks(GetUserBanksRequest request)
+        {
+            var validatorResult = await new GetUserBanksValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                   new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+               );
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.GETUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var userBank = await _userBankModel.GetUserBankByUserAsync(user.Id);
+            if (!userBank.Any())
+                return Ok(
+                    new ResponseApiSucess(userBank)
+                );
+
+            var response = userBank.Select(x => new GetUserBanksResponse(x)).ToList();
+
+            return Ok(new ResponseApiSucess(response));
+        }
     }
 }

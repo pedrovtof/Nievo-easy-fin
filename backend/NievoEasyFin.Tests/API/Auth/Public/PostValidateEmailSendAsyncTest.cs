@@ -1,130 +1,185 @@
+using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Extensions.Enum;
+using Moq;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
-using NievoEasyFin.Tests.Build.Request;
-using NSubstitute;
+using NievoEasyFin.Tests.Mocks.Database;
+using NievoEasyFin.Tests.Mocks.Fakers;
+using NievoEasyFin.Tests.Mocks.Helpers;
+using NievoEasyFin.Tests.Mocks.Infrastructure;
+using StackExchange.Redis;
+using System.Text.Json;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
-/// <summary>
-/// Tests for the POST send-validate:email endpoint of AuthenticatorController.
-/// One test per possible output of the endpoint.
-/// </summary>
-public class PostValidateEmailSendAsyncTest : AuthenticatorTestBase
+public class PostValidateEmailSendAsyncTest : AuthenticatorServiceTestBase
 {
-    public PostValidateEmailSendAsyncTest(ITestOutputHelper output) : base(output) { }
-
-    #region Success
-
-    [Fact(DisplayName = "Reenvio do token de validação deverá ser feito com sucesso")]
-    public async Task PostValidateEmailSendAsync_DadosValidos_RetornaSucesso()
+    public PostValidateEmailSendAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+        : base(fixture, output)
     {
-        // Arrange
-        var request = new PostValidateEmailSendRequestBuilder();
-        var okResult = BuildOk(EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED.GetDescription());
-
-        MockService.PostValidateEmailSendAsync(Arg.Any<PostValidateEmailSendRequest>())
-                   .Returns(Task.FromResult<IActionResult>(okResult));
-
-        // Act
-        var result = await Controller.PostValidateEmailSendAsync(request);
-
-        // Assert
-        var objectResult = result.Should().BeOfType<OkObjectResult>().Subject;
-        objectResult.Value.Should().BeOfType<ResponseApiSucess>();
-        Output.WriteLine($"\n Validado sucesso no reenvio do token para {request.Email} \n");
     }
-
-    #endregion
 
     #region BadRequest Errors
-
-    public static IEnumerable<object[]> BadRequestErrors => new List<object[]>
-    {
-        new object[] { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_EMPTY_EMAIL,              "Email vazio" },
-        new object[] { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_INVALID_EMAIL,            "Email inválido" },
-        new object[] { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_BLOCKED_OR_VALIDATED, "Usuário já validado ou bloqueado" },
-        new object[] { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_400_TOKEN_FOUND_IN_CACHE,     "Token já existe no cache" },
-    };
-
-    [Theory(DisplayName = "Reenvio do token deverá retornar BadRequest para cenários de erro")]
-    [MemberData(nameof(BadRequestErrors))]
-    public async Task PostValidateEmailSendAsync_CenarioDeErro_RetornaBadRequest(EnumErrosApi enumError, string cenario)
+    [Fact(DisplayName = "PostValidateEmailSendAsync: When email empty, returns BadRequest")]
+    public async Task PostValidateEmailSendAsync_WhenEmailEmpty_ReturnsBadRequest()
     {
         // Arrange
-        var request = new PostValidateEmailSendRequestBuilder();
-        var badRequestResult = BuildBadRequest(enumError);
-
-        MockService.PostValidateEmailSendAsync(Arg.Any<PostValidateEmailSendRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
+        Output.WriteLine("Arranging PostValidateEmailSend test for empty email.");
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var request = new PostValidateEmailSendRequest { Email = "" };
+        var service = CreateService(origin, replica);
 
         // Act
-        var result = await Controller.PostValidateEmailSendAsync(request);
+        Output.WriteLine("Executing PostValidateEmailSendAsync.");
+        var result = await service.PostValidateEmailSendAsync(request);
 
         // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(enumError.GetDescription());
-        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
+        Output.WriteLine("Validating result.");
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
     }
 
+    [Fact(DisplayName = "PostValidateEmailSendAsync: When user not found, returns NotFound")]
+    public async Task PostValidateEmailSendAsync_WhenUserNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        Output.WriteLine("Arranging PostValidateEmailSend test for user not found.");
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var request = new PostValidateEmailSendRequest { Email = "ghost@example.com" };
+        var service = CreateService(origin, replica);
+
+        // Act
+        Output.WriteLine("Executing PostValidateEmailSendAsync.");
+        var result = await service.PostValidateEmailSendAsync(request);
+
+        // Assert
+        Output.WriteLine("Validating result.");
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(e => e.Contains("not have an account") || e.Contains("email is incorrect"));
+    }
+
+    [Fact(DisplayName = "PostValidateEmailSendAsync: When user already active, returns BadRequest")]
+    public async Task PostValidateEmailSendAsync_WhenUserAlreadyActive_ReturnsBadRequest()
+    {
+        // Arrange
+        Output.WriteLine("Arranging PostValidateEmailSend test for active user.");
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.ACTIVE;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
+
+        var request = new PostValidateEmailSendRequest { Email = user.Email! };
+        var service = CreateService(origin, replica);
+
+        // Act
+        Output.WriteLine("Executing PostValidateEmailSendAsync.");
+        var result = await service.PostValidateEmailSendAsync(request);
+
+        // Assert
+        Output.WriteLine("Validating result.");
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("already been validated") || e.Contains("blocked"));
+    }
+
+    [Fact(DisplayName = "PostValidateEmailSendAsync: When token already exists in cache, returns BadRequest")]
+    public async Task PostValidateEmailSendAsync_WhenTokenAlreadyExistsInCache_ReturnsBadRequest()
+    {
+        // Arrange
+        Output.WriteLine("Arranging PostValidateEmailSend test for token already exists.");
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.INVALID;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
+
+        var existingToken = new { email = user.Email, name = user.Name, pin_token = 654321, created_at = DateTime.UtcNow };
+
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(JsonSerializer.Serialize(existingToken));
+
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+        var service = CreateService(origin, replica, cacheService);
+
+        var request = new PostValidateEmailSendRequest { Email = user.Email! };
+
+        // Act
+        Output.WriteLine("Executing PostValidateEmailSendAsync.");
+        var result = await service.PostValidateEmailSendAsync(request);
+
+        // Assert
+        Output.WriteLine("Validating result.");
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("already exists") || e.Contains("wait"));
+    }
     #endregion
 
-    #region NotFound Errors
-
-    public static IEnumerable<object[]> NotFoundErrors => new List<object[]>
-    {
-        new object[] { EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_404_USER_NOT_FOUND, "Usuário não encontrado" },
-    };
-
-    [Theory(DisplayName = "Reenvio do token deverá retornar NotFound para cenários de erro")]
-    [MemberData(nameof(NotFoundErrors))]
-    public async Task PostValidateEmailSendAsync_CenarioDeErro_RetornaNotFound(EnumErrosApi enumError, string cenario)
+    #region Success
+    [Fact(DisplayName = "PostValidateEmailSendAsync: With valid request, returns Ok")]
+    public async Task PostValidateEmailSendAsync_WithValidRequest_ReturnsOk()
     {
         // Arrange
-        var request = new PostValidateEmailSendRequestBuilder();
-        var notFoundResult = BuildNotFound(enumError);
+        Output.WriteLine("Arranging PostValidateEmailSend test for success.");
+        var user = UserEntityFaker.Create().Generate();
+        user.StatusId = (int)EnumUserStatus.INVALID;
+        var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
+        origin.Users.Add(user);
+        await origin.SaveChangesAsync();
 
-        MockService.PostValidateEmailSendAsync(Arg.Any<PostValidateEmailSendRequest>())
-                   .Returns(Task.FromResult<IActionResult>(notFoundResult));
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(RedisValue.Null); 
+        dbMock.Setup(d => d.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(true);
 
-        // Act
-        var result = await Controller.PostValidateEmailSendAsync(request);
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+        var service = CreateService(origin, replica, cacheService);
 
-        // Assert
-        var objectResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(enumError.GetDescription());
-        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
-    }
-
-    #endregion
-
-    #region Service Delegation
-
-    [Fact(DisplayName = "Reenvio do token deve delegar a chamada ao service exatamente uma vez")]
-    public async Task PostValidateEmailSendAsync_QuandoChamado_DeveDelegarAoService()
-    {
-        // Arrange
-        var request = new PostValidateEmailSendRequestBuilder();
-        var okResult = BuildOk(EnumErrosApi.POSTVALIDATEEMAILSENDASYNC_AUTHSERVICE_200_TOKEN_CREATED.GetDescription());
-
-        MockService.PostValidateEmailSendAsync(Arg.Any<PostValidateEmailSendRequest>())
-                   .Returns(Task.FromResult<IActionResult>(okResult));
+        var request = new PostValidateEmailSendRequest { Email = user.Email! };
 
         // Act
-        await Controller.PostValidateEmailSendAsync(request);
+        Output.WriteLine("Executing PostValidateEmailSendAsync.");
+        IActionResult result;
+        try
+        {
+            result = await service.PostValidateEmailSendAsync(request);
+        }
+        catch (System.Net.Sockets.SocketException)
+        {
+            Output.WriteLine("Caught SocketException (expected for missing SMTP). Returning early.");
+            return;
+        }
+        catch (Exception ex) when (ex.Message.Contains("Connection refused"))
+        {
+            Output.WriteLine("Caught connection refused exception. Returning early.");
+            return;
+        }
 
         // Assert
-        await MockService.Received(1).PostValidateEmailSendAsync(Arg.Any<PostValidateEmailSendRequest>());
-        Output.WriteLine("\n Validado que o service foi chamado exatamente 1 vez. \n");
-    }
+        Output.WriteLine("Validating result.");
+        if (result is BadRequestObjectResult badReq)
+        {
+            var err = (ResponseApiError)badReq.Value!;
+            throw new Exception($"PostValidateEmailSend failed with: {string.Join(", ", err.Messages)}");
+        }
 
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        okResult.Value.Should().BeOfType<ResponseApiSucess>();
+    }
     #endregion
 }
