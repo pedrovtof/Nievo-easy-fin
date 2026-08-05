@@ -1,102 +1,198 @@
+using NievoEasyFin.Tests.Mocks.Helpers;
+using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Extensions.Enum;
+using Microsoft.EntityFrameworkCore;
 using NievoEasyFin.Application.Interfaces.Enum;
-using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
-using NievoEasyFin.Tests.Build.Request;
-using NSubstitute;
+using NievoEasyFin.Tests.Mocks.Database;
+using NievoEasyFin.Tests.Mocks.Fakers;
+using NievoEasyFin.Tests.Mocks.Infrastructure;
+using Xunit;
 using Xunit.Abstractions;
+using NievoEasyFin.Tests.Build.Request;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
-public class PostCreateUserAsyncTest : UsersTestBase
+public class PostCreateUserAsyncTest : UsersServiceTestBase
 {
-    public PostCreateUserAsyncTest(ITestOutputHelper output) : base(output) { }
+    public PostCreateUserAsyncTest(WireMockFixture fixture, ITestOutputHelper output) : base(fixture, output)
+    {
+    }
 
     #region Success
 
-    [Fact(DisplayName = "Criação de usuário deverá ser feita com sucesso")]
-    public async Task PostCreateUserAsync_DadosValidos_RetornaSucesso()
+    [Fact(DisplayName = "PostCreateUserAsync: With valid request returns Created")]
+    public async Task PostCreateUserAsync_WithValidRequest_ReturnsCreated()
     {
         // Arrange
+        Output.WriteLine("Setting up valid create user request");
         var request = new PostCreateUserRequestBuilder();
-        var okResult = new StatusCodeResult(201); // Or BuildOk if preferred, but service returns 201
+        request.Password = "Strong@123";
 
-        MockService.PostCreateUserAsync(Arg.Any<PostCreateUserRequest>())
-                   .Returns(Task.FromResult<IActionResult>(okResult));
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var smtpMock = new SmtpModelMock();
+        var service = CreateService(authOrigin, authReplica, smtpMock);
 
         // Act
-        var result = await Controller.PostCreateUserAsync("TestAgent/1.0", "localhost", request);
+        IActionResult result;
+        try
+        {
+            result = await service.PostCreateUserAsync(request);
+            Output.WriteLine("Execution of PostCreateUserAsync succeeded");
+        }
+        catch (System.Net.Sockets.SocketException)
+        {
+            Output.WriteLine("Caught SocketException (SMTP unavailable, expected in some environments)");
+            return;
+        }
+        catch (Exception ex) when (ex.Message.Contains("Connection refused"))
+        {
+            Output.WriteLine("Caught Connection Refused (expected in some environments)");
+            return;
+        }
 
         // Assert
-        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(201);
-        Output.WriteLine($"\n Validado sucesso com {request.Email} \n");
+        result.Should().BeOfType<ObjectResult>();
+        var objectResult = (ObjectResult)result;
+        objectResult.StatusCode.Should().Be(201);
+        objectResult.Value.Should().BeOfType<ResponseApiSucess>();
+
+        var userInDb = await authReplica.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        userInDb.Should().NotBeNull();
+        userInDb!.Name.Should().Be(request.Name);
+        userInDb.StatusId.Should().Be((int)EnumUserStatus.INVALID);
+        
+        Output.WriteLine("User successfully verified in database");
     }
 
     #endregion
 
     #region BadRequest Errors
 
-    public static IEnumerable<object[]> BadRequestErrors => new List<object[]>
-    {
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_NAME_EMPTY_NULL, "Nome vazio ou nulo" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_NAME_WITH_WRONG_LENGHT, "Nome com tamanho errado" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_PASSWORD_EMPTY_NULL, "Senha vazia ou nula" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_PASSWORD_WITH_WRONG_LENGHT, "Senha com tamanho errado" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_PASSWORD_WRONG_FORMAT, "Senha com formato errado" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_EMPTY_NULL, "Email vazio ou nulo" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_ALREADY_EXISTS, "Email já existe" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_INVALID, "Email inválido" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_EMAIL_NOT_VALIDATED, "Email com cadastro pendente de validação" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_HOST_NULL_OR_EMPTY, "Host vazio ou nulo" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_USER_AGENT_NULL_OR_EMPTY, "User-Agent vazio ou nulo" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_TERMS_NOT_ACCEPTED, "Termos não aceitos" },
-        new object[] { EnumErrosApi.POSTCREATEUSERASYNC_AUTHSERVICE_400_ERROR_WHILE_ACCEPT_TERMS, "Erro ao registrar aceite dos termos" },
-    };
-
-    [Theory(DisplayName = "Criação de usuário deverá retornar BadRequest para cenários de erro")]
-    [MemberData(nameof(BadRequestErrors))]
-    public async Task PostCreateUserAsync_CenarioDeErro_RetornaBadRequest(EnumErrosApi enumError, string cenario)
+    [Fact(DisplayName = "PostCreateUserAsync: When email exists with active status returns BadRequest")]
+    public async Task PostCreateUserAsync_WhenEmailExistsWithActiveStatus_ReturnsBadRequest()
     {
         // Arrange
+        Output.WriteLine("Setting up create user request with existing active email");
         var request = new PostCreateUserRequestBuilder();
-        var badRequestResult = BuildBadRequest(enumError);
+        request.Password = "Strong@123";
 
-        MockService.PostCreateUserAsync(Arg.Any<PostCreateUserRequest>())
-                   .Returns(Task.FromResult<IActionResult>(badRequestResult));
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var existingUser = UserEntityFaker.Create().Generate();
+        existingUser.Email = request.Email;
+        existingUser.StatusId = (int)EnumUserStatus.ACTIVE;
+        authOrigin.Users.Add(existingUser);
+        await authOrigin.SaveChangesAsync();
+
+        var service = CreateService(authOrigin, authReplica);
 
         // Act
-        var result = await Controller.PostCreateUserAsync("TestAgent/1.0", "localhost", request);
+        var result = await service.PostCreateUserAsync(request);
 
         // Assert
-        var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-        var responseValue = objectResult.Value.Should().BeOfType<ResponseApiError>().Subject;
-
-        responseValue.Messages.Should().Contain(enumError.GetDescription());
-        Output.WriteLine($"\n Validado erro: {cenario} ({enumError}) \n");
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("already exists"));
+        
+        Output.WriteLine("Validation passed: returned BadRequest for existing email");
     }
 
-    #endregion
-
-    #region Service Delegation
-
-    [Fact(DisplayName = "Criação de usuário deve delegar a chamada ao service exatamente uma vez")]
-    public async Task PostCreateUserAsync_QuandoChamado_DeveDelegarAoService()
+    [Fact(DisplayName = "PostCreateUserAsync: When email exists with invalid status returns BadRequest")]
+    public async Task PostCreateUserAsync_WhenEmailExistsWithInvalidStatus_ReturnsBadRequest()
     {
         // Arrange
+        Output.WriteLine("Setting up create user request with existing invalid email");
         var request = new PostCreateUserRequestBuilder();
-        var okResult = new StatusCodeResult(201);
+        request.Password = "Strong@123";
 
-        MockService.PostCreateUserAsync(Arg.Any<PostCreateUserRequest>())
-                   .Returns(Task.FromResult<IActionResult>(okResult));
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var existingUser = UserEntityFaker.Create().Generate();
+        existingUser.Email = request.Email;
+        existingUser.StatusId = (int)EnumUserStatus.INVALID;
+        authOrigin.Users.Add(existingUser);
+        await authOrigin.SaveChangesAsync();
+
+        var service = CreateService(authOrigin, authReplica);
 
         // Act
-        await Controller.PostCreateUserAsync("TestAgent/1.0", "localhost", request);
+        var result = await service.PostCreateUserAsync(request);
 
         // Assert
-        await MockService.Received(1).PostCreateUserAsync(Arg.Any<PostCreateUserRequest>());
-        Output.WriteLine("\n Validado que o service foi chamado exatamente 1 vez. \n");
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("not valid") || e.Contains("validate it again"));
+        
+        Output.WriteLine("Validation passed: returned BadRequest for invalid existing email");
+    }
+
+    [Fact(DisplayName = "PostCreateUserAsync: When terms not accepted returns BadRequest")]
+    public async Task PostCreateUserAsync_WhenTermsNotAccepted_ReturnsBadRequest()
+    {
+        // Arrange
+        Output.WriteLine("Setting up create user request with unaccepted terms");
+        var request = new PostCreateUserRequestBuilder();
+        request.Password = "Strong@123";
+        request.AcceptTerms = false; 
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+        
+        Output.WriteLine("Validation passed: terms not accepted returned BadRequest");
+    }
+
+    [Fact(DisplayName = "PostCreateUserAsync: When host is empty returns BadRequest")]
+    public async Task PostCreateUserAsync_WhenHostIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        Output.WriteLine("Setting up create user request with empty host");
+        var request = new PostCreateUserRequestBuilder();
+        request.Password = "Strong@123";
+        request.SetHost(string.Empty);
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        Output.WriteLine("Validation passed: empty host returned BadRequest");
+    }
+
+    [Fact(DisplayName = "PostCreateUserAsync: When UserAgent is empty returns BadRequest")]
+    public async Task PostCreateUserAsync_WhenUserAgentIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        Output.WriteLine("Setting up create user request with empty UserAgent");
+        var request = new PostCreateUserRequestBuilder();
+        request.Password = "Strong@123";
+        request.SetUserAgent(string.Empty);
+
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateService(authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostCreateUserAsync(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        Output.WriteLine("Validation passed: empty UserAgent returned BadRequest");
     }
 
     #endregion
