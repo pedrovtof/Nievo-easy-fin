@@ -59,4 +59,14 @@ public class AccountsController : Controller
         );
         return await _accountsService.GetUserBanks(request);
     }
+
+    /// <summary>
+    /// Get card types
+    /// </summary>
+    [HttpGet("card-type")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetCardType([FromQuery] GetCardTypeRequest request)
+        => await _accountsService.GetCardType(request);
 }

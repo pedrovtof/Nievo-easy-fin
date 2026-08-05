@@ -219,5 +219,24 @@ namespace NievoEasyFin.Application.Services.Base
 
             return Ok(new ResponseApiSucess(response));
         }
+
+        /// <summary>
+        /// Get card types
+        /// </summary>
+        /// <param name="request">GetCardTypeRequest</param>
+        /// <returns></returns>
+        public async Task<IActionResult> GetCardType(GetCardTypeRequest request)
+        {
+            return Ok(new ResponseApiSucess(null));
+        }
+
+        /// <summary>
+        /// Create an bank card
+        /// </summary>
+        /// <param name="request">PostBankCardRequest</param>
+        public async Task<IActionResult> PostBankCard(PostBankCardRequest request)
+        {
+            return Ok(new ResponseApiSucess(null));
+        }
     }
 }

@@ -46,4 +46,14 @@ public class AccountsController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetBanks([FromQuery] GetBanksRequest request)
         => await _accountsService.GetBanks(request);
+
+    /// <summary>
+    /// Create an bank card
+    /// </summary>
+    [HttpPost("bank-card")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostBankCard([FromBody] PostBankCardRequest request)
+        => await _accountsService.PostBankCard(request);
 }
