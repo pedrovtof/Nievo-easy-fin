@@ -5,13 +5,13 @@ using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Services.Security;
 
-namespace NievoEasyFin.Core.Controllers.Private;
+namespace NievoEasyFin.Core.Controllers.Public;
 
 /// <summary>
 /// Controller responsible for managing user accounts and bank accounts operations.
 /// </summary>
 [ApiController]
-[Route("api/private/v1/[controller]")]
+[Route("api/public/v1/[controller]")]
 public class AccountsController : Controller
 {
     private readonly IAccountsService _accountsService;
@@ -25,25 +25,38 @@ public class AccountsController : Controller
     }
 
     /// <summary>
-    /// Creates a new bank account.
+    /// Creates a new user bank account.
     /// </summary>
-    /// <param name="request">The bank account creation request data.</param>
-    /// <response code = "200">Return created with sucess</response>
-    /// <response code = "400">BadRequest</response>
-    [HttpPost("banks")]
+    /// <param name="authorization">Token JWT</param>
+    /// <param name="request">PostUserBanksRequest</param>
+    /// <returns>IActionResult</returns>
+    [HttpPost("user-banks")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostAccountsBanks([FromBody] PostAccountsBanksRequest request)
-        => await _accountsService.PostAccountsBanks(request);
+    public async Task<IActionResult> PostUserBanks([FromHeader] string authorization, [FromBody] PostUserBanksRequest request)
+    {
+        request.SetEmail(
+            await _jsonWebTokenService.GetClaimValue(authorization, "email")
+        );
+        return await _accountsService.PostUserBanks(request);
+    }
 
     /// <summary>
-    /// Get list of banks
+    /// Get user bank accounts.
     /// </summary>
-    [HttpGet("banks")]
+    /// <param name="authorization">Token JWT</param>
+    /// <returns>IActionResult</returns>
+    [HttpGet("user-banks")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetBanks([FromQuery] GetBanksRequest request)
-        => await _accountsService.GetBanks(request);
+    public async Task<IActionResult> GetUserBanks([FromHeader] string authorization)
+    {
+        GetUserBanksRequest request = new();
+        request.SetEmail(
+            await _jsonWebTokenService.GetClaimValue(authorization, "email")
+        );
+        return await _accountsService.GetUserBanks(request);
+    }
 }
