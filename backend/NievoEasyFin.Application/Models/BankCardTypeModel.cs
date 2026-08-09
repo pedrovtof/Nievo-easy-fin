@@ -46,8 +46,8 @@ namespace NievoEasyFin.Application.Models
                     name, 
                     description, 
                     active,
-                    created_at,
-                    updated_at
+                    created_at as CreatedAt,
+                    updated_at as UpdatedAt
                 FROM accounts.bank_card_type
                 WHERE active = true;
             ");
