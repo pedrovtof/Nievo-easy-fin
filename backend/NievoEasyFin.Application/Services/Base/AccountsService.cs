@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Data.Entities;
+using NievoEasyFin.Application.Data.Views;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
@@ -27,12 +28,18 @@ namespace NievoEasyFin.Application.Services.Base
 
         private readonly UserBankModel _userBankModel;
 
+        private readonly BankCardModel _bankCardModel;
+
+        private readonly BankCardTypeModel _bankCardTypeModel;
+
         public AccountsService(
             BankModel bankModel,
             AuthDbCacheService authDbCacheService,
             BankTypeModel bankTypeModel,
             UserModel userModel,
-            UserBankModel userBankModel
+            UserBankModel userBankModel,
+            BankCardModel bankCardModel,
+            BankCardTypeModel bankCardTypeModel
         )
         {
             _bankModel = bankModel;
@@ -40,6 +47,8 @@ namespace NievoEasyFin.Application.Services.Base
             _bankTypeModel = bankTypeModel;
             _userModel = userModel;
             _userBankModel = userBankModel;
+            _bankCardModel = bankCardModel;
+            _bankCardTypeModel = bankCardTypeModel;
         }
 
         /// <summary>
@@ -218,6 +227,76 @@ namespace NievoEasyFin.Application.Services.Base
             var response = userBank.Select(x => new GetUserBanksResponse(x)).ToList();
 
             return Ok(new ResponseApiSucess(response));
+        }
+
+        /// <summary>
+        /// Get card types
+        /// </summary>
+        /// <param name="request">GetCardTypeRequest</param>
+        /// <returns></returns>
+        public async Task<IActionResult> GetCardType(GetCardTypeRequest request)
+        {
+            var validatorResult = await new GetCardTypeValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var (cardTypes, itemsCount) = await _bankCardTypeModel.GetBankCardTypesAsync();
+            if (!cardTypes.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new List<GetCardTypeResponse>())
+                );
+            }
+
+            var cardTypeView = cardTypes.Select(x => new BankCardTypeView(x)).ToList();
+
+            GetCardTypeResponse response = new(
+                request.Page,
+                request.PageSize,
+                itemsCount,
+                cardTypeView
+            );
+
+            return Ok(new ResponseApiSucess(response));
+        }
+
+        /// <summary>
+        /// Create an bank card
+        /// </summary>
+        /// <param name="request">PostBankCardRequest</param>
+        public async Task<IActionResult> PostBankCard(PostBankCardRequest request)
+        {
+            var validatorResult = await new PostBankCardValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+               );
+
+            var bank = await _bankModel.GetBankByIdAsync(request.BankId);
+            if (bank == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND.GetDescription() }
+                ));
+
+            var cardType = await _bankCardTypeModel.GetBankCardTypeByIdOrNameAsync(request.CardType, request.Name);
+            if (cardType == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_404_CARD_TYPE_NOT_FOUND.GetDescription() }
+                ));
+
+            var card = await _bankCardModel.GetBankCardByBankIdAndCardTypeAndNameAsync(request.BankId, request.CardType, request.Name);
+            if (card != null)
+                return BadRequest(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_400_CARD_ALREADY_EXISTS.GetDescription() }
+                ));
+
+            var newCard = await _bankCardModel.CreateBankCardAsync(request.BankId, request.CardType, request.Name);
+
+            return Ok(new ResponseApiSucess(
+                EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_200_CARD_CREATED.GetDescription()
+            ));
         }
     }
 }

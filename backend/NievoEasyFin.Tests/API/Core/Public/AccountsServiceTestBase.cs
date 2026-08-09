@@ -115,6 +115,23 @@ public abstract class AccountsServiceTestBase : IDisposable
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS accounts.bank_card (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    bank_id INTEGER,
+                    name TEXT,
+                    card_type INTEGER,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS accounts.bank_card_type (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
             ";
             cmd.ExecuteNonQuery();
         }
@@ -128,6 +145,8 @@ public abstract class AccountsServiceTestBase : IDisposable
         var bankTypeModel = new BankTypeModel(origin, replica);
         var userModel = new UserModel(authOrigin, authReplica);
         var userBankModel = new UserBankModel(origin, replica);
+        var bankCardModel = new BankCardModel(origin, replica);
+        var bankCardTypeModel = new BankCardTypeModel(origin, replica);
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
@@ -137,6 +156,6 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel);
+        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel);
     }
 }

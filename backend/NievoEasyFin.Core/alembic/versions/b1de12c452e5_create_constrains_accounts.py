@@ -42,12 +42,24 @@ def upgrade() -> None:
                 ALTER TABLE accounts.bank_card
                 ADD CONSTRAINT fk_bank_card_card_type FOREIGN KEY (card_type) REFERENCES accounts.bank_card_type(id);
             END IF;
+
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_user_bank_card_bank') THEN
+                ALTER TABLE accounts.user_bank_card
+                ADD CONSTRAINT fk_user_bank_card_bank FOREIGN KEY (bank_id) REFERENCES accounts.bank(id);
+            END IF;
+
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_user_bank_card_card') THEN
+                ALTER TABLE accounts.user_bank_card
+                ADD CONSTRAINT fk_user_bank_card_card FOREIGN KEY (card_id) REFERENCES accounts.bank_card(id);
+            END IF;
+            
         END $$;
 
         GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA accounts TO app_core_service_efn;
 
         CREATE UNIQUE INDEX IF NOT EXISTS idx_unic_user_bank ON accounts.user_bank (user_id,bank_id);
 
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_unic_user_bank_card ON accounts.user_bank_card (user_id,card_id);
     """)
     pass
 
@@ -76,6 +88,17 @@ def downgrade() -> None:
                ALTER TABLE accounts.bank_card
                DROP CONSTRAINT fk_bank_card_card_type;
             END IF;
+
+            IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_user_bank_card_card') THEN
+                ALTER TABLE accounts.user_bank_card
+                DROP CONSTRAINT fk_user_bank_card_card;
+            END IF;
+
+            IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_user_bank_card_bank') THEN
+                ALTER TABLE accounts.user_bank_card
+                DROP CONSTRAINT fk_user_bank_card_bank;
+            END IF;
+
         END $$;
 
         REVOKE SELECT, USAGE ON ALL SEQUENCES IN SCHEMA accounts FROM app_core_service_efn;

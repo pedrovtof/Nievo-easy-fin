@@ -52,11 +52,21 @@ def upgrade() -> None:
         CREATE TABLE IF NOT EXISTS "accounts"."bank_card" (
             "id" SERIAL PRIMARY KEY,
             "bank_id" INTEGER,
-            "user_id" INTEGER,
             "name" VARCHAR(150),
             "card_type" INTEGER,
-            "expire_at" TIMESTAMP without time zone,
             "active" boolean DEFAULT true NOT NULL,
+            "created_at" TIMESTAMP without time zone DEFAULT now() NOT NULL,
+            "updated_at" TIMESTAMP without time zone
+        );
+
+        CREATE TABLE IF NOT EXISTS "accounts"."user_bank_card" (
+            "id" SERIAL PRIMARY KEY,
+            "bank_id" INTEGER,
+            "name" VARCHAR(150),
+            "card_id" INTEGER,
+            "active" boolean DEFAULT true NOT NULL,
+            "user_id" INTEGER,
+            "expired_at" TIMESTAMP without time zone,
             "created_at" TIMESTAMP without time zone DEFAULT now() NOT NULL,
             "updated_at" TIMESTAMP without time zone
         );
@@ -83,6 +93,8 @@ def upgrade() -> None:
         GRANT SELECT,INSERT,UPDATE ON TABLE accounts."bank_type" TO app_core_service_efn;
 
         GRANT SELECT,INSERT,UPDATE ON TABLE accounts."bank_card_type" TO app_core_service_efn;
+
+        GRANT SELECT,INSERT,UPDATE ON TABLE accounts."user_bank_card" TO app_core_service_efn;
     """)
     pass
 
@@ -99,5 +111,7 @@ def downgrade() -> None:
         DROP TABLE IF EXISTS "accounts"."bank_type" CASCADE;
 
         DROP TABLE IF EXISTS "accounts"."bank_card_type" CASCADE;
+
+        DROP TABLE IF EXISTS "accounts"."user_bank_card" CASCADE;
     """)
     pass

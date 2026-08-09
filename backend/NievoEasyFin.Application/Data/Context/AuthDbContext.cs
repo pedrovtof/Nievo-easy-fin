@@ -27,7 +27,8 @@ public abstract class EasyFinDbContext : DbContext
     public DbSet<BankEntity> Bank { get; set; }
     public DbSet<BankTypeEntity> BankType { get; set; }
     public DbSet<UserBankEntity> UserBank { get; set; }
-
+    public DbSet<BankCardEntity> BankCard { get; set; }
+    public DbSet<BankCardTypeEntity> BankCardType { get; set; }
 
     protected EasyFinDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {

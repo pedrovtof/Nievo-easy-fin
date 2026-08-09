@@ -34,6 +34,7 @@ namespace NievoEasyFin.Application.Models
 
             query.Append("""
                 select
+                    b.id as BankId,
                     b."name" as Name,
                     b.active as BankActive,
                     b.bank_type as BankType,
@@ -65,6 +66,14 @@ namespace NievoEasyFin.Application.Models
 
             return (banks, records);
         }
+
+        /// <summary>
+        /// Method to search a valid bank by id
+        /// </summary>
+        /// <param name="id">Id</param>
+        /// <returns>BankEntity</returns>
+        public async Task<BankEntity> GetBankByIdAsync(int id)
+            => await _CoreReplicaNodeDatabase.Bank.FirstOrDefaultAsync(x => x.Id == id && x.Active == true);
 
         /// <summary>
         /// Return database entity

@@ -4,11 +4,11 @@ using NievoEasyFin.Application.Interfaces.Request;
 namespace NievoEasyFin.Tests.Build.Request;
 
 /// <summary>
-/// Fluent builder for GetBanksRequest.
+/// Fluent builder for GetCardTypeRequest.
 /// </summary>
-public class GetBanksRequestBuilder : GetBanksRequest
+public class GetCardTypeRequestBuilder : GetCardTypeRequest
 {
-    public GetBanksRequestBuilder()
+    public GetCardTypeRequestBuilder()
     {
         Page = 1;
         PageSize = 10;
