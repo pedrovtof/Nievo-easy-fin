@@ -43,13 +43,12 @@ namespace NievoEasyFin.Application.Models
             sql.Append(@"
                 SELECT 
                     id, 
-                    bank_id, 
                     name, 
-                    card_type, 
+                    description, 
                     active,
                     created_at,
                     updated_at
-                FROM accounts.bank_card
+                FROM accounts.bank_card_type
                 WHERE active = true;
             ");
 
