@@ -10,5 +10,7 @@ public class GetBanksRequestBuilder : GetBanksRequest
 {
     public GetBanksRequestBuilder()
     {
+        Page = 1;
+        PageSize = 10;
     }
 }
