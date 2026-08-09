@@ -252,7 +252,7 @@ namespace NievoEasyFin.Application.Services.Base
 
             var cardTypeView = cardTypes.Select(x => new BankCardTypeView(x)).ToList();
 
-            ResponsePaginationBase<BankCardTypeView> response = new(
+            GetCardTypeResponse response = new(
                 request.Page,
                 request.PageSize,
                 itemsCount,
