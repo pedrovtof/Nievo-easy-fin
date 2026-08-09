@@ -529,8 +529,14 @@ public enum EnumErrosApi
 
     #region GetUserBanksRequest
 
+    /// <summary>
+    /// Empty email.
+    /// </summary>
     GETUSERBANKSASYNC_CORESERVICE_400_EMPTY_EMAIL,
 
+    /// <summary>
+    /// Invalid email.
+    /// </summary>
     GETUSERBANKSASYNC_CORESERVICE_400_INVALID_EMAIL,
 
     /// <summary>
@@ -538,6 +544,79 @@ public enum EnumErrosApi
     /// </summary>
     [Description("It was not possible to find a user with your configuration.")]
     GETUSERBANKSASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    #endregion
+
+    #region PostBankCardRequest
+
+    /// <summary>
+    /// Empty name.
+    /// </summary>
+    POSTBANKCARDASYNC_CORESERVICE_400_EMPTY_NAME,
+
+    /// <summary>
+    /// The name must be between 2 and 100 letters.
+    /// </summary>
+    [Description("The name must be between 2 and 100 letters")]
+    POSTBANKCARDASYNC_CORESERVICE_400_INVALID_NAME,
+
+    /// <summary>
+    /// Empty bank id.
+    /// </summary>
+    POSTBANKCARDASYNC_CORESERVICE_400_EMPTY_BANK_ID,
+
+    /// <summary>
+    /// Invalid bank id.
+    /// </summary>
+    POSTBANKCARDASYNC_CORESERVICE_400_INVALID_BANK_ID,
+
+    /// <summary>
+    /// There isn't any bank with that id, try again with another one.
+    /// </summary>
+    [Description("There isn't any bank with that id, try again with another one.")]
+    POSTBANKCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND,
+
+    /// <summary>
+    /// Empty card type.
+    /// </summary>
+    POSTBANKCARDASYNC_CORESERVICE_400_EMPTY_CARD_TYPE,
+
+    /// <summary>
+    /// Invalid card type.
+    /// </summary>
+    POSTBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE,
+
+    /// <summary>
+    /// There isn't any Card type with that id, try again with another one.
+    /// </summary>
+    [Description("There isn't any card type with that id, try again with another one.")]
+    POSTBANKCARDASYNC_CORESERVICE_404_CARD_TYPE_NOT_FOUND,
+
+    /// <summary>
+    /// The card already exists, you may want to validate if it is active.
+    /// </summary>
+    [Description("The card already exists, you may want to validate if it is active.")]
+    POSTBANKCARDASYNC_CORESERVICE_400_CARD_ALREADY_EXISTS,
+
+    /// <summary>
+    /// Card created with sucess.
+    /// </summary>
+    [Description("Card created with sucess.")]
+    POSTBANKCARDASYNC_CORESERVICE_200_CARD_CREATED,
+
+    #endregion
+
+    #region GetCardTypeRequest
+
+    /// <summary>
+    /// Invalid page
+    /// </summary>
+    GETCARDTYPEASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// Invalid pageSize
+    /// </summary>
+    GETCARDTYPEASYNC_CORESERVICE_400_INVALID_PAGE_SIZE
 
     #endregion
 }

@@ -97,6 +97,8 @@ public class Startup
         services.AddScoped<BankModel>();
         services.AddScoped<BankTypeModel>();
         services.AddScoped<UserBankModel>();
+        services.AddScoped<BankCardModel>();
+        services.AddScoped<BankCardTypeModel>();
 
         // Service 
         services.AddScoped<IAccountsService, AccountsService>();
@@ -138,9 +140,9 @@ public class Startup
             };
 
             c.AddSecurityDefinition("Bearer", bearerScheme);
-            c.AddSecurityRequirement(document => new Microsoft.OpenApi.OpenApiSecurityRequirement
+            c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                [new Microsoft.OpenApi.OpenApiSecuritySchemeReference("Bearer", document)] = []
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
             });
         });
         Console.WriteLine("Configured Swagger with xml paths and endpoints");
