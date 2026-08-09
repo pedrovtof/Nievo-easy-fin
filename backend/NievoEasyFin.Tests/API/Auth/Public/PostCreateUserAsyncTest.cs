@@ -32,28 +32,29 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
         request.Password = "Strong@123";
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var code = Environment.GetEnvironmentVariable("CODE_SINGUP_TERMS") ?? "SINGUP_TERMS_V1";
+        var connection = authOrigin.Database.GetDbConnection();
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = $"INSERT INTO journey.accept_terms (code, name, version, active, created_at, updated_at) VALUES ('{code}', 'Terms of Service', 1, 1, datetime('now'), datetime('now'));";
+            cmd.ExecuteNonQuery();
+        }
+
         var smtpMock = new SmtpModelMock();
         var service = CreateService(authOrigin, authReplica, smtpMock);
 
         // Act
-        IActionResult result;
-        try
-        {
-            result = await service.PostCreateUserAsync(request);
-            Output.WriteLine("Execution of PostCreateUserAsync succeeded");
-        }
-        catch (System.Net.Sockets.SocketException)
-        {
-            Output.WriteLine("Caught SocketException (SMTP unavailable, expected in some environments)");
-            return;
-        }
-        catch (Exception ex) when (ex.Message.Contains("Connection refused"))
-        {
-            Output.WriteLine("Caught Connection Refused (expected in some environments)");
-            return;
-        }
+        var result = await service.PostCreateUserAsync(request);
+        Output.WriteLine("Execution of PostCreateUserAsync succeeded");
 
         // Assert
+        if (result is BadRequestObjectResult badReq)
+        {
+            var err = (ResponseApiError)badReq.Value!;
+            throw new Exception($"Create User failed with: {string.Join(", ", err.Messages)}");
+        }
+
         result.Should().BeOfType<ObjectResult>();
         var objectResult = (ObjectResult)result;
         objectResult.StatusCode.Should().Be(201);
@@ -63,6 +64,9 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
         userInDb.Should().NotBeNull();
         userInDb!.Name.Should().Be(request.Name);
         userInDb.StatusId.Should().Be((int)EnumUserStatus.INVALID);
+
+        smtpMock.WasSingUpUserTokenMailCalled.Should().BeTrue();
+        smtpMock.LastEmailSentTo.Should().Be(request.Email);
         
         Output.WriteLine("User successfully verified in database");
     }

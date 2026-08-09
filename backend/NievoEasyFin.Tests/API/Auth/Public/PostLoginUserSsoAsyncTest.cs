@@ -31,7 +31,10 @@ public class PostLoginUserSsoAsyncTest : AuthenticatorServiceTestBase
         Output.WriteLine("Arranging user SSO test.");
         var (origin, replica) = DbContextMockFactory.CreateSharedAuthContexts();
 
-        var provider = new SsoProviderEntity { Id = 1, Name = "google", Active = true };
+        var provider = SsoProviderEntityFaker.Create().Generate();
+        provider.Id = 1;
+        provider.Name = "google";
+        provider.Active = true;
         origin.SsoProvider.Add(provider);
         await origin.SaveChangesAsync();
 
@@ -40,7 +43,10 @@ public class PostLoginUserSsoAsyncTest : AuthenticatorServiceTestBase
         await origin.SaveChangesAsync();
 
         var subId = "google-sub-123";
-        var userSso = new UserProviderSsoEntity { SsoProviderId = provider.Id, UserId = user.Id, Sub = subId };
+        var userSso = UserProviderSsoEntityFaker.Create().Generate();
+        userSso.SsoProviderId = provider.Id;
+        userSso.UserId = user.Id;
+        userSso.Sub = subId;
         origin.UserProvider.Add(userSso);
         await origin.SaveChangesAsync();
 

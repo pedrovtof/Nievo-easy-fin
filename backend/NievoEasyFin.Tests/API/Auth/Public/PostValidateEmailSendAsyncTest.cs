@@ -147,27 +147,14 @@ public class PostValidateEmailSendAsyncTest : AuthenticatorServiceTestBase
               .ReturnsAsync(true);
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
-        var service = CreateService(origin, replica, cacheService);
+        var smtpMock = new SmtpModelMock();
+        var service = CreateService(origin, replica, cacheService, smtpMock);
 
         var request = new PostValidateEmailSendRequest { Email = user.Email! };
 
         // Act
         Output.WriteLine("Executing PostValidateEmailSendAsync.");
-        IActionResult result;
-        try
-        {
-            result = await service.PostValidateEmailSendAsync(request);
-        }
-        catch (System.Net.Sockets.SocketException)
-        {
-            Output.WriteLine("Caught SocketException (expected for missing SMTP). Returning early.");
-            return;
-        }
-        catch (Exception ex) when (ex.Message.Contains("Connection refused"))
-        {
-            Output.WriteLine("Caught connection refused exception. Returning early.");
-            return;
-        }
+        var result = await service.PostValidateEmailSendAsync(request);
 
         // Assert
         Output.WriteLine("Validating result.");
@@ -180,6 +167,9 @@ public class PostValidateEmailSendAsyncTest : AuthenticatorServiceTestBase
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
+        
+        smtpMock.WasSingUpUserTokenMailCalled.Should().BeTrue();
+        smtpMock.LastEmailSentTo.Should().Be(user.Email);
     }
     #endregion
 }

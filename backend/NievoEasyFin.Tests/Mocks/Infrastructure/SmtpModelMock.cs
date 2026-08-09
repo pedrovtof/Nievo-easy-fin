@@ -13,7 +13,7 @@ public class SmtpModelMock : SmtpModel
     public bool WasSingUpUserTokenMailCalled { get; private set; }
     public string? LastEmailSentTo { get; private set; }
 
-    public new Task<bool> ResetTokenMailAsync(string email, int token)
+    public override Task<bool> ResetTokenMailAsync(string email, int token)
     {
         WasResetTokenMailCalled = true;
         LastEmailSentTo = email;
@@ -23,14 +23,14 @@ public class SmtpModelMock : SmtpModel
     /// <summary>
     /// Shadows SmtpModel.SingUpUserTokenMailAsync to avoid real SMTP calls in tests.
     /// </summary>
-    public new Task<bool> SingUpUserTokenMailAsync(string email, int token)
+    public override Task<bool> SingUpUserTokenMailAsync(string email, int token)
     {
         WasSingUpUserTokenMailCalled = true;
         LastEmailSentTo = email;
         return Task.FromResult(true);
     }
 
-    public new Task<bool> TestSendEmailAsync(string email)
+    public override Task<bool> TestSendEmailAsync(string email)
     {
         return Task.FromResult(true);
     }

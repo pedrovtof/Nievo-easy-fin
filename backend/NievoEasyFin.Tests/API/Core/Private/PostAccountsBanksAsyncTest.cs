@@ -111,7 +111,12 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
         // Seed bank type
-        var existingBankType = new BankTypeEntity { Id = request.BankType, Name = "Conta Corrente", Description = "Conta Corrente", Active = true, CreatedAt = DateTime.UtcNow };
+        var existingBankType = BankTypeEntityFaker.Create().Generate();
+        existingBankType.Id = request.BankType;
+        existingBankType.Name = "Conta Corrente";
+        existingBankType.Description = "Conta Corrente";
+        existingBankType.Active = true;
+        existingBankType.CreatedAt = DateTime.UtcNow;
         origin.BankType.Add(existingBankType);
         await origin.SaveChangesAsync();
 

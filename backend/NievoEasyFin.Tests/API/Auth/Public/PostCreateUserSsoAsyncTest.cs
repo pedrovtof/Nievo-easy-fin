@@ -41,7 +41,10 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
-        var provider = new SsoProviderEntity { Id = 1, Name = "google", Active = true };
+        var provider = SsoProviderEntityFaker.Create().Generate();
+        provider.Id = 1;
+        provider.Name = "google";
+        provider.Active = true;
         authOrigin.SsoProvider.Add(provider);
 
         var user = UserEntityFaker.Create().Generate();
@@ -49,7 +52,10 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
         await authOrigin.SaveChangesAsync();
 
         var subId = "google-sub-123";
-        var userSso = new UserProviderSsoEntity { SsoProviderId = provider.Id, UserId = user.Id, Sub = subId };
+        var userSso = UserProviderSsoEntityFaker.Create().Generate();
+        userSso.SsoProviderId = provider.Id;
+        userSso.UserId = user.Id;
+        userSso.Sub = subId;
         authOrigin.UserProvider.Add(userSso);
         await authOrigin.SaveChangesAsync();
 
@@ -92,7 +98,10 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
-        var provider = new SsoProviderEntity { Id = 1, Name = "google", Active = true };
+        var provider = SsoProviderEntityFaker.Create().Generate();
+        provider.Id = 1;
+        provider.Name = "google";
+        provider.Active = true;
         authOrigin.SsoProvider.Add(provider);
         await authOrigin.SaveChangesAsync();
 

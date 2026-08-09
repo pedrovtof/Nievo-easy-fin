@@ -12,7 +12,7 @@ namespace NievoEasyFin.Application.Models
         /// <param name="email"></param>
         /// <param name="token"></param>
         /// <returns>true</returns>
-        public async Task<bool> ResetTokenMailAsync(string email, int token)
+        public virtual async Task<bool> ResetTokenMailAsync(string email, int token)
         {
             string? fileWithBody = null;
 
@@ -49,7 +49,7 @@ namespace NievoEasyFin.Application.Models
         /// <param name="email"></param>
         /// <param name="token"></param>
         /// <returns>true</returns>
-        public async Task<bool> SingUpUserTokenMailAsync(string email, int token)
+        public virtual async Task<bool> SingUpUserTokenMailAsync(string email, int token)
         {
             string? fileWithBody = null;
 
@@ -85,7 +85,7 @@ namespace NievoEasyFin.Application.Models
         /// </summary>
         /// <param name="email">email to send test</param>
         /// <returns>true</returns>
-        public async Task<bool> TestSendEmailAsync(string email)
+        public virtual async Task<bool> TestSendEmailAsync(string email)
         {
             string fileWithBody = "<span>teste</span>";
             var mail = await SendMailFromToAsync(

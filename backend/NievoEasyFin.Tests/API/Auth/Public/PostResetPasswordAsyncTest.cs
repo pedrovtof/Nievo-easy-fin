@@ -51,21 +51,7 @@ public class PostResetPasswordAsyncTest : AuthenticatorServiceTestBase
 
         // Act
         Output.WriteLine("Executing PostResetPasswordAsync.");
-        IActionResult result;
-        try
-        {
-            result = await service.PostResetPasswordAsync(request);
-        }
-        catch (System.Net.Sockets.SocketException)
-        {
-            Output.WriteLine("Caught SocketException (expected for missing SMTP). Returning early.");
-            return;
-        }
-        catch (Exception ex) when (ex.Message.Contains("Connection refused"))
-        {
-            Output.WriteLine("Caught connection refused exception. Returning early.");
-            return;
-        }
+        var result = await service.PostResetPasswordAsync(request);
 
         // Assert
         Output.WriteLine("Validating result.");
@@ -78,6 +64,9 @@ public class PostResetPasswordAsyncTest : AuthenticatorServiceTestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = (ObjectResult)result;
         objectResult.StatusCode.Should().Be(201);
+        
+        smtpMock.WasResetTokenMailCalled.Should().BeTrue();
+        smtpMock.LastEmailSentTo.Should().Be(user.Email);
     }
     #endregion
 }
