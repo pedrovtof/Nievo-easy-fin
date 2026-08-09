@@ -14,11 +14,18 @@ namespace NievoEasyFin.Application.Interfaces.Response
         /// <param name="view">BanksViews</param>
         public GetBanksResponse(BanksViews view)
         {
+            BankId = view.BankId;
             Name = view.Name;
             BankType = view.BankType;
             BankTypeName = view.BankTypeName;
             Description = view.Description;
         }
+
+        /// <summary>
+        /// Bank id
+        /// </summary>
+        [JsonPropertyName("bank_id")]
+        public int BankId { get; set; }
 
         /// <summary>
         /// Name

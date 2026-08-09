@@ -19,6 +19,11 @@ public class BanksViews
     public int Records { get; set; }
 
     /// <summary>
+    /// Bank Id
+    /// </summary>
+    public int BankId { get; set; }
+
+    /// <summary>
     /// Name
     /// </summary>
     [JsonPropertyName("name")]

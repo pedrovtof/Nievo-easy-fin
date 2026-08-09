@@ -34,6 +34,7 @@ namespace NievoEasyFin.Application.Models
 
             query.Append("""
                 select
+                    b.id as BankId,
                     b."name" as Name,
                     b.active as BankActive,
                     b.bank_type as BankType,
