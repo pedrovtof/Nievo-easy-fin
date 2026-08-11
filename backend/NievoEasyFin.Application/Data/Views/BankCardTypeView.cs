@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using NievoEasyFin.Application.Data.Entities;
 
@@ -21,37 +22,29 @@ public class BankCardTypeView
         Name = entity.Name;
         Description = entity.Description;
         Active = entity.Active;
-        CreatedAt = entity.CreatedAt;
-        UpdatedAt = entity.UpdatedAt;
     }
 
     /// <summary>
     /// Id
     /// </summary>
+    [JsonPropertyName("id")]
     public int Id { get; set; }
 
     /// <summary>
     /// Name
     /// </summary>
+    [JsonPropertyName("name")]
     public string Name { get; set; }
 
     /// <summary>
     /// Description
     /// </summary>
+    [JsonPropertyName("description")]
     public string Description { get; set; }
 
     /// <summary>
     /// Active
     /// </summary>
+    [JsonPropertyName("active")]
     public bool Active { get; set; }
-
-    /// <summary>
-    /// Created at
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
-
-    /// <summary>
-    /// Updated at
-    /// </summary>
-    public DateTime UpdatedAt { get; set; }
 }

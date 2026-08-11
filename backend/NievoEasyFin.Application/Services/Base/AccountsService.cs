@@ -298,5 +298,16 @@ namespace NievoEasyFin.Application.Services.Base
                 EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_200_CARD_CREATED.GetDescription()
             ));
         }
+
+        public async Task<IActionResult> GetBankCard(GetBankCardRequest request)
+        {
+            var validatorResult = await new GetBankCardValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            return Ok(new ResponseApiSucess(null));
+        }
     }
 }
