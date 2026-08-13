@@ -73,9 +73,9 @@ public class GetCardTypeAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         var response = (ResponseApiSucess)okResult.Value!;
-        
-        response.Data.Should().BeOfType<List<GetCardTypeResponse>>();
-        ((List<GetCardTypeResponse>)response.Data).Should().BeEmpty();
+        response.Data.Should().BeAssignableTo<NievoEasyFin.Application.Interfaces.Response.ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardTypeView>>();
+        var data = (NievoEasyFin.Application.Interfaces.Response.ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardTypeView>)response.Data;
+        data.Items.Should().BeEmpty();
     }
 
     [Fact(DisplayName = "GetCardType With Valid Request Returns Ok With Data")]
