@@ -69,4 +69,19 @@ public class AccountsController : Controller
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetCardType([FromQuery] GetCardTypeRequest request)
         => await _accountsService.GetCardType(request);
+
+    /// <summary>
+    /// Get bank cards
+    /// </summary>
+    [HttpGet("bank-cards")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetBankCard([FromHeader] string authorization, [FromQuery] GetBankCardRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.GetBankCard(request);
+    }
 }

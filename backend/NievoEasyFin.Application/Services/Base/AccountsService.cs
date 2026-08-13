@@ -246,7 +246,12 @@ namespace NievoEasyFin.Application.Services.Base
             if (!cardTypes.Any())
             {
                 return Ok(
-                    new ResponseApiSucess(new List<GetCardTypeResponse>())
+                    new ResponseApiSucess(new ResponsePaginationBase<BankCardTypeView>(
+                        request.Page,
+                        request.PageSize,
+                        0,
+                        new()
+                    ))
                 );
             }
 
@@ -297,6 +302,41 @@ namespace NievoEasyFin.Application.Services.Base
             return Ok(new ResponseApiSucess(
                 EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_200_CARD_CREATED.GetDescription()
             ));
+        }
+
+        /// <summary>
+        /// Search for bank cards
+        /// </summary>
+        /// <param name="request">GetBankCardRequest</param>
+        public async Task<IActionResult> GetBankCard(GetBankCardRequest request)
+        {
+            var validatorResult = await new GetBankCardValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var (items, itemsCount) = await _bankCardModel.GetBankCardsAsync(request.Page, request.PageSize, request.BankId, request.CardType);
+            if (!items.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new ResponsePaginationBase<BankCardView>(
+                        request.Page,
+                        request.PageSize,
+                        0,
+                        new()
+                    ))
+                );
+            }
+
+            GetBankCardResponse response = new(
+                request.Page,
+                request.PageSize,
+                itemsCount,
+                items
+            );
+
+            return Ok(new ResponseApiSucess(response));
         }
     }
 }

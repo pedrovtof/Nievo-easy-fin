@@ -616,7 +616,41 @@ public enum EnumErrosApi
     /// <summary>
     /// Invalid pageSize
     /// </summary>
-    GETCARDTYPEASYNC_CORESERVICE_400_INVALID_PAGE_SIZE
+    GETCARDTYPEASYNC_CORESERVICE_400_INVALID_PAGE_SIZE,
+
+    #endregion
+
+    #region GetBankCard
+
+    /// <summary>
+    /// Invalid page
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// Invalid pageSize
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_INVALID_PAGE_SIZE,
+
+    /// <summary>
+    /// Empty email
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Invalid bank id
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_INVALID_BANK_ID,
+
+    /// <summary>
+    /// Invalid card type
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE,
 
     #endregion
 }

@@ -45,7 +45,12 @@ namespace NievoEasyFin.Application.Interfaces.Services
         /// Create an bank card
         /// </summary>
         /// <param name="request">PostBankCardRequest</param>
-        /// <returns></returns>
         Task<IActionResult> PostBankCard(PostBankCardRequest request);
+
+        /// <summary>
+        /// Get list of card registred of the bank
+        /// </summary>
+        /// <param name="request">GetBankCardRequest</param>
+        Task<IActionResult> GetBankCard(GetBankCardRequest request);
     }
 }

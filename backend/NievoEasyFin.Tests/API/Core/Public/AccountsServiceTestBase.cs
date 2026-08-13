@@ -158,4 +158,23 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel);
     }
+
+    protected async System.Threading.Tasks.Task SyncCoreToAttachedDatabasesAsync(CoreOrigin context)
+    {
+        var connection = context.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync();
+
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = @"
+                INSERT OR REPLACE INTO accounts.bank SELECT * FROM main.bank;
+                INSERT OR REPLACE INTO accounts.bank_type SELECT * FROM main.bank_type;
+                INSERT OR REPLACE INTO accounts.user_bank SELECT * FROM main.user_bank;
+                INSERT OR REPLACE INTO accounts.bank_card SELECT * FROM main.bank_card;
+                INSERT OR REPLACE INTO accounts.bank_card_type SELECT * FROM main.bank_card_type;
+            ";
+            await cmd.ExecuteNonQueryAsync();
+        }
+    }
 }
