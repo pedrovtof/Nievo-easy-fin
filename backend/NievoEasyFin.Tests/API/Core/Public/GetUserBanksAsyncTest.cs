@@ -6,6 +6,7 @@ using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NSubstitute;
 using Xunit.Abstractions;
+using NievoEasyFin.Tests.Build.Request;
 
 namespace NievoEasyFin.Tests.API.Core.Public;
 
@@ -31,7 +32,8 @@ public class GetUserBanksAsyncTest : AccountsTestBase
         var fakeToken = "fake-token"; // GetClaimValue will return null for this, but that's fine for the controller logic test.
 
         // Act
-        var result = await Controller.GetUserBanks(fakeToken);
+        var request = new GetUserBanksRequestBuilder();
+        var result = await Controller.GetUserBanks(fakeToken, request);
 
         // Assert
         var objectResult = result.Should().BeOfType<OkObjectResult>().Subject;
@@ -63,7 +65,8 @@ public class GetUserBanksAsyncTest : AccountsTestBase
         var fakeToken = "fake-token";
 
         // Act
-        var result = await Controller.GetUserBanks(fakeToken);
+        var request = new GetUserBanksRequestBuilder();
+        var result = await Controller.GetUserBanks(fakeToken, request);
 
         // Assert
         var objectResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
@@ -89,7 +92,8 @@ public class GetUserBanksAsyncTest : AccountsTestBase
         var fakeToken = "fake-token";
 
         // Act
-        await Controller.GetUserBanks(fakeToken);
+        var request = new GetUserBanksRequestBuilder();
+        await Controller.GetUserBanks(fakeToken, request);
 
         // Assert
         await MockService.Received(1).GetUserBanks(Arg.Any<GetUserBanksRequest>());
