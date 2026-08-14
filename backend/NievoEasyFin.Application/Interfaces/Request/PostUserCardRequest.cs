@@ -5,5 +5,8 @@ using System.Threading.Tasks;
 
 namespace NievoEasyFin.Application.Interfaces.Request
 {
-    public class GetUserBanksRequest : ClaimRequestBase { }
+    public class PostUserCardRequest : ClaimRequestBase
+    {
+
+    }
 }

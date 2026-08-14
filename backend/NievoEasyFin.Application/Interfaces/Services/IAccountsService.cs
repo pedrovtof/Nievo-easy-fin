@@ -52,5 +52,15 @@ namespace NievoEasyFin.Application.Interfaces.Services
         /// </summary>
         /// <param name="request">GetBankCardRequest</param>
         Task<IActionResult> GetBankCard(GetBankCardRequest request);
+
+        /// <summary>
+        /// Get list of card registred of the user
+        /// </summary>
+        Task<IActionResult> GetUserCard([FromQuery] GetUserCardRequest request);
+
+        /// <summary>
+        /// Create a user card
+        /// </summary>
+        Task<IActionResult> PostUserCard([FromBody] PostUserCardRequest request);
     }
 }

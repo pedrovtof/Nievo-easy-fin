@@ -338,5 +338,18 @@ namespace NievoEasyFin.Application.Services.Base
 
             return Ok(new ResponseApiSucess(response));
         }
+
+        /// <summary>
+        /// Get user card banks
+        /// </summary>
+        public async Task<IActionResult> GetUserCard(GetUserCardRequest request)
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> PostUserCard(PostUserCardRequest request)
+        {
+            return Ok();
+        }
     }
 }
