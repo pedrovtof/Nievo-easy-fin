@@ -342,13 +342,31 @@ namespace NievoEasyFin.Application.Services.Base
         /// <summary>
         /// Get user card banks
         /// </summary>
+        /// <param name="request">GetUserCardRequest</param>
         public async Task<IActionResult> GetUserCard(GetUserCardRequest request)
         {
+            var validatorResult = await new GetUserCardValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
             return Ok();
         }
 
+        /// <summary>
+        /// Get user card banks
+        /// </summary>
+        ///  <param name="request">PostUserCardRequest</param>
         public async Task<IActionResult> PostUserCard(PostUserCardRequest request)
         {
+            var validatorResult = await new PostUserCardValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+
             return Ok();
         }
     }

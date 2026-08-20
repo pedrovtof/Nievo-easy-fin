@@ -653,4 +653,32 @@ public enum EnumErrosApi
     GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE,
 
     #endregion
+
+    #region GetUserCard
+
+    /// <summary>
+    /// Invalid page size
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE_SIZE,
+
+    /// <summary>
+    /// Invalid page
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    #endregion
+
+    #region PostUserCard
+
+    /// <summary>
+    /// Empty email
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    #endregion
 }
