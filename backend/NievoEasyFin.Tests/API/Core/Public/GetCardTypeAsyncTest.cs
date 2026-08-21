@@ -1,16 +1,9 @@
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Extensions.Enum;
-using NievoEasyFin.Application.Interfaces.Enum;
-using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
-using Xunit;
 using Xunit.Abstractions;
-using System.Collections.Generic;
 using NievoEasyFin.Tests.Build.Request;
 
 namespace NievoEasyFin.Tests.API.Core.Public;
@@ -85,7 +78,7 @@ public class GetCardTypeAsyncTest : AccountsServiceTestBase
         var request = new GetCardTypeRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        
+
         origin.BankCardType.Add(BankCardTypeEntityFaker.Create().Generate());
         origin.BankCardType.Add(BankCardTypeEntityFaker.Create().Generate());
         await origin.SaveChangesAsync();

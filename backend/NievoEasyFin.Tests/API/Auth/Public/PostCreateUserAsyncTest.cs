@@ -1,6 +1,4 @@
 using NievoEasyFin.Tests.Mocks.Helpers;
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +7,6 @@ using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
 using NievoEasyFin.Tests.Mocks.Infrastructure;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -67,7 +64,7 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
 
         smtpMock.WasSingUpUserTokenMailCalled.Should().BeTrue();
         smtpMock.LastEmailSentTo.Should().Be(request.Email);
-        
+
         Output.WriteLine("User successfully verified in database");
     }
 
@@ -101,7 +98,7 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().Contain(e => e.Contains("already exists"));
-        
+
         Output.WriteLine("Validation passed: returned BadRequest for existing email");
     }
 
@@ -131,7 +128,7 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().Contain(e => e.Contains("not valid") || e.Contains("validate it again"));
-        
+
         Output.WriteLine("Validation passed: returned BadRequest for invalid existing email");
     }
 
@@ -142,7 +139,7 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
         Output.WriteLine("Setting up create user request with unaccepted terms");
         var request = new PostCreateUserRequestBuilder();
         request.Password = "Strong@123";
-        request.AcceptTerms = false; 
+        request.AcceptTerms = false;
 
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
         var service = CreateService(authOrigin, authReplica);
@@ -155,7 +152,7 @@ public class PostCreateUserAsyncTest : UsersServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().NotBeEmpty();
-        
+
         Output.WriteLine("Validation passed: terms not accepted returned BadRequest");
     }
 

@@ -355,9 +355,33 @@ namespace NievoEasyFin.Application.Services.Base
                     new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
 
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
 
+            var (items, records) = await _userBankCardModel.GetUserBankCard(request.Page, request.PageSize, request.BankId, user.Id, request.Active);
+            if (!items.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new ResponsePaginationBase<UserBankCardView>(
+                        request.Page,
+                        request.PageSize,
+                        0,
+                        new()
+                    ))
+                );
+            }
 
-            return Ok();
+            GetUserBankCardResponse response = new(
+               request.Page,
+               request.PageSize,
+               records,
+               items
+           );
+
+            return Ok(new ResponseApiSucess(response));
         }
 
         /// <summary>

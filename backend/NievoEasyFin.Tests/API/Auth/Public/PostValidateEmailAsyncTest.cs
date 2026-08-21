@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,17 +8,15 @@ using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
 using NievoEasyFin.Tests.Mocks.Helpers;
-using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using System.Text.Json;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
 public class PostValidateEmailAsyncTest : AuthenticatorServiceTestBase
 {
-    public PostValidateEmailAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+    public PostValidateEmailAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
     }
@@ -86,7 +82,7 @@ public class PostValidateEmailAsyncTest : AuthenticatorServiceTestBase
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
-              .ReturnsAsync(RedisValue.Null); 
+              .ReturnsAsync(RedisValue.Null);
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
         var service = CreateService(origin, replica, cacheService);
@@ -126,7 +122,7 @@ public class PostValidateEmailAsyncTest : AuthenticatorServiceTestBase
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
         var service = CreateService(origin, replica, cacheService);
 
-        var request = new PostValidateEmailRequest { Email = user.Email!, PinToken = 999999 }; 
+        var request = new PostValidateEmailRequest { Email = user.Email!, PinToken = 999999 };
 
         // Act
         Output.WriteLine("Executing PostValidateEmailAsync.");

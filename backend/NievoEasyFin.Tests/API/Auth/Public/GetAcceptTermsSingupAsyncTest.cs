@@ -1,6 +1,4 @@
 using NievoEasyFin.Tests.Mocks.Helpers;
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,15 +7,13 @@ using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
-using NievoEasyFin.Tests.Mocks.Infrastructure;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
 public class GetAcceptTermsSingupAsyncTest : AuthenticatorServiceTestBase
 {
-    public GetAcceptTermsSingupAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+    public GetAcceptTermsSingupAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
     }

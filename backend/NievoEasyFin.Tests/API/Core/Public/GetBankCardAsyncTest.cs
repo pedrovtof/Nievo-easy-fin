@@ -1,10 +1,8 @@
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -151,7 +149,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         var response = (ResponseApiSucess)okResult.Value!;
-        
+
         response.Data.Should().BeAssignableTo<ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardView>>();
         var data = (ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardView>)response.Data;
         data.Items.Should().BeEmpty();
@@ -164,7 +162,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        
+
         var bank = BankEntityFaker.Create().Generate();
         var cardType = BankCardTypeEntityFaker.Create().Generate();
 
@@ -175,7 +173,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var card2 = BankCardEntityFaker.Create().Generate();
         card2.BankId = bank.Id;
         card2.CardType = cardType.Id;
-        
+
         origin.BankCardType.Add(cardType);
         origin.Bank.Add(bank);
         origin.BankCard.Add(card1);
@@ -194,7 +192,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
         var response = (ResponseApiSucess)okResult.Value!;
-        
+
         response.Data.Should().BeAssignableTo<ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardView>>();
         var data = (ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardView>)response.Data;
         data.Items.Should().NotBeEmpty();
@@ -206,7 +204,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         // Arrange
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        
+
         var bank = BankEntityFaker.Create().Generate();
         var cardType = BankCardTypeEntityFaker.Create().Generate();
 
@@ -215,17 +213,17 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         card1.CardType = cardType.Id;
 
         var card2 = BankCardEntityFaker.Create().Generate(); // Not matching filters
-        
+
         origin.BankCardType.Add(cardType);
         origin.Bank.Add(bank);
         origin.BankCard.Add(card1);
         origin.BankCard.Add(card2);
-        
+
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var request = new GetBankCardRequestBuilder 
-        { 
+        var request = new GetBankCardRequestBuilder
+        {
             BankId = bank.Id,
             CardType = cardType.Id
         };
@@ -239,7 +237,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
         var response = (ResponseApiSucess)okResult.Value!;
-        
+
         response.Data.Should().BeAssignableTo<ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardView>>();
         var data = (ResponsePaginationBase<NievoEasyFin.Application.Data.Views.BankCardView>)response.Data;
         data.Items.Should().NotBeEmpty();

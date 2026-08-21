@@ -1,18 +1,13 @@
 using NievoEasyFin.Tests.Mocks.Helpers;
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
-using NievoEasyFin.Tests.Mocks.Infrastructure;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
@@ -78,7 +73,7 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
-        
+
         Output.WriteLine("Validation passed: returned Ok for existing SSO user");
     }
 
@@ -149,7 +144,7 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
 
         var ssoLink = await authReplica.UserProvider.FirstOrDefaultAsync(ups => ups.Sub == subId && ups.UserId == userInDb.Id);
         ssoLink.Should().NotBeNull();
-        
+
         Output.WriteLine("Validation passed: returned Created for new SSO user");
     }
 
@@ -182,7 +177,7 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().Contain(e => e.Contains("unknown") || e.Contains("not configured") || e.Contains("não configurado"));
-        
+
         Output.WriteLine("Validation passed: returned BadRequest for unknown provider");
     }
 
@@ -211,7 +206,7 @@ public class PostCreateUserSsoAsyncTest : UsersServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().NotBeEmpty();
-        
+
         Output.WriteLine("Validation passed: returned BadRequest when terms not accepted");
     }
 

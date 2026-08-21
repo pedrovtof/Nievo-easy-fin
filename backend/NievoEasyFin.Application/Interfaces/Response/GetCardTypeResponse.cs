@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Views;
 
 namespace NievoEasyFin.Application.Interfaces.Response

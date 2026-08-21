@@ -1,4 +1,3 @@
-using System.Data;
 using FluentValidation;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;

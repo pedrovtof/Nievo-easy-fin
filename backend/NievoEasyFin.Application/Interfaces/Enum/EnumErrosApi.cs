@@ -666,6 +666,17 @@ public enum EnumErrosApi
     /// </summary>
     GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE,
 
+    /// <summary>
+    /// Invalid page size
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    GETUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
     #endregion
 
     #region PostUserCard

@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +6,8 @@ using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
 using NievoEasyFin.Tests.Mocks.Helpers;
-using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using System.Text.Json;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -19,7 +15,7 @@ namespace NievoEasyFin.Tests.API.Auth.Public;
 
 public class PatchResetPasswordAsyncTest : AuthenticatorServiceTestBase
 {
-    public PatchResetPasswordAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+    public PatchResetPasswordAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
     }

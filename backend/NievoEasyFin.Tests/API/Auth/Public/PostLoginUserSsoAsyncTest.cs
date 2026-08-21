@@ -1,16 +1,11 @@
 using NievoEasyFin.Tests.Mocks.Helpers;
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
-using NievoEasyFin.Tests.Mocks.Infrastructure;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -18,7 +13,7 @@ namespace NievoEasyFin.Tests.API.Auth.Public;
 
 public class PostLoginUserSsoAsyncTest : AuthenticatorServiceTestBase
 {
-    public PostLoginUserSsoAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+    public PostLoginUserSsoAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
     }

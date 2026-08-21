@@ -16,6 +16,11 @@ namespace NievoEasyFin.Application.Interfaces.Services
             RuleFor(x => x.PageSize)
                 .Must(x => x > 0 && x < 101)
                 .WithErrorCode(EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE_SIZE.ToString());
+
+            RuleFor(x => x.BankId)
+                .Must(x => x > 0)
+                .GreaterThan(0)
+                    .WithErrorCode(EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID.ToString());
         }
     }
 }

@@ -1,24 +1,13 @@
-using System;
-using System.IO;
 using Moq;
-using NievoEasyFin.Application.Data.Entities;
-using NievoEasyFin.Application.Interfaces.Enum;
-using NievoEasyFin.Application.Interfaces.Request;
-using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base.Users;
 using NievoEasyFin.Application.Services.Security;
 using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Data.Context.Database;
-using NievoEasyFin.Tests.Mocks.Database;
-using NievoEasyFin.Tests.Mocks.Fakers;
 using NievoEasyFin.Tests.Mocks.Helpers;
 using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using WireMock.Server;
-using WireMock.RequestBuilders;
-using WireMock.ResponseBuilders;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
