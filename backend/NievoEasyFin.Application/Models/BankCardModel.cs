@@ -32,6 +32,14 @@ namespace NievoEasyFin.Application.Models
         public async Task<BankCardEntity> GetBankCardByBankIdAndCardTypeAndNameAsync(int bankId, int cardTypeId, string name)
             => await _CoreReplicaNodeDatabase.BankCard.FirstOrDefaultAsync(x => x.BankId == bankId && x.CardType == cardTypeId && x.Name == name);
 
+        /// <summary>
+        /// Search for bankCard using BankID and CardID
+        /// </summary>
+        /// <param name="bankId">int</param>
+        /// <param name="CardId">int</param>
+        /// <returns>BankCardEntity</returns>
+        public async Task<BankCardEntity> GetBankCardByBankIdAndCardId(int bankId, int CardId)
+            => await _CoreReplicaNodeDatabase.BankCard.FirstOrDefaultAsync(x => x.BankId == bankId && x.Id == CardId && x.Active == true);
 
         /// <summary>
         /// 

@@ -1,16 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
-using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -142,7 +137,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         existingCard.CardType = 1;
         existingCard.Name = "Black Card";
         origin.BankCard.Add(existingCard);
-        
+
         await origin.SaveChangesAsync();
 
         var service = CreateService(origin, replica, authOrigin, authReplica);

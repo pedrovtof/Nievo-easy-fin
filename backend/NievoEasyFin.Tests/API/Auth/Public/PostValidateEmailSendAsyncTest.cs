@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -12,14 +10,13 @@ using NievoEasyFin.Tests.Mocks.Helpers;
 using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using System.Text.Json;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
 public class PostValidateEmailSendAsyncTest : AuthenticatorServiceTestBase
 {
-    public PostValidateEmailSendAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+    public PostValidateEmailSendAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
     }
@@ -142,7 +139,7 @@ public class PostValidateEmailSendAsyncTest : AuthenticatorServiceTestBase
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
-              .ReturnsAsync(RedisValue.Null); 
+              .ReturnsAsync(RedisValue.Null);
         dbMock.Setup(d => d.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
               .ReturnsAsync(true);
 
@@ -167,7 +164,7 @@ public class PostValidateEmailSendAsyncTest : AuthenticatorServiceTestBase
         result.Should().BeOfType<OkObjectResult>();
         var okResult = (OkObjectResult)result;
         okResult.Value.Should().BeOfType<ResponseApiSucess>();
-        
+
         smtpMock.WasSingUpUserTokenMailCalled.Should().BeTrue();
         smtpMock.LastEmailSentTo.Should().Be(user.Email);
     }

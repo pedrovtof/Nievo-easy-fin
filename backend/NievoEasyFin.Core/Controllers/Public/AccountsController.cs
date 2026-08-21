@@ -46,14 +46,14 @@ public class AccountsController : Controller
     /// Get user bank accounts.
     /// </summary>
     /// <param name="authorization">Token JWT</param>
+    /// <param name="request">GetUserBanksRequest</param>
     /// <returns>IActionResult</returns>
     [HttpGet("user-banks")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetUserBanks([FromHeader] string authorization)
+    public async Task<IActionResult> GetUserBanks([FromHeader] string authorization, [FromQuery] GetUserBanksRequest request)
     {
-        GetUserBanksRequest request = new();
         request.SetEmail(
             await _jsonWebTokenService.GetClaimValue(authorization, "email")
         );
@@ -73,7 +73,7 @@ public class AccountsController : Controller
     /// <summary>
     /// Get bank cards
     /// </summary>
-    [HttpGet("bank-cards")]
+    [HttpGet("bank-card")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -83,5 +83,35 @@ public class AccountsController : Controller
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
         return await _accountsService.GetBankCard(request);
+    }
+
+    /// <summary>
+    /// Get user card banks
+    /// </summary>
+    [HttpGet("user:bank-card")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetUserCard([FromHeader] string authorization, [FromQuery] GetUserCardRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.GetUserCard(request);
+    }
+
+    /// <summary>
+    /// Create user card banks
+    /// </summary>
+    [HttpPost("user:bank-card")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostUserCard([FromHeader] string authorization, [FromBody] PostUserCardRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.PostUserCard(request);
     }
 }

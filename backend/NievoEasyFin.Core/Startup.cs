@@ -99,6 +99,7 @@ public class Startup
         services.AddScoped<UserBankModel>();
         services.AddScoped<BankCardModel>();
         services.AddScoped<BankCardTypeModel>();
+        services.AddScoped<UserBankCardModel>();
 
         // Service 
         services.AddScoped<IAccountsService, AccountsService>();

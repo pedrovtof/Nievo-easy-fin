@@ -1,15 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -43,7 +39,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().Contain(e => e.Contains("'Name' must not be empty."));
         response.Messages.Should().Contain(e => e.Contains("'Bank Type' must not be empty.") || e.Contains("'Bank Type' must be greater than or equal to '1'."));
-        
+
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -72,7 +68,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().Contain(e => e.Contains(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_BANK_ALREADY_EXISTS.GetDescription()));
-        
+
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -94,7 +90,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
         response.Messages.Should().Contain(e => e.Contains(EnumErrosApi.POSTACCOUNTSBANKS_CORESERVICE_400_BANKTYPE_INVALID.GetDescription()));
-        
+
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -137,7 +133,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         var bankInDb = await replica.Bank.FirstOrDefaultAsync(b => b.Name == request.Name && b.BankType == request.BankType);
         bankInDb.Should().NotBeNull();
         bankInDb!.Active.Should().BeTrue();
-        
+
         Output.WriteLine("Success test executed correctly.");
     }
 

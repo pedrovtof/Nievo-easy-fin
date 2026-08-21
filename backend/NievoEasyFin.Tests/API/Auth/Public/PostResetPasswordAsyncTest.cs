@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -9,7 +7,6 @@ using NievoEasyFin.Tests.Mocks.Fakers;
 using NievoEasyFin.Tests.Mocks.Helpers;
 using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
-using Xunit;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
@@ -17,7 +14,7 @@ namespace NievoEasyFin.Tests.API.Auth.Public;
 
 public class PostResetPasswordAsyncTest : AuthenticatorServiceTestBase
 {
-    public PostResetPasswordAsyncTest(WireMockFixture fixture, ITestOutputHelper output) 
+    public PostResetPasswordAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
     }
@@ -64,7 +61,7 @@ public class PostResetPasswordAsyncTest : AuthenticatorServiceTestBase
         result.Should().BeOfType<ObjectResult>();
         var objectResult = (ObjectResult)result;
         objectResult.StatusCode.Should().Be(201);
-        
+
         smtpMock.WasResetTokenMailCalled.Should().BeTrue();
         smtpMock.LastEmailSentTo.Should().Be(user.Email);
     }

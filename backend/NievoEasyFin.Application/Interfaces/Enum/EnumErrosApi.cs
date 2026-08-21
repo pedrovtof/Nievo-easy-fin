@@ -653,4 +653,93 @@ public enum EnumErrosApi
     GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE,
 
     #endregion
+
+    #region GetUserCard
+
+    /// <summary>
+    /// Invalid page size
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE_SIZE,
+
+    /// <summary>
+    /// Invalid page
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// Invalid page size
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    GETUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    #endregion
+
+    #region PostUserCard
+
+    /// <summary>
+    /// Empty email
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Invalid bank
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_BANK,
+
+    /// <summary>
+    /// Invalid bank card
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_CARD,
+
+    /// <summary>
+    /// Invalid card name
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_CARDNAME,
+
+    /// <summary>
+    /// Invalid expire date
+    /// </summary>
+    POSTUSERCARDASYNC_CORESERVICE_400_INVALID_EXPIREDAT,
+
+    /// <summary>
+    /// Bank not found
+    /// </summary>
+    [Description("There isn't any Bank with that id, try again with another one.")]
+    POSTUSERCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND,
+
+    /// <summary>
+    /// Card not found
+    /// </summary>
+    [Description("There isn't any Card with that id and bank, try again with another one.")]
+    POSTUSERCARDASYNC_CORESERVICE_404_BANKCARD_NOT_FOUND,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    POSTUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// There was an error during the process, try again later.
+    /// </summary>
+    [Description("There was an error during the process, try again later.")]
+    POSTUSERCARDASYNC_CORESERVICE_400_CARD_NOT_CREATED,
+
+    /// <summary>
+    /// Created user card with sucess.
+    /// </summary>
+    [Description("Created user card with sucess.")]
+    POSTUSERCARDASYNC_CORESERVICE_200_CARD_CREATED,
+
+    #endregion
 }
