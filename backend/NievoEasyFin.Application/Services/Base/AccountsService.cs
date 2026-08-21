@@ -32,6 +32,8 @@ namespace NievoEasyFin.Application.Services.Base
 
         private readonly BankCardTypeModel _bankCardTypeModel;
 
+        private readonly UserBankCardModel _userBankCardModel;
+
         public AccountsService(
             BankModel bankModel,
             AuthDbCacheService authDbCacheService,
@@ -39,7 +41,8 @@ namespace NievoEasyFin.Application.Services.Base
             UserModel userModel,
             UserBankModel userBankModel,
             BankCardModel bankCardModel,
-            BankCardTypeModel bankCardTypeModel
+            BankCardTypeModel bankCardTypeModel,
+            UserBankCardModel userBankCardModel
         )
         {
             _bankModel = bankModel;
@@ -49,6 +52,7 @@ namespace NievoEasyFin.Application.Services.Base
             _userBankModel = userBankModel;
             _bankCardModel = bankCardModel;
             _bankCardTypeModel = bankCardTypeModel;
+            _userBankCardModel = userBankCardModel;
         }
 
         /// <summary>
@@ -351,11 +355,13 @@ namespace NievoEasyFin.Application.Services.Base
                     new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
 
+
+
             return Ok();
         }
 
         /// <summary>
-        /// Get user card banks
+        /// Post user card banks
         /// </summary>
         ///  <param name="request">PostUserCardRequest</param>
         public async Task<IActionResult> PostUserCard(PostUserCardRequest request)
@@ -366,8 +372,33 @@ namespace NievoEasyFin.Application.Services.Base
                     new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
 
+            var bank = await _bankModel.GetBankByIdAsync(request.BankId);
+            if (bank == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND.GetDescription() }
+                ));
 
-            return Ok();
+            var card = await _bankCardModel.GetBankCardByBankIdAndCardId(request.BankId, request.CardId);
+            if (card == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_BANKCARD_NOT_FOUND.GetDescription() }
+                ));
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var userCard = await _userBankCardModel.CreateUserBankCard(bank.Id, card.Id, user.Id, request.CardUserName, request.ExpireAt);
+            if (userCard == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_400_CARD_NOT_CREATED.GetDescription() }
+                ));
+
+            return Ok(new ResponseApiSucess(
+                EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_200_CARD_CREATED.GetDescription()
+            ));
         }
     }
 }
