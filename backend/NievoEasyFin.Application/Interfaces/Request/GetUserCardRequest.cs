@@ -8,7 +8,7 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// Bank id
         /// </summary>
         [FromQuery(Name = "bank_id")]
-        public int BankId { get; set; }
+        public int? BankId { get; set; }
 
         /// <summary>
         /// Active

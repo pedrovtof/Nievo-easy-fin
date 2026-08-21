@@ -20,6 +20,15 @@ namespace NievoEasyFin.Application.Models
             _CoreReplicaNodeDatabase = coreReplicaNodeDatabase;
         }
 
+        /// <summary>
+        /// Create a user bank card for the current user
+        /// </summary>
+        /// <param name="bankId">int</param>
+        /// <param name="cardId">int</param>
+        /// <param name="userId">int</param>
+        /// <param name="cardUserName">string</param>
+        /// <param name="expireAt">datetime</param>
+        /// <returns>UserBankCardEntity</returns>
         public async Task<UserBankCardEntity> CreateUserBankCard(int bankId, int cardId, int userId, string cardUserName, DateTime expireAt)
         {
             UserBankCardEntity userBankCard = new()
@@ -40,6 +49,15 @@ namespace NievoEasyFin.Application.Models
             return userBankCard;
         }
 
+        /// <summary>
+        /// Search for a list of user bank card
+        /// </summary>
+        /// <param name="page">int</param>
+        /// <param name="pageSize">int</param>
+        /// <param name="bankId">int</param>
+        /// <param name="userId">int</param>
+        /// <param name="active">bool</param>
+        /// <returns>UserBankCardView</returns>
         public async Task<(List<UserBankCardView>, int)> GetUserBankCard(int page, int pageSize, int? bankId, int userId, bool active)
         {
             List<UserBankCardView> items = new();

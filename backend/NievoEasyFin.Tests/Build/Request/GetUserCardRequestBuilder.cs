@@ -25,7 +25,7 @@ public class GetUserCardRequestBuilder : GetUserCardRequest
         return this;
     }
 
-    public GetUserCardRequestBuilder WithBankId(int bankId)
+    public GetUserCardRequestBuilder WithBankId(int? bankId)
     {
         BankId = bankId;
         return this;

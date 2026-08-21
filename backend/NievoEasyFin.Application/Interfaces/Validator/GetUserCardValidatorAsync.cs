@@ -18,9 +18,24 @@ namespace NievoEasyFin.Application.Interfaces.Services
                 .WithErrorCode(EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE_SIZE.ToString());
 
             RuleFor(x => x.BankId)
-                .Must(x => x > 0)
+                .Must(x => Valid(x))
                 .GreaterThan(0)
                     .WithErrorCode(EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID.ToString());
+        }
+
+        /// <summary>
+        /// Validate the bankId
+        /// </summary>
+        /// <param name="x">int</param>
+        /// <returns>true/false</returns>
+        private bool Valid(int? x)
+        {
+            if (x == null)
+                return true;
+            else if (x > 0)
+                return true;
+            else
+                return false;
         }
     }
 }
