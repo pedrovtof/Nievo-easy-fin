@@ -146,6 +146,7 @@ public abstract class AccountsServiceTestBase : IDisposable
         var userBankModel = new UserBankModel(origin, replica);
         var bankCardModel = new BankCardModel(origin, replica);
         var bankCardTypeModel = new BankCardTypeModel(origin, replica);
+        var userBankCardModel = new UserBankCardModel(origin, replica);
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
@@ -155,7 +156,7 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel);
+        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel, userBankCardModel);
     }
 
     protected async System.Threading.Tasks.Task SyncCoreToAttachedDatabasesAsync(CoreOrigin context)
