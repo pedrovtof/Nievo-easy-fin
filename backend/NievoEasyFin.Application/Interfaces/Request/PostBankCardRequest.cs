@@ -24,5 +24,11 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [JsonPropertyName("card_type")]
         public int CardType { get; set; }
+
+        /// <summary>
+        /// Flag
+        /// </summary>
+        [JsonPropertyName("flag")]
+        public string Flag { get; set; }
     }
 }

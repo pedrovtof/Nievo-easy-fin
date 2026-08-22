@@ -21,6 +21,10 @@ namespace NievoEasyFin.Application.Interfaces.Services
                 .Must(x => Valid(x))
                 .GreaterThan(0)
                     .WithErrorCode(EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID.ToString());
+
+            RuleFor(x => x.Flag)
+                .Must(x => Valid(x))
+                    .WithErrorCode(EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_FLAG.ToString());
         }
 
         /// <summary>
@@ -36,6 +40,21 @@ namespace NievoEasyFin.Application.Interfaces.Services
                 return true;
             else
                 return false;
+        }
+
+        /// <summary>
+        /// Validate the Flag
+        /// </summary>
+        /// <param name="x">string</param>
+        /// <returns>true/false</returns>
+        private bool Valid(string? x)
+        {
+            if (x == null)
+                return true;
+            else if (x.Length <= 0)
+                return false;
+            else
+                return true;
         }
     }
 }

@@ -34,11 +34,12 @@ namespace NievoEasyFin.Application.Models
         /// Bring a list of valid bank card types
         /// </summary>
         /// <returns>List of BankCardTypeEntity</returns>
-        public async Task<(List<BankCardTypeEntity>, int)> GetBankCardTypesAsync()
+        public async Task<(List<BankCardTypeEntity>, int)> GetBankCardTypesAsync(int page, int pageSize)
         {
             List<BankCardTypeEntity> items = new();
 
             StringBuilder sql = new();
+            DynamicParameters param = new();
 
             sql.Append(@"
                 SELECT 
@@ -49,14 +50,23 @@ namespace NievoEasyFin.Application.Models
                     created_at as CreatedAt,
                     updated_at as UpdatedAt
                 FROM accounts.bank_card_type
-                WHERE active = true;
+                WHERE active = true
             ");
+
+            sql.Append(@"
+                limit @limit
+                offset @offset
+            ");
+
+            param.Add("limit", pageSize);
+            param.Add("offset", (page - 1) * pageSize);
 
             var connection = _CoreReplicaNodeDatabase.Database.GetDbConnection();
 
             items.AddRange(
                 await connection.QueryAsync<BankCardTypeEntity>(
-                    sql.ToString()
+                    sql.ToString(),
+                    param
                 )
             );
 

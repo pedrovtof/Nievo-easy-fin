@@ -21,6 +21,11 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                 .Must(x => x.Length > 1 && x.Length <= 100)
                     .WithErrorCode(EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_400_INVALID_NAME.GetDescription());
 
+            RuleFor(x => x.Flag)
+                .NotEmpty()
+                .NotNull()
+                .WithErrorCode(EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_400_INVALID_FLAG.ToString());
+
             RuleFor(x => x.BankId)
                 .NotEmpty()
                     .WithErrorCode(EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_400_EMPTY_BANK_ID.ToString())
@@ -33,6 +38,5 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                 .GreaterThanOrEqualTo(1)
                     .WithErrorCode(EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE.ToString());
         }
-
     }
 }

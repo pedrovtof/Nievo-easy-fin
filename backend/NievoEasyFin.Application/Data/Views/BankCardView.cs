@@ -32,6 +32,12 @@ namespace NievoEasyFin.Application.Data.Views
         public string CardName { get; set; }
 
         /// <summary>
+        /// Card flag
+        /// </summary>
+        [JsonPropertyName("card_flag")]
+        public string Flag { get; set; }
+
+        /// <summary>
         /// Records
         /// </summary>
         [JsonIgnore]

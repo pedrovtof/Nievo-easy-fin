@@ -71,6 +71,16 @@ public class AccountsController : Controller
         => await _accountsService.GetCardType(request);
 
     /// <summary>
+    /// Get card flags
+    /// </summary>
+    [HttpGet("card-flag")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetCardFlag([FromQuery] GetCardFlagRequest request)
+        => await _accountsService.GetCardFlag(request);
+
+    /// <summary>
     /// Get bank cards
     /// </summary>
     [HttpGet("bank-card")]

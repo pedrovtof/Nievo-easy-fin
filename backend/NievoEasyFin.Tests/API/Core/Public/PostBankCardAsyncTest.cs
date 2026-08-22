@@ -167,6 +167,9 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         var existingCardType = BankCardTypeEntityFaker.Create().Generate();
         existingCardType.Id = 1;
         origin.BankCardType.Add(existingCardType);
+        var existingFlag = BankCardFlagEntityFaker.Create().Generate();
+        existingFlag.Name = "Mastercard";
+        origin.BankCardFlag.Add(existingFlag);
         await origin.SaveChangesAsync();
 
         var service = CreateService(origin, replica, authOrigin, authReplica);

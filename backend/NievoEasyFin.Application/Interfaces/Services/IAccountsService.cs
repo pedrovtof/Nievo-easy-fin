@@ -42,6 +42,13 @@ namespace NievoEasyFin.Application.Interfaces.Services
         Task<IActionResult> GetCardType(GetCardTypeRequest request);
 
         /// <summary>
+        /// Get list of card flag
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<IActionResult> GetCardFlag(GetCardFlagRequest request);
+
+        /// <summary>
         /// Create an bank card
         /// </summary>
         /// <param name="request">PostBankCardRequest</param>

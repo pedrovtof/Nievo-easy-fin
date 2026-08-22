@@ -15,5 +15,11 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [FromQuery(Name = "active")]
         public bool Active { get; set; } = true;
+
+        /// <summary>
+        /// Flag
+        /// </summary>
+        [FromQuery(Name = "flag")]
+        public string? Flag { get; set; }
     }
 }

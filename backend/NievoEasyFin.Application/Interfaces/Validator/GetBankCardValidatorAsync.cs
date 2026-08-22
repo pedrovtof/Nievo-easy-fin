@@ -35,6 +35,10 @@ public class GetBankCardValidatorAsync : AbstractValidator<GetBankCardRequest>
         RuleFor(x => x.CardType)
             .Must(x => Valid(x))
                 .WithErrorCode(EnumErrosApi.GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE.ToString());
+
+        RuleFor(x => x.Flag)
+            .Must(x => Valid(x))
+                .WithErrorCode(EnumErrosApi.GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_FLAG.ToString());
     }
 
     /// <summary>
@@ -47,6 +51,21 @@ public class GetBankCardValidatorAsync : AbstractValidator<GetBankCardRequest>
         if (value == null)
             return true;
         else if (value <= 0)
+            return false;
+        else
+            return true;
+    }
+
+    /// <summary>
+    /// Validate the optional param
+    /// </summary>
+    /// <param name="value">string</param>
+    /// <returns>bool</returns>
+    private bool Valid(string? value)
+    {
+        if (value == null)
+            return true;
+        else if (value.Length <= 0)
             return false;
         else
             return true;

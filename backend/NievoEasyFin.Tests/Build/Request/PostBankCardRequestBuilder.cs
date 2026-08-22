@@ -15,5 +15,6 @@ public class PostBankCardRequestBuilder : PostBankCardRequest
         Name = _faker.Commerce.ProductName();
         BankId = _faker.Random.Int(1, 100);
         CardType = _faker.Random.Int(1, 10);
+        Flag = "Mastercard";
     }
 }

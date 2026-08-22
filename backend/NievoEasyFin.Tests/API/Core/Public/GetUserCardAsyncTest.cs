@@ -50,6 +50,7 @@ public class GetUserCardAsyncTest : AccountsTestBase
         new object[] { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE_SIZE, "Page size inválido" },
         new object[] { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_PAGE, "Page inválido" },
         new object[] { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID, "Bank id inválido" },
+        new object[] { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_400_INVALID_FLAG, "Flag inválida" },
         new object[] { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND, "Usuário não encontrado" },
     };
 

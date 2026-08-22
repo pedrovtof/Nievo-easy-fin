@@ -30,6 +30,7 @@ public abstract class EasyFinDbContext : DbContext
     public DbSet<BankCardEntity> BankCard { get; set; }
     public DbSet<BankCardTypeEntity> BankCardType { get; set; }
     public DbSet<UserBankCardEntity> UserBankCard { get; set; }
+    public DbSet<BankCardFlagEntity> BankCardFlag { get; set; }
 
     protected EasyFinDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {

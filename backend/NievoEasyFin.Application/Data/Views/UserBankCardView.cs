@@ -47,6 +47,12 @@ namespace NievoEasyFin.Application.Data.Views
         public string BankCardType { get; set; }
 
         /// <summary>
+        /// Bank card flag
+        /// </summary>
+        [JsonPropertyName("bank_card_flag")]
+        public string BankCardFlag { get; set; }
+
+        /// <summary>
         /// Records
         /// </summary>
         [JsonIgnore]

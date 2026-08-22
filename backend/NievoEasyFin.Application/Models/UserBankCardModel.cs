@@ -57,8 +57,9 @@ namespace NievoEasyFin.Application.Models
         /// <param name="bankId">int</param>
         /// <param name="userId">int</param>
         /// <param name="active">bool</param>
+        /// <param name="flag">string</param>
         /// <returns>UserBankCardView</returns>
-        public async Task<(List<UserBankCardView>, int)> GetUserBankCard(int page, int pageSize, int? bankId, int userId, bool active)
+        public async Task<(List<UserBankCardView>, int)> GetUserBankCard(int page, int pageSize, int? bankId, int userId, bool active, string? flag)
         {
             List<UserBankCardView> items = new();
             StringBuilder query = new();
@@ -73,6 +74,7 @@ namespace NievoEasyFin.Application.Models
                     b.name as BankName,
                     bc.name as BankCardName,
                     bct.name  as BankCardType,
+                    bcf.name as BankCardFlag,
                     count(*) over() as Records
                 from accounts.user_bank_card ubc
                     inner join accounts.bank b 
@@ -82,11 +84,14 @@ namespace NievoEasyFin.Application.Models
                             and ubc.bank_id  = bc.bank_id
                     inner join accounts.bank_card_type bct 
                         on bc.card_type = bct.id 
+                    inner join accounts.bank_card_flag bcf 
+    	                on bc.flag_id = bcf.id 
                 where  ubc.user_id = @userId
                     and ubc.active = @active
                     and b.active = true
                     and bc.active = true
                     and bct.active = true
+                    and bcf.active = true
             ");
 
             param.Add("userId", userId);
@@ -95,8 +100,14 @@ namespace NievoEasyFin.Application.Models
 
             if (bankId != null)
             {
-                query.Append("and b.id = @bankId");
+                query.Append("and b.id = @bankId ");
                 param.Add("bankId", bankId);
+            }
+
+            if (flag != null)
+            {
+                query.Append("and bcf.name = @flag ");
+                param.Add("flag", flag);
             }
 
             query.Append(@"

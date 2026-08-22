@@ -10,6 +10,7 @@ using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Interfaces.Validator;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Cache;
+using Org.BouncyCastle.Ocsp;
 
 namespace NievoEasyFin.Application.Services.Base
 {
@@ -34,6 +35,8 @@ namespace NievoEasyFin.Application.Services.Base
 
         private readonly UserBankCardModel _userBankCardModel;
 
+        private readonly BankCardFlagModel _bankCardFlagModel;
+
         public AccountsService(
             BankModel bankModel,
             AuthDbCacheService authDbCacheService,
@@ -42,7 +45,8 @@ namespace NievoEasyFin.Application.Services.Base
             UserBankModel userBankModel,
             BankCardModel bankCardModel,
             BankCardTypeModel bankCardTypeModel,
-            UserBankCardModel userBankCardModel
+            UserBankCardModel userBankCardModel,
+            BankCardFlagModel bankCardFlag
         )
         {
             _bankModel = bankModel;
@@ -53,6 +57,7 @@ namespace NievoEasyFin.Application.Services.Base
             _bankCardModel = bankCardModel;
             _bankCardTypeModel = bankCardTypeModel;
             _userBankCardModel = userBankCardModel;
+            _bankCardFlagModel = bankCardFlag;
         }
 
         /// <summary>
@@ -246,7 +251,7 @@ namespace NievoEasyFin.Application.Services.Base
                     new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
 
-            var (cardTypes, itemsCount) = await _bankCardTypeModel.GetBankCardTypesAsync();
+            var (cardTypes, itemsCount) = await _bankCardTypeModel.GetBankCardTypesAsync(request.Page, request.PageSize);
             if (!cardTypes.Any())
             {
                 return Ok(
@@ -269,6 +274,44 @@ namespace NievoEasyFin.Application.Services.Base
             );
 
             return Ok(new ResponseApiSucess(response));
+        }
+
+        /// <summary>
+        /// Search for valid flag cards
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> GetCardFlag(GetCardFlagRequest request)
+        {
+            var validatorResult = await new GetCardFlagValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var (cardFlag, itemsCount) = await _bankCardFlagModel.GetBankCardFlagAsync(request.Page, request.PageSize);
+            if (!cardFlag.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new ResponsePaginationBase<BankCardFlagView>(
+                        request.Page,
+                        request.PageSize,
+                        0,
+                        new()
+                    ))
+                );
+            }
+
+            var cardFlagView = cardFlag.Select(x => new BankCardFlagView(x)).ToList();
+
+            GetCardFlagesponse response = new(
+                request.Page,
+                request.PageSize,
+                itemsCount,
+                cardFlagView
+            );
+
+            return Ok(new ResponseApiSucess(response)); ;
         }
 
         /// <summary>
@@ -301,7 +344,13 @@ namespace NievoEasyFin.Application.Services.Base
                     new List<string>() { EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_400_CARD_ALREADY_EXISTS.GetDescription() }
                 ));
 
-            var newCard = await _bankCardModel.CreateBankCardAsync(request.BankId, request.CardType, request.Name);
+            var flag = await _bankCardFlagModel.GetBankCardFlagByName(request.Flag);
+            if (flag == null)
+                return NotFound(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_404_FLAG_NOT_FOUND.GetDescription() }
+                    ));
+
+            var newCard = await _bankCardModel.CreateBankCardAsync(request.BankId, request.CardType, request.Name, flag.Id);
 
             return Ok(new ResponseApiSucess(
                 EnumErrosApi.POSTBANKCARDASYNC_CORESERVICE_200_CARD_CREATED.GetDescription()
@@ -320,7 +369,7 @@ namespace NievoEasyFin.Application.Services.Base
                     new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
                 );
 
-            var (items, itemsCount) = await _bankCardModel.GetBankCardsAsync(request.Page, request.PageSize, request.BankId, request.CardType);
+            var (items, itemsCount) = await _bankCardModel.GetBankCardsAsync(request.Page, request.PageSize, request.BankId, request.CardType, request.Flag);
             if (!items.Any())
             {
                 return Ok(
@@ -361,7 +410,7 @@ namespace NievoEasyFin.Application.Services.Base
                     new List<string>() { EnumErrosApi.GETUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
                 ));
 
-            var (items, records) = await _userBankCardModel.GetUserBankCard(request.Page, request.PageSize, request.BankId, user.Id, request.Active);
+            var (items, records) = await _userBankCardModel.GetUserBankCard(request.Page, request.PageSize, request.BankId, user.Id, request.Active, request.Flag);
             if (!items.Any())
             {
                 return Ok(
