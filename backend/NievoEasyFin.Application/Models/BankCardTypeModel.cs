@@ -50,7 +50,7 @@ namespace NievoEasyFin.Application.Models
                     created_at as CreatedAt,
                     updated_at as UpdatedAt
                 FROM accounts.bank_card_type
-                WHERE active = true;
+                WHERE active = true
             ");
 
             sql.Append(@"

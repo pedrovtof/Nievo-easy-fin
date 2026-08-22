@@ -165,14 +165,19 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
 
         var bank = BankEntityFaker.Create().Generate();
         var cardType = BankCardTypeEntityFaker.Create().Generate();
+        var flag = BankCardFlagEntityFaker.Create().Generate();
+        flag.Id = 1;
+        origin.BankCardFlag.Add(flag);
 
         var card1 = BankCardEntityFaker.Create().Generate();
         card1.BankId = bank.Id;
         card1.CardType = cardType.Id;
+        card1.FlagId = 1;
 
         var card2 = BankCardEntityFaker.Create().Generate();
         card2.BankId = bank.Id;
         card2.CardType = cardType.Id;
+        card2.FlagId = 1;
 
         origin.BankCardType.Add(cardType);
         origin.Bank.Add(bank);
@@ -207,10 +212,14 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
 
         var bank = BankEntityFaker.Create().Generate();
         var cardType = BankCardTypeEntityFaker.Create().Generate();
+        var flag = BankCardFlagEntityFaker.Create().Generate();
+        flag.Id = 1;
+        origin.BankCardFlag.Add(flag);
 
         var card1 = BankCardEntityFaker.Create().Generate();
         card1.BankId = bank.Id;
         card1.CardType = cardType.Id;
+        card1.FlagId = 1;
 
         var card2 = BankCardEntityFaker.Create().Generate(); // Not matching filters
 
