@@ -42,13 +42,14 @@ namespace NievoEasyFin.Application.Models
             => await _CoreReplicaNodeDatabase.BankCard.FirstOrDefaultAsync(x => x.BankId == bankId && x.Id == CardId && x.Active == true);
 
         /// <summary>
-        /// 
+        /// Create bank card
         /// </summary>
         /// <param name="bankId"></param>
         /// <param name="cardTypeId"></param>
         /// <param name="name"></param>
+        /// <param name="flagId"></param>
         /// <returns>BankCardEntity</returns>
-        public async Task<BankCardEntity> CreateBankCardAsync(int bankId, int cardTypeId, string name)
+        public async Task<BankCardEntity> CreateBankCardAsync(int bankId, int cardTypeId, string name, int flagId)
         {
             BankCardEntity bankCardEntity = new()
             {
@@ -57,7 +58,8 @@ namespace NievoEasyFin.Application.Models
                 Name = name,
                 Active = true,
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.Now,
+                FlagId = flagId
             };
 
             await _CoreMainNodeDatabase.BankCard.AddAsync(bankCardEntity);
@@ -73,8 +75,9 @@ namespace NievoEasyFin.Application.Models
         /// <param name="pageSize"></param>
         /// <param name="bankId"></param>
         /// <param name="cardTypeId"></param>
+        /// <param name="flag"></param>
         /// <returns></returns>
-        public async Task<(List<BankCardView>, int)> GetBankCardsAsync(int page, int pageSize, int? bankId, int? cardTypeId)
+        public async Task<(List<BankCardView>, int)> GetBankCardsAsync(int page, int pageSize, int? bankId, int? cardTypeId, string? flag)
         {
             List<BankCardView> items = new();
 
@@ -87,15 +90,19 @@ namespace NievoEasyFin.Application.Models
                     bct.name as CardType,
                     bc.name as CardName,
                     bc.id as Id,
+                    bcf.name  as Flag,
                     count(*) over() as Records
                 from accounts.bank_card bc
                     inner join accounts.bank b 
                         on bc.bank_id = b.id
                     inner join accounts.bank_card_type bct 
-                        on bc.card_type = bct.id 
+                        on bc.card_type = bct.id
+                    inner join accounts.bank_card_flag bcf 
+    	                on bc.flag_id = bcf.id 
                 where b.active = true
                     and bc.active = true
                     and bct.active = true
+                    and bcf.active = true
             ");
 
             if (bankId != null)
@@ -112,6 +119,14 @@ namespace NievoEasyFin.Application.Models
                     and bct.id = @cardTypeId
                 ");
                 param.Add("cardTypeId", cardTypeId);
+            }
+
+            if (flag != null)
+            {
+                query.Append(@"
+                    and bcf.name = @flag
+                ");
+                param.Add("flag", flag);
             }
 
             query.Append(@"

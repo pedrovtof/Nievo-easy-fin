@@ -18,5 +18,11 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [FromQuery(Name = "card_type")]
         public int? CardType { get; set; }
+
+        /// <summary>
+        /// Flag name
+        /// </summary>
+        [FromQuery(Name = "flag")]
+        public string? Flag { get; set; }
     }
 }

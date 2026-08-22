@@ -5,10 +5,10 @@ using System.Text.Json.Serialization;
 namespace NievoEasyFin.Application.Data.Entities;
 
 /// <summary>
-/// Class data BankCard
+/// Class data BankCardFlag
 /// </summary>
-[Table("bank_card", Schema = "accounts")]
-public class BankCardEntity
+[Table("bank_card_flag", Schema = "accounts")]
+public class BankCardFlagEntity
 {
     /// <summary>
     /// Id
@@ -19,13 +19,6 @@ public class BankCardEntity
     public int Id { get; set; }
 
     /// <summary>
-    /// BankId
-    /// </summary>
-    [JsonPropertyName("bank_id")]
-    [Column("bank_id", TypeName = "INTEGER")]
-    public int? BankId { get; set; }
-
-    /// <summary>
     /// Name
     /// </summary>
     [JsonPropertyName("name")]
@@ -33,11 +26,11 @@ public class BankCardEntity
     public string Name { get; set; }
 
     /// <summary>
-    /// CardType
+    /// Description
     /// </summary>
-    [JsonPropertyName("card_type")]
-    [Column("card_type", TypeName = "INTEGER")]
-    public int? CardType { get; set; }
+    [JsonPropertyName("description")]
+    [Column("description", TypeName = "VARCHAR(255)")]
+    public string Description { get; set; }
 
     /// <summary>
     /// Active
@@ -59,11 +52,4 @@ public class BankCardEntity
     [JsonPropertyName("updated_at")]
     [Column("updated_at", TypeName = "TIMESTAMP")]
     public DateTime? UpdatedAt { get; set; }
-
-    /// <summary>
-    /// FlagId
-    /// </summary>
-    [JsonPropertyName("flag_id")]
-    [Column("flag_id", TypeName = "INTEGER")]
-    public int? FlagId { get; set; }
 }

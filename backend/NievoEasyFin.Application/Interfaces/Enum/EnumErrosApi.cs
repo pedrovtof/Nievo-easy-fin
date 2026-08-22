@@ -561,6 +561,11 @@ public enum EnumErrosApi
     POSTBANKCARDASYNC_CORESERVICE_400_INVALID_NAME,
 
     /// <summary>
+    /// Invalid flag
+    /// </summary>
+    POSTBANKCARDASYNC_CORESERVICE_400_INVALID_FLAG,
+
+    /// <summary>
     /// Empty bank id.
     /// </summary>
     POSTBANKCARDASYNC_CORESERVICE_400_EMPTY_BANK_ID,
@@ -575,6 +580,12 @@ public enum EnumErrosApi
     /// </summary>
     [Description("There isn't any bank with that id, try again with another one.")]
     POSTBANKCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND,
+
+    /// <summary>
+    /// There isn't any bank with that id, try again with another one.
+    /// </summary>
+    [Description("There isn't any flag with that name, try again with another one.")]
+    POSTBANKCARDASYNC_CORESERVICE_404_FLAG_NOT_FOUND,
 
     /// <summary>
     /// Empty card type.
@@ -620,6 +631,20 @@ public enum EnumErrosApi
 
     #endregion
 
+    #region GetBankCardFlag
+
+    /// <summary>
+    /// Invalid page
+    /// </summary>
+    GETCARDFLAGPEASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// Invalid page size
+    /// </summary>
+    GETCARDFLAGPEASYNC_CORESERVICE_400_INVALID_PAGE_SIZE,
+
+    #endregion
+
     #region GetBankCard
 
     /// <summary>
@@ -652,6 +677,11 @@ public enum EnumErrosApi
     /// </summary>
     GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_TYPE,
 
+    /// <summary>
+    /// Invalid card flag
+    /// </summary>
+    GETBANKCARDASYNC_CORESERVICE_400_INVALID_CARD_FLAG,
+
     #endregion
 
     #region GetUserCard
@@ -670,6 +700,11 @@ public enum EnumErrosApi
     /// Invalid page size
     /// </summary>
     GETUSERCARDASYNC_CORESERVICE_400_INVALID_BANK_ID,
+
+    /// <summary>
+    /// Invalid Flag
+    /// </summary>
+    GETUSERCARDASYNC_CORESERVICE_400_INVALID_FLAG,
 
     /// <summary>
     /// User not found
