@@ -1,56 +1,88 @@
-# Procedimentos Operacionais
+# Procedimentos Operacionais e Ambiente de Desenvolvimento
 
-Esta seção descreve as etapas necessárias para configurar, executar e manter o ambiente do Nievo Easy Fin.
+Esta seção fornece instruções detalhadas para preparar, configurar, executar e manter o ambiente local de desenvolvimento do **Nievo EasyFin**.
 
-## Ambiente de Desenvolvimento
+---
 
-O projeto utiliza um `makefile` para simplificar as operações comuns.
+## 🛠️ 1. Requisitos Prévios do Sistema
 
-### 1. Requisitos Prévios
+Antes de iniciar, certifique-se de ter as seguintes ferramentas instaladas em seu ambiente (Linux / macOS / Windows Subsystem for Linux):
 
-*   Docker e Docker Compose
-*   .NET 8 SDK (ou superior)
-*   Node.js e NPM (para o frontend)
-*   Python 3.x (para microserviços de dados)
+- **Docker Engine** (v24.0+) e **Docker Compose** (v2.20+)
+- **.NET 10 SDK** (ou .NET 8 SDK mínimo)
+- **Node.js** (v18.x ou v20.x LTS) e **NPM** (v9.x+)
+- **Python 3.10+** e `venv` (para os serviços de dados e migrações Alembic)
+- **Make** (utilitário de automação de tarefas)
 
-### 2. Configuração Inicial
+---
 
-Clone o repositório e configure as variáveis de ambiente:
-1.  Copie o `backend/env-example.txt` para um arquivo `.env` na raiz do projeto e nas pastas dos serviços correspondentes.
-2.  Ajuste as credenciais de banco de dados e chaves de API conforme necessário.
+## ⚙️ 2. Configuração de Variáveis de Ambiente
 
-### 3. Execução da Infraestrutura
+O projeto disponibiliza modelos de variáveis de ambiente (`.env-example`). Para criar os arquivos `.env` em todos os módulos automaticamente:
 
-Para subir os bancos de dados (Postgres, ClickHouse, Redis) e o API Gateway (Kong):
+```bash
+make envs
+```
+
+Este comando executará a cópia dos modelos para os diretórios:
+- `backend/.env`
+- `frontend/web/.env`
+- `infraestrutura/docker/.env`
+
+---
+
+## 🚀 3. Inicialização dos Serviços em Desenvolvimento
+
+A execução da aplicação é simplificada por comandos declarativos no `makefile`:
+
+### Etapa 1: Subir a Infraestrutura (Bancos + Gateway)
+Inicia o PostgreSQL (master e replica), ClickHouse (2 nós + Zookeeper), Redis e o Kong API Gateway:
 
 ```bash
 make infra-up
 ```
 
-### 4. Execução dos Serviços Backend
+### Etapa 2: Executar os Microsserviços Backend (.NET)
+Em terminais separados (ou em segundo plano), execute os serviços em modo `dotnet watch` para recompilação automática durante edições de código:
 
-Os serviços backend podem ser executados via `dotnet watch` para facilitar o desenvolvimento:
+- **Microsserviço de Autenticação (`NievoEasyFin.Auth`):**
+  ```bash
+  make dotnet-run-auth
+  ```
+- **Monólito Core (`NievoEasyFin.Core`):**
+  ```bash
+  make dotnet-run-core
+  ```
 
-*   **Auth Service:** `make dotnet-run-auth`
-*   **Core Service:** `make dotnet-run-core`
-
-### 5. Execução do Frontend
-
-Para iniciar o servidor de desenvolvimento do frontend:
+### Etapa 3: Executar o Frontend Web (React / Vite)
+Instala as dependências e inicia o servidor de desenvolvimento do Vite com HMR na porta `5173`:
 
 ```bash
 make web-exec
 ```
 
-## Manutenção e Deploy
+---
 
-### Migrações de Banco de Dados
+## 🧪 4. Execução de Suíte de Testes
 
-*   **Postgres:** As migrações são gerenciadas pelo Entity Framework Core (no Monólito) ou Alembic (nos microserviços).
-*   **ClickHouse:** Esquemas de tabelas devem ser aplicados manualmente ou via scripts de inicialização no Docker.
+Para rodar a suíte completa de testes unitários e de integração do backend:
 
-### Comandos Úteis do Makefile
+```bash
+make dotnet-test
+```
 
-*   `make docs-up`: Sobe a documentação (MkDocs) via Docker.
-*   `make dotnet-test`: Executa os testes unitários do backend.
-*   `make docker-nievo`: Sobe toda a aplicação (Infra + App) via Docker Compose.
+---
+
+## 📚 5. Servidor Local da Documentação (MkDocs)
+
+Para visualizar e testar esta documentação localmente via container Docker:
+
+```bash
+make docs-up
+```
+
+Acesse a documentação no seu navegador no endereço: `http://localhost:6030`. Para encerrar o container da documentação:
+
+```bash
+make docs-down
+```

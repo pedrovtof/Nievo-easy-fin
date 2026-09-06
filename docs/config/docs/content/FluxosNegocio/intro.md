@@ -1,34 +1,31 @@
 # Fluxos de Negócio
 
-Os fluxos de negócio do Nievo Easy Fin foram desenhados para serem intuitivos, seguros e eficientes, garantindo que o usuário tenha total controle sobre sua vida financeira com o mínimo de fricção.
+Os fluxos de negócio do **Nievo EasyFin** foram projetados para oferecer uma experiência de gestão financeira pessoal e empresarial simples, segura e transparente, reduzindo o tempo de digitação manual e garantindo a auditabilidade total de dados sensíveis.
 
-## 1. Fluxo de Integração (Onboarding)
+---
 
-O primeiro contato do usuário com a plataforma ocorre através do registro.
+## 🗺️ Visão Geral das Jornadas do Usuário
 
-*   **Registro Tradicional:** O usuário fornece Nome, Email, Senha e deve **aceitar os Termos de Uso** (`accept_terms: true`). O sistema valida a complexidade da senha, a unicidade do e-mail e o aceite dos termos antes de criar a conta. Os headers `Host` e `User-Agent` são obrigatórios e ficam registrados junto ao aceite de termos para fins de auditoria e compliance.
-*   **Registro via SSO (Google):** O usuário pode optar por utilizar sua conta Google. O sistema valida o token enviado pelo frontend, recupera os dados básicos e vincula a conta. O aceite dos Termos de Uso (`accept_terms: true`) também é **obrigatório** neste fluxo, e os headers `Host` e `User-Agent` são igualmente registrados.
-*   **Registro de Aceite de Termos:** Para cada cadastro bem-sucedido, o sistema persiste um registro na tabela `journey.users_accepted_terms`, associando o usuário ao termo vigente (`journey.accept_terms`) no momento do cadastro, incluindo a versão do termo, data, IP de origem (via Host) e agente do navegador.
+```mermaid
+flowchart LR
+    A["1. Onboarding e Termos"] --> B["2. Autenticação e Segurança"]
+    B --> C["3. Gestão de Contas e Cartões"]
+    C --> D["4. Lançamentos e Metas (Core)"]
+    D --> E["5. Análise e Insights (Analytics)"]
+```
 
-## 2. Fluxo de Autenticação e Segurança
+---
 
-A segurança é centralizada no serviço de **Auth**.
+## 📌 Principais Módulos de Negócio
 
-*   **Login:** Após a validação das credenciais, o sistema gera um token **JWT (JSON Web Token)** assinado. Este token deve ser enviado em todas as requisições subsequentes para endpoints privados.
-*   **Recuperação de Senha:** Caso o usuário esqueça sua senha, ele pode solicitar um reset. O sistema gera um PIN temporário, armazena em cache (Redis) e envia por e-mail (via SMTP). O usuário utiliza este PIN para definir uma nova senha.
+### 1. [Onboarding e Aceite de Termos](onboarding_termos.md)
+Entrada do usuário na plataforma via registro com e-mail/senha ou SSO Google. Obrigatoriedade de aceite dos Termos de Uso (`accept_terms: true`) com armazenamento de evidências legais (Host, User-Agent e Data) na tabela `journey.users_accepted_terms`.
 
-## 3. Gestão Financeira (Core)
+### 2. [Autenticação e Segurança](autenticacao_seguranca.md)
+Autenticação via login local ou SSO, validação de e-mail por PIN temporário enviado por e-mail (SMTP / MailKit), redefinição de senha com PIN de segurança de 6 dígitos e emissão de tokens JWT com claims de autorização.
 
-Uma vez autenticado, o usuário interage com o **Monólito Core**.
+### 3. [Gestão de Contas e Cartões](gestao_contas_cartoes.md)
+Modelagem de instituições financeiras (`Bank`), cadastro de contas bancárias do usuário (`UserBank`), e gestão de cartões de crédito/débito (`UserBankCard`), com suporte a múltiplos tipos de cartão e bandeiras (`Visa`, `Mastercard`, `Elo`, `Amex`).
 
-*   **Lançamentos:** Registro de despesas e receitas. Cada lançamento pode ser categorizado e associado a uma conta específica.
-*   **Categorização:** O sistema permite a criação de categorias e subcategorias personalizadas para um detalhamento preciso dos gastos.
-*   **Metas:** Definição de orçamentos mensais por categoria. O sistema monitora o consumo em tempo real e alerta o usuário sobre o progresso das metas.
-
-## 4. Análise e Insights (Analytics)
-
-O processamento pesado de dados ocorre de forma assíncrona ou dedicada.
-
-*   **Processamento de Dados:** Os dados brutos do Postgres são refletidos no **ClickHouse** para análise de alta performance.
-*   **Geração de Insights:** O microserviço em Python processa os volumes históricos para identificar padrões de consumo e fornecer previsões financeiras baseadas em comportamento passado.
-
+### 4. [Sobre e Casos de Uso](about.md)
+Especificação funcional detalhada do produto, público-alvo, comparativo de mercado, diagramas UML (Casos de Uso, Sequência e Implantação) e fontes de pesquisa de mercado.

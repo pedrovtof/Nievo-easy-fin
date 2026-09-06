@@ -1,16 +1,31 @@
-
 site_name: Nievo EasyFin Docs
 site_url: https://nievo.com.br/easy-fin/docs
+
 nav:
   - Home: index.md
-  - Arquitetura do Sistema: ./content/ArquiteturaSistema/intro.md
+  - Arquitetura do Sistema:
+    - Visão Geral: content/ArquiteturaSistema/intro.md
+    - Banco de Dados e Esquemas: content/ArquiteturaSistema/banco_de_dados.md
+    - Gateway e Infraestrutura: content/ArquiteturaSistema/infraestrutura.md
   - Fluxos de Negócio:
-    - Introdução: ./content/FluxosNegocio/intro.md
-    - Sobre: ./content/FluxosNegocio/about.md
-  - APIs e Integrações: ./content/ApiIntegracoes/intro.md
-  - Procedimentos Operacionais: ./content/ProcedimentosOperacionais/intro.md
-  - Boas Práticas: ./content/BoasPraticas/intro.md
-  - Atualizações e Histórico: ./content/AtualizacoesHistorico/intro.md
+    - Visão Geral: content/FluxosNegocio/intro.md
+    - Sobre e Casos de Uso: content/FluxosNegocio/about.md
+    - Onboarding e Aceite de Termos: content/FluxosNegocio/onboarding_termos.md
+    - Autenticação e Segurança: content/FluxosNegocio/autenticacao_seguranca.md
+    - Gestão de Contas e Cartões: content/FluxosNegocio/gestao_contas_cartoes.md
+  - Frontend:
+    - Arquitetura e Componentes: content/Frontend/intro.md
+  - APIs e Integrações:
+    - Visão Geral e Kong Gateway: content/ApiIntegracoes/intro.md
+    - Endpoints de Autenticação (Auth): content/ApiIntegracoes/auth_endpoints.md
+    - Endpoints de Contas e Cartões (Core): content/ApiIntegracoes/core_endpoints.md
+  - Procedimentos Operacionais:
+    - Ambiente e Desenvolvimento: content/ProcedimentosOperacionais/intro.md
+    - Docker, Clusters e Migrações: content/ProcedimentosOperacionais/docker_migracoes.md
+  - Boas Práticas:
+    - Padrões Técnicos e Arquitetura: content/BoasPraticas/intro.md
+  - Atualizações e Histórico:
+    - Histórico de Alterações (Changelog): content/AtualizacoesHistorico/intro.md
 
 theme:
   name: material

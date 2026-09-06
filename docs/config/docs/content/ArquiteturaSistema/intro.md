@@ -1,31 +1,92 @@
 # Arquitetura do Sistema
 
-O Nievo Easy Fin utiliza uma **arquitetura híbrida**, combinando um monólito robusto com microserviços especializados para otimizar desempenho e escalabilidade onde é mais necessário.
+O **Nievo EasyFin** adota uma **arquitetura híbrida**, combinando um monólito robusto com microsserviços especializados para equilibrar a consistência do negócio com alta escalabilidade e isolamento de responsabilidades.
 
-## Componentes Principais
+---
 
-### 1. Core Monolith (C# / .NET)
-O coração da aplicação, responsável pelas regras de negócio principais, orquestração de dados e serviços fundamentais. Foi escolhido pela sua consistência, resiliência e forte tipagem.
+## 🏗️ Visão Geral da Arquitetura
 
-### 2. Microserviço de Autenticação (C# / .NET)
-Um serviço isolado dedicado à gestão de identidade, login (incluindo SSO) e segurança. Este isolamento garante que a superfície de ataque seja minimizada e que o serviço possa ser escalado independentemente.
+```mermaid
+flowchart TD
+    Client["Client App (React / Vite / MUI)"]
+    
+    subgraph Gateway["API Gateway (Kong)"]
+        Kong["Kong Gateway (Port 8000)"]
+        RateLimit["Rate Limiter (Redis DB 1)"]
+        JWTPlugin["JWT Auth Plugin"]
+    end
 
-### 3. Microserviço de Dados e Análise (Python / Flask)
-Especializado em operações matemáticas complexas e processamento analítico. O Python foi escolhido para este componente devido ao seu ecossistema maduro de bibliotecas de ciência de dados e performance em cálculos.
+    subgraph Backend["Serviços Backend"]
+        AuthService["NievoEasyFin.Auth (C# / .NET 10) - Port 8081"]
+        CoreService["NievoEasyFin.Core (C# / .NET 10) - Port 8082"]
+        DataService["Data Service (Python / Flask) - Port 8083"]
+    end
 
-## Estratégia de Persistência (Polyglot Persistence)
+    subgraph Database["Persistência Poliglota"]
+        PostgresMaster[("PostgreSQL Master (Node A - Port 5432)")]
+        PostgresReplica[("PostgreSQL Replica (Node B - Port 5433)")]
+        RedisCache[("Redis Cache (Port 6379)")]
+        ClickHouseCluster[("ClickHouse OLAP Cluster (Nodes A & B + Zookeeper)")]
+    end
 
-A aplicação utiliza diferentes tecnologias de banco de dados para atender a requisitos específicos:
+    Client -->|HTTP / REST| Kong
+    Kong --> RateLimit
+    Kong --> JWTPlugin
+    Kong -->|/api/auth| AuthService
+    Kong -->|/api/core| CoreService
+    Kong -->|/api/data| DataService
 
-*   **PostgreSQL:** Banco relacional principal para dados transacionais e consistência forte. Utiliza uma arquitetura com réplicas para leitura para garantir alta disponibilidade.
-*   **Redis:** Utilizado como camada de cache e para suporte ao API Gateway (Kong), proporcionando tempos de resposta extremamente rápidos para dados acessados frequentemente.
-*   **ClickHouse:** Banco de dados colunar focado em análise de grandes volumes de dados (OLAP), permitindo consultas analíticas rápidas sobre o histórico de gastos.
+    AuthService -->|user_details e journey| PostgresMaster
+    AuthService -->|Read Replica| PostgresReplica
+    AuthService -->|Cache / Tokens| RedisCache
 
-## Infraestrutura e Gateway
+    CoreService -->|accounts, goals, payment| PostgresMaster
+    CoreService -->|Read Replica| PostgresReplica
+    CoreService -->|Cache Bancos| RedisCache
 
-A solução é containerizada utilizando **Docker** e orquestrada via **Kubernetes (K8S)**. 
+    DataService -->|Analytics / Reports| ClickHouseCluster
+    PostgresMaster -.->|Streaming Replication| PostgresReplica
+```
 
-O **Kong API Gateway** atua como o ponto de entrada único para o ecossistema, gerenciando:
-*   Roteamento de tráfego.
-*   Rate Limiting para proteção contra abusos.
-*   Autenticação centralizada.
+---
+
+## 🧩 Componentes Principais
+
+### 1. Microsserviço de Autenticação e Segurança (`NievoEasyFin.Auth`)
+- **Tecnologia:** C# / .NET 10.
+- **Responsabilidades:** 
+  - Gestão de usuários e status no schema `user_details` (`user_details.user` e `user_details.user_status`).
+  - Gestão de login social SSO Google no schema `journey` (`journey.sso_provider` e `journey.user_provider_sso`).
+  - Emissão e validação de tokens JWT (HS256 com claims customizadas).
+  - Autenticação e verificação de senhas com hashing seguro PBKDF2.
+  - Recuperação de senha por e-mail via PIN temporário (armazenado em cache Redis).
+  - Gestão de termos de uso e auditoria de aceites (`journey.accept_terms` e `journey.users_accepted_terms`).
+
+### 2. Monólito Core (`NievoEasyFin.Core`)
+- **Tecnologia:** C# / .NET 10 (Arquitetura orientada a objetos com injeção de dependência).
+- **Responsabilidades:**
+  - Regras do domínio financeiro no schema `accounts` (`accounts.bank`, `accounts.bank_type`, `accounts.user_bank`, `accounts.bank_card`, `accounts.bank_card_type`, `accounts.bank_card_flag`, `accounts.user_bank_card`).
+  - Planejamento e orçamentos no schema `goals`.
+  - Lançamentos e transações de pagamento no schema `payment`.
+
+### 3. Microsserviço de Análise e Inteligência (`Data Service`)
+- **Tecnologia:** Python / Flask.
+- **Responsabilidades:**
+  - Processamento analítico de alto desempenho sobre o histórico financeiro.
+  - Geração de relatórios consolidados e previsões consumindo dados do **ClickHouse**.
+
+---
+
+## 💾 Estratégia de Persistência Poliglota (Polyglot Persistence)
+
+1. **PostgreSQL 16 (Relacional Transacional):**
+   - Configurado em cluster Master-Replica (`postgres_nodea` e `postgres_nodeb`).
+   - Dividido nos schemas `user_details`, `journey`, `accounts`, `goals` e `payment`.
+
+2. **Redis 7 (Armazenamento em Memória):**
+   - Cache de entidades bancárias (`BankCacheEntity`) e tipos de banco (`BankTypeCacheEntity`).
+   - Armazenamento temporário de PINs de cadastro e redefinição de senha com TTL (Time-To-Live).
+   - Backend dos contadores de Rate Limiting do Kong Gateway (database 1).
+
+3. **ClickHouse (Banco Colunar OLAP):**
+   - Armazenamento analítico otimizado para grandes volumes em cluster de 2 nós com coordenação via **Apache Zookeeper**.
