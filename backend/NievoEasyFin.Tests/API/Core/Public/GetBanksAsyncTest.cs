@@ -6,9 +6,7 @@ using NievoEasyFin.Tests.Mocks.Database;
 using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 
-using NievoEasyFin.Tests.API.Core.Public;
-
-namespace NievoEasyFin.Tests.API.Core.Private;
+namespace NievoEasyFin.Tests.API.Core.Public;
 
 public class GetBanksAsyncTest : AccountsServiceTestBase
 {
