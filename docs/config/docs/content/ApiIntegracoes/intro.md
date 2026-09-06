@@ -1,35 +1,87 @@
-# API e Integrações
+# APIs e Integrações
 
-A comunicação no Nievo Easy Fin é centralizada através de um API Gateway, garantindo segurança e padronização.
+A comunicação entre os clientes (Frontend React/Vite, aplicativos móbiles ou integrações externas) e os microsserviços do **Nievo EasyFin** é inteiramente padronizada e centralizada pelo **Kong API Gateway**.
 
-## Gateway: Kong
+---
 
-O **Kong** atua como o cérebro da rede, interceptando todas as chamadas externas. Ele é responsável por:
-*   **Rate Limiting:** Protege os serviços contra excesso de requisições.
-*   **Auth Centralizada:** Valida tokens JWT antes mesmo da requisição chegar aos microserviços.
-*   **Abstração de Endereços:** O frontend conhece apenas o endereço do Kong, que por sua vez conhece a topologia interna do Kubernetes.
+## 🌐 1. Base URLs e Roteamento
 
-## Estrutura de Endpoints
+Todas as chamadas devem utilizar o endereço público do Kong Gateway (Porta `8000`). O Gateway intercepta os prefixos de URL e roteia internamente para os respectivos serviços:
 
-Os endpoints são categorizados por visibilidade e versão:
+```
+https://api.nievo.com.br/
+├── /api/auth/...   --> Roteado para Auth Service (Porta 8081)
+├── /api/core/...   --> Roteado para Core Service (Porta 8082)
+└── /api/data/...   --> Roteado para Data Service Python (Porta 8083)
+```
 
-### Endpoints Públicos (`/api/public/v1/...`)
-Destinados ao fluxo de acesso inicial, onde o usuário ainda não possui uma sessão ativa ou precisa realizar ações de recuperação.
-*   **Autenticação:** Login tradicional e SSO (Google, etc).
-*   **Gestão de Senha:** Solicitação de reset e atualização via token.
-*   **Cadastro de Usuário (`POST /singup`):** Cria um novo usuário com e-mail e senha.
-    *   **Headers obrigatórios:** `User-Agent`, `Host`
-    *   **Body obrigatório:** `name`, `email`, `password`, `accept_terms: true`
-    *   **Respostas:** `201 Created` (sucesso) | `400 Bad Request` (validação, e-mail duplicado, termos não aceitos, erro ao registrar aceite)
-*   **Cadastro de Usuário SSO (`POST /singup-sso`):** Cria ou vincula um usuário via provedor SSO.
-    *   **Headers obrigatórios:** `User-Agent`, `Host`
-    *   **Body obrigatório:** `provider_name`, `provider_access_token`, `accept_terms: true`
-    *   **Respostas:** `201 Created` (novo usuário) | `200 OK` (usuário já existe) | `400 Bad Request` (provedor inválido, token inválido, termos não aceitos)
+---
 
-### Endpoints Privados (`/api/private/v1/...`)
-Exigem um token JWT válido. O Kong valida a assinatura do token antes de encaminhar a requisição.
-*   **Core Business:** Gestão de transações, categorias e orçamentos.
-*   **Perfil:** Dados do usuário e configurações de conta.
+## 📑 2. Convenções e Headers Obrigatórios
 
-## Contratos de Dados (D TOs)
-A aplicação utiliza DTOs rigorosos para garantir que apenas os dados necessários sejam trafegados, minimizando o payload e protegendo informações sensíveis do banco de dados.
+### 📥 Headers HTTP
+
+Todas as requisições enviadas à API devem incluir os seguintes cabeçalhos conforme a natureza do endpoint:
+
+| Header | Tipo | Obrigatório em | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Content-Type` | `string` | POST / PUT / PATCH | Deve ser `application/json`. |
+| `User-Agent` | `string` | Cadastro (`/singup`) | Identificação do navegador/cliente para auditoria de termos. |
+| `Host` | `string` | Cadastro (`/singup`) | Endereço IP / Host de origem para auditoria de termos. |
+| `Authorization`| `string` | Endpoints Privados | Token no formato `Bearer <token_jwt>`. |
+
+---
+
+## 📦 3. Envelopes de Resposta Padronizados
+
+Para garantir a previsibilidade na integração do frontend, todos os endpoints retornam um formato de envelope JSON consistente:
+
+### 🟢 Resposta de Sucesso Padrão (`ResponseApiSucess`)
+
+```json
+{
+  "sucess": true,
+  "data": {
+    "message": "Operação realizada com sucesso."
+  }
+}
+```
+
+### 🔴 Resposta de Erro Padrão (`ResponseApiError`)
+
+```json
+{
+  "sucess": false,
+  "errors": [
+    "O campo 'email' é obrigatório.",
+    "A senha deve conter no mínimo 8 caracteres e um símbolo especial."
+  ]
+}
+```
+
+### 📄 Resposta Paginada Padrão (`ResponsePaginationBase<T>`)
+
+```json
+{
+  "sucess": true,
+  "data": {
+    "page": 1,
+    "page_size": 10,
+    "total_records": 42,
+    "total_pages": 5,
+    "items": [
+      { "id": 1, "name": "Itaú" },
+      { "id": 2, "name": "Nubank" }
+    ]
+  }
+}
+```
+
+---
+
+## 📑 4. Especificações de Endpoints
+
+Consulte as seções detalhadas a seguir para verificar os contratos completos, payloads de entrada, parâmetros de consulta e códigos de retorno de cada microsserviço:
+
+- **[Endpoints de Autenticação (Auth)](auth_endpoints.md):** Rotas do microsserviço `NievoEasyFin.Auth`.
+- **[Endpoints de Contas e Cartões (Core)](core_endpoints.md):** Rotas do Monólito `NievoEasyFin.Core`.
