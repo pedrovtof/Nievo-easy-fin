@@ -70,6 +70,9 @@ infra-up: ## Execute docker up for database/gateway
 	docker compose -f $(INFRA_PATH_DOCKER)/docker-compose.yml up -d
 	docker ps -a
 
+infra-down: ## Execute docker down for database/gateway
+	docker compose -f $(INFRA_PATH_DOCKER)/docker-compose.yml  down 
+
 web-exec: ## Initialize the web application
 	npm --prefix $(FRONTEND_PATH) ci  
 	npm --prefix $(FRONTEND_PATH) run dev   	
