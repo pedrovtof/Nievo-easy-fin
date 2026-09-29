@@ -72,7 +72,7 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         using (var cmd = _connection.CreateCommand())
         {
-            cmd.CommandText = "ATTACH DATABASE ':memory:' AS user_details; ATTACH DATABASE ':memory:' AS journey; ATTACH DATABASE ':memory:' AS accounts;";
+            cmd.CommandText = "ATTACH DATABASE ':memory:' AS user_details; ATTACH DATABASE ':memory:' AS journey; ATTACH DATABASE ':memory:' AS accounts; ATTACH DATABASE ':memory:' AS goals;";
             cmd.ExecuteNonQuery();
         }
 
@@ -140,6 +140,18 @@ public abstract class AccountsServiceTestBase : IDisposable
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS goals.goals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    user_id INTEGER,
+                    amount INTEGER,
+                    is_percent INTEGER,
+                    expire_at TEXT,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
             ";
             cmd.ExecuteNonQuery();
         }
@@ -157,6 +169,7 @@ public abstract class AccountsServiceTestBase : IDisposable
         var bankCardTypeModel = new BankCardTypeModel(origin, replica);
         var userBankCardModel = new UserBankCardModel(origin, replica);
         var bankCardFlagModel = new BankCardFlagModel(origin, replica);
+        var goalModel = new GoalModel(origin, replica);
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
@@ -166,7 +179,7 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel, userBankCardModel, bankCardFlagModel);
+        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel, userBankCardModel, bankCardFlagModel, goalModel);
     }
 
     protected async System.Threading.Tasks.Task SyncCoreToAttachedDatabasesAsync(CoreOrigin context)
@@ -184,6 +197,7 @@ public abstract class AccountsServiceTestBase : IDisposable
                 INSERT OR REPLACE INTO accounts.bank_card SELECT * FROM main.bank_card;
                 INSERT OR REPLACE INTO accounts.bank_card_type SELECT * FROM main.bank_card_type;
                 INSERT OR REPLACE INTO accounts.bank_card_flag SELECT * FROM main.bank_card_flag;
+                INSERT OR REPLACE INTO goals.goals SELECT * FROM main.goals;
             ";
             await cmd.ExecuteNonQueryAsync();
         }

@@ -26,7 +26,7 @@ public abstract class AccountsTestBase
     {
         Output = output;
         MockService = Substitute.For<IAccountsService>();
-        
+
         JwtService = new JsonWebTokenService(null!);
         Controller = new AccountsController(MockService, JwtService);
     }

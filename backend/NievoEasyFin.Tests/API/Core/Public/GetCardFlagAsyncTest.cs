@@ -64,7 +64,7 @@ public class GetCardFlagAsyncTest : AccountsServiceTestBase
         var flag2 = BankCardFlagEntityFaker.Create().Generate();
         origin.BankCardFlag.Add(flag1);
         origin.BankCardFlag.Add(flag2);
-        
+
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 

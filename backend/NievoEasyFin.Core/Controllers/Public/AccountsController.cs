@@ -134,4 +134,19 @@ public class AccountsController : Controller
        );
         return await _accountsService.PostUserCard(request);
     }
+
+    /// <summary>
+    /// Create user goals
+    /// </summary>
+    [HttpPost("user:goal")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostUserGoal([FromHeader] string authorization, [FromBody] PostUserGoalRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.PostUserGoal(request);
+    }
 }
