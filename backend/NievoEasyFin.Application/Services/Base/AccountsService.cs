@@ -1,4 +1,5 @@
 
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Views;
@@ -37,6 +38,8 @@ namespace NievoEasyFin.Application.Services.Base
 
         private readonly BankCardFlagModel _bankCardFlagModel;
 
+        private readonly GoalModel _goalModel;
+
         public AccountsService(
             BankModel bankModel,
             AuthDbCacheService authDbCacheService,
@@ -46,7 +49,8 @@ namespace NievoEasyFin.Application.Services.Base
             BankCardModel bankCardModel,
             BankCardTypeModel bankCardTypeModel,
             UserBankCardModel userBankCardModel,
-            BankCardFlagModel bankCardFlag
+            BankCardFlagModel bankCardFlag,
+            GoalModel goalModel
         )
         {
             _bankModel = bankModel;
@@ -58,6 +62,7 @@ namespace NievoEasyFin.Application.Services.Base
             _bankCardTypeModel = bankCardTypeModel;
             _userBankCardModel = userBankCardModel;
             _bankCardFlagModel = bankCardFlag;
+            _goalModel = goalModel;
         }
 
         /// <summary>
@@ -472,6 +477,42 @@ namespace NievoEasyFin.Application.Services.Base
             return Ok(new ResponseApiSucess(
                 EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_200_CARD_CREATED.GetDescription()
             ));
+        }
+
+        /// <summary>
+        /// Post user goal
+        /// </summary>
+        /// <param name="request">PostUserGoalRequest</param>
+        public async Task<IActionResult> PostUserGoal(PostUserGoalRequest request)
+        {
+            var validatorResult = await new PostUserGoalValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERGOALASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var goal = await _goalModel.GetGoalValidByUserAndName(user.Id, request.Name);
+            if (goal != null)
+                return BadRequest(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTUSERGOALASYNC_CORESERVICE_400_GOAL_ALREADY_EXIST.GetDescription() }
+                    ));
+
+            goal = await _goalModel.CreateGoal(
+                request.Name,
+                request.Description,
+                user.Id,
+                request.Amount,
+                request.IsPercent,
+                request.ExpireAt
+            );
+
+            return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERGOALASYNC_CORESERVICE_200_GOAL_CREATED.GetDescription()));
         }
     }
 }

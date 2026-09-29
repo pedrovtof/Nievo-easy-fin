@@ -777,4 +777,56 @@ public enum EnumErrosApi
     POSTUSERCARDASYNC_CORESERVICE_200_CARD_CREATED,
 
     #endregion
+
+    #region PostUserGoal
+
+    /// <summary>
+    /// Empty email
+    /// </summary>
+    POSTUSERGOALASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    POSTUSERGOALASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Invalid name
+    /// </summary>
+    POSTUSERGOALASYNC_CORESERVICE_400_INVALID_NAME,
+
+    /// <summary>
+    /// Empty name
+    /// </summary>
+    POSTUSERGOALASYNC_CORESERVICE_400_EMPTY_NAME,
+
+    /// <summary>
+    /// Invalid amount
+    /// </summary>
+    POSTUSERGOALASYNC_CORESERVICE_400_INVALID_AMOUNT,
+
+    /// <summary>
+    /// Invalid expired_at
+    /// </summary>
+    POSTUSERGOALASYNC_CORESERVICE_400_INVALID_EXPIRED_AT,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    POSTUSERGOALASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// Already exists an active goal for the user with this name.
+    /// </summary>
+    [Description("Already exist an active goal for the user with this name.")]
+    POSTUSERGOALASYNC_CORESERVICE_400_GOAL_ALREADY_EXIST,
+
+    /// <summary>
+    /// Created goal.
+    /// </summary>
+    [Description("Created goal.")]
+    POSTUSERGOALASYNC_CORESERVICE_200_GOAL_CREATED,
+
+    #endregion
 }

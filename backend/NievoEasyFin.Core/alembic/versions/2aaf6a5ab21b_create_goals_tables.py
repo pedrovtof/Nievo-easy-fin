@@ -28,7 +28,7 @@ def upgrade() -> None:
             active bool DEFAULT true NOT NULL,
             user_id INT,
             amount INT,
-            is_percent INT,
+            is_percent bool DEFAULT false NOT NULL,
             expire_at DATE,
             created_at TIMESTAMP without time zone DEFAULT now() NOT NULL,
             updated_at TIMESTAMP without time zone

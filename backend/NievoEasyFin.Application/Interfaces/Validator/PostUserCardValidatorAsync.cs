@@ -35,7 +35,16 @@ namespace NievoEasyFin.Application.Interfaces.Validator
             RuleFor(x => x.ExpireAt)
                 .NotEmpty()
                 .NotNull()
+                .Must(x => ValidateExpiredAt(x))
                 .WithErrorCode(EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_400_INVALID_EXPIREDAT.ToString());
         }
+
+        /// <summary>
+        /// Validate the expired date
+        /// </summary>
+        /// <param name="x">Datetime</param>
+        /// <returns>bool</returns>
+        private bool ValidateExpiredAt(DateTime x)
+            => x.Date > DateTime.Today;
     }
 }

@@ -28,6 +28,5 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [JsonPropertyName("expire_at")]
         public DateTime ExpireAt { get; set; }
-
     }
 }
