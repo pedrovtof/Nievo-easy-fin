@@ -65,8 +65,8 @@ flowchart TD
 ### 2. Monólito Core (`NievoEasyFin.Core`)
 - **Tecnologia:** C# / .NET 10 (Arquitetura orientada a objetos com injeção de dependência).
 - **Responsabilidades:**
-  - Regras do domínio financeiro no schema `accounts` (`accounts.bank`, `accounts.bank_type`, `accounts.user_bank`, `accounts.bank_card`, `accounts.bank_card_type`, `accounts.bank_card_flag`, `accounts.user_bank_card`).
-  - Planejamento e orçamentos no schema `goals`.
+  - Regras do domínio de contas e cartões no schema `accounts` (`accounts.bank`, `accounts.bank_type`, `accounts.user_bank`, `accounts.bank_card`, `accounts.bank_card_type`, `accounts.bank_card_flag`, `accounts.user_bank_card`).
+  - Planejamento financeiro, metas de economia e categorização no schema `goals` (`goals.goals` e `goals.category`), implementados via `GoalModel` e `CategoryModel` com suporte a listagens paginadas via Dapper.
   - Lançamentos e transações de pagamento no schema `payment`.
 
 ### 3. Microsserviço de Análise e Inteligência (`Data Service`)

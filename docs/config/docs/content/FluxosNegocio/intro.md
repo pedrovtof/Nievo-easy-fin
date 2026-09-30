@@ -27,5 +27,8 @@ Autenticação via login local ou SSO, validação de e-mail por PIN temporário
 ### 3. [Gestão de Contas e Cartões](gestao_contas_cartoes.md)
 Modelagem de instituições financeiras (`Bank`), cadastro de contas bancárias do usuário (`UserBank`), e gestão de cartões de crédito/débito (`UserBankCard`), com suporte a múltiplos tipos de cartão e bandeiras (`Visa`, `Mastercard`, `Elo`, `Amex`).
 
-### 4. [Sobre e Casos de Uso](about.md)
+### 4. [Planejamento de Metas e Categorias](metas_categorias.md)
+Definição de metas orçamentárias (`goals.goals`) e estruturação em árvore de categorias financeiras (`goals.category`), com suporte a limites percentuais ou nominais, expiração e regra de exclusividade de vínculo.
+
+### 5. [Sobre e Casos de Uso](about.md)
 Especificação funcional detalhada do produto, público-alvo, comparativo de mercado, diagramas UML (Casos de Uso, Sequência e Implantação) e fontes de pesquisa de mercado.

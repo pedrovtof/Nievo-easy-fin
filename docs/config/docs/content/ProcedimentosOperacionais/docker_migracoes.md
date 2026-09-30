@@ -65,25 +65,29 @@ curl "http://localhost:8123/?query=SELECT%201"
 
 As migrações de esquema são separadas por microsserviço:
 
-### 🐍 Migrações via Alembic (Python) - Schemas `journey` e `bank`
+### 🐍 Migrações via Alembic (Python) - Schemas `journey`, `accounts` e `goals`
 
-Nos projetos `NievoEasyFin.Auth` e `NievoEasyFin.Core`, as alterações de esquema do PostgreSQL são versionadas via scripts Python do **Alembic**:
+Nos projetos `NievoEasyFin.Auth` e `NievoEasyFin.Core`, as alterações de esquema do PostgreSQL são estritamente versionadas via scripts Python do **Alembic**:
 
 ```bash
 # Ativar o ambiente virtual de dependências Python
 source backend/venv/bin/activate
 
-# Aplicar migrações pendentes no microsserviço de Auth
+# Aplicar migrações pendentes no microsserviço de Auth (schemas user_details e journey)
 cd backend/NievoEasyFin.Auth
 alembic upgrade head
 
 # Gerar uma nova migração após alterar entidades no Auth
 alembic revision --autogenerate -m "nome_da_migracao"
 
-# Aplicar migrações no microsserviço Core
+# Aplicar migrações no microsserviço Core (schemas accounts e goals)
 cd ../NievoEasyFin.Core
 alembic upgrade head
 ```
+
+#### 📌 Principais Migrações do Schema `goals`:
+- **`2aaf6a5ab21b_create_goals_tables.py`:** Criação das tabelas `goals.goals` e `goals.category`, concessão de privilégios de `USAGE` e permissões CRUD para os usuários de banco `cross_database_user` e `app_core_service_efn`.
+- **`7159b0d736ad_create_goals_constrains.py`:** Criação da constraint de chave estrangeira `fk_goals_category`, criação de índices de performance (`idx_goals_category_parent`, `idx_goals_category_active`, `idx_goals_category_user`, `idx_goals_user`, `idx_goals_active`, `idx_goals_expire_at`) e liberação de acesso às *sequences*.
 
 ---
 
