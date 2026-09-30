@@ -97,7 +97,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
         // Verify category was created in database
         var categoryInDb = await origin.Category.FirstOrDefaultAsync(c => c.Name == request.Name && c.UserId == existingUser.Id);
         categoryInDb.Should().NotBeNull();
-        categoryInDb!.ParrentCategory.Should().Be(parentCategory.Id);
+        categoryInDb!.ParentCategory.Should().Be(parentCategory.Id);
 
         Output.WriteLine("Success test executed correctly.");
     }
