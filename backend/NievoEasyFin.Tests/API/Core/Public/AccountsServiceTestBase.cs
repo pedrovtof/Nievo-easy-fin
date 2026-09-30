@@ -57,7 +57,7 @@ public abstract class AccountsServiceTestBase : IDisposable
     protected AccountsServiceTestBase(ITestOutputHelper output)
     {
         Output = output;
-        DotNetEnv.Env.Load(".env");
+        TestEnvironment.Setup();
     }
 
     public void Dispose()

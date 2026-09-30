@@ -23,12 +23,7 @@ public abstract class AuthenticatorServiceTestBase : IDisposable
 
     static AuthenticatorServiceTestBase()
     {
-        DotNetEnv.Env.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
-
-        var googleId = "test-google-client-id"; // Value from .env
-        Environment.SetEnvironmentVariable("JWT_PRIVATE_CONTRACT_STRING", "super-secret-private-key-long-enough-32-chars");
-        Environment.SetEnvironmentVariable("JWT_PUBLIC_CONTRACT_STRING", "super-secret-public-key-long-enough-32-chars");
-        Environment.SetEnvironmentVariable("GOOGLE_ID_CLIENT", googleId);
+        TestEnvironment.Setup();
     }
 
     protected AuthenticatorServiceTestBase(WireMockFixture fixture, ITestOutputHelper output)

@@ -21,19 +21,7 @@ public abstract class UsersServiceTestBase : IDisposable
 
     static UsersServiceTestBase()
     {
-        // Load env for all tests in this class
-        var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
-        DotNetEnv.Env.Load(envPath);
-
-        var googleId = "test-google-client-id"; // Value from .env
-        // Ensure variables are also in Environment
-        Environment.SetEnvironmentVariable("REGEX_PASSWORD_RULE", "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,12}$");
-        Environment.SetEnvironmentVariable("PASSWORD_CRYPTO_ITERATIONS", "350000");
-        Environment.SetEnvironmentVariable("PASSWORD_CRYPTO_KEYSIZE", "64");
-        Environment.SetEnvironmentVariable("PASSWORD_CRYPTO_SALT", "4142434445464748494A4B4C4D4E4F505152535455565758595A6162636465666768696A6B6C6D6E6F707172737475767778797A31323334353637383930");
-
-        Environment.SetEnvironmentVariable("GOOGLE_ID_CLIENT", googleId);
-        Environment.SetEnvironmentVariable("CODE_SINGUP_TERMS", "SINGUP_TERMS_V1");
+        TestEnvironment.Setup();
     }
 
     protected UsersServiceTestBase(WireMockFixture fixture, ITestOutputHelper output)
