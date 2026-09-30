@@ -1,9 +1,6 @@
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using Dapper;
-using System.Text;
-using NievoEasyFin.Application.Data.Views;
 
 namespace NievoEasyFin.Application.Models
 {

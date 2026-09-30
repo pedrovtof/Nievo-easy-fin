@@ -136,7 +136,7 @@ public class AccountsController : Controller
     }
 
     /// <summary>
-    /// Create user goals
+    /// Create an user goals
     /// </summary>
     [HttpPost("user:goal")]
     [Authorize]
@@ -148,5 +148,20 @@ public class AccountsController : Controller
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
         return await _accountsService.PostUserGoal(request);
+    }
+
+    /// <summary>
+    /// Create an user category
+    /// </summary>
+    [HttpPost("user:category")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostUserCategory([FromHeader] string authorization, [FromBody] PostUserCategoryRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.PostUserCategory(request);
     }
 }

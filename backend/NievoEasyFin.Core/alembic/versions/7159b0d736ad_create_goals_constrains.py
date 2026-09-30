@@ -25,7 +25,7 @@ def upgrade() -> None:
             BEGIN
             IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_goals_category') THEN
                 ALTER TABLE goals.category
-                ADD CONSTRAINT fk_goals_category FOREIGN KEY (goals_id) REFERENCES goals.goals(id);
+                ADD CONSTRAINT fk_goals_category FOREIGN KEY (goal_id) REFERENCES goals.goals(id);
             END IF;
         END $$;
 

@@ -829,4 +829,63 @@ public enum EnumErrosApi
     POSTUSERGOALASYNC_CORESERVICE_200_GOAL_CREATED,
 
     #endregion
+
+    #region PostUserCategory
+
+    /// <summary>
+    /// Empty email
+    /// </summary>
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Empty name
+    /// </summary>
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_EMPTY_NAME,
+
+    /// <summary>
+    /// Invalid name
+    /// </summary>
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_INVALID_NAME,
+
+    /// <summary>
+    /// Invalid parent category id
+    /// </summary>
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_INVALID_PARENTCATEGORY,
+
+    /// <summary>
+    /// Invalid goal
+    /// </summary>
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_INVALID_GOAL,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    POSTUSERCATEGORYASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// There isn't any valid perant category with this id, try again with another one.
+    /// </summary>
+    [Description("There isn't any valid parent category with this id, try again with another one.")]
+    POSTUSERCATEGORYASYNC_CORESERVICE_404_PARENTCATEGORY_NOT_FOUND,
+
+
+    /// <summary>
+    /// Already exists an active category for the user with this name.
+    /// </summary>
+    [Description("Already exist an active category for the user with this name.")]
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ALREADY_EXIST,
+
+    /// <summary>
+    /// Created with sucess.
+    /// </summary>
+    [Description("Created with sucess.")]
+    POSTUSERCATEGORYASYNC_CORESERVICE_200_CREATED,
+
+    #endregion
 }
