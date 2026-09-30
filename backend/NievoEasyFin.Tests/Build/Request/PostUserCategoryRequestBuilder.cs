@@ -37,7 +37,7 @@ public class PostUserCategoryRequestBuilder : PostUserCategoryRequest
         return this;
     }
 
-    public PostUserCategoryRequestBuilder WithGoal(int goal)
+    public PostUserCategoryRequestBuilder WithGoal(int? goal)
     {
         Goal = goal;
         return this;

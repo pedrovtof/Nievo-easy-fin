@@ -82,6 +82,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
 
         var request = new PostUserCategoryRequestBuilder()
             .WithEmail(existingUser.Email)
+            .WithGoal(null)
             .WithParentCategory(parentCategory.Id);
 
         var service = CreateService(origin, replica, authOrigin, authReplica);
@@ -155,6 +156,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
     {
         // Arrange
         var request = new PostUserCategoryRequestBuilder()
+            .WithGoal(null)
             .WithParentCategory(999);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
