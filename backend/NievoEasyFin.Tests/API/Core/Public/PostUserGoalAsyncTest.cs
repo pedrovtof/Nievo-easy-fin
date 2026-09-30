@@ -10,9 +10,7 @@ using Xunit.Abstractions;
 using NievoEasyFin.Tests.Build.Request;
 using NievoEasyFin.Application.Data.Entities;
 
-using NievoEasyFin.Tests.API.Core.Public;
-
-namespace NievoEasyFin.Tests.API.Core.Private;
+namespace NievoEasyFin.Tests.API.Core.Public;
 
 public class PostUserGoalAsyncTest : AccountsServiceTestBase
 {
@@ -30,7 +28,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
 
         // Seed user
         var existingUser = UserEntityFaker.Create().Generate();
-        existingUser.Email = request.GetEmail();
+        existingUser.Email = request.GetEmail()!;
         authOrigin.Users.Add(existingUser);
         await authOrigin.SaveChangesAsync();
 
@@ -114,7 +112,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
 
         // Seed user
         var existingUser = UserEntityFaker.Create().Generate();
-        existingUser.Email = request.GetEmail();
+        existingUser.Email = request.GetEmail()!;
         authOrigin.Users.Add(existingUser);
         await authOrigin.SaveChangesAsync();
 
@@ -122,7 +120,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
         var existingGoal = new GoalEntity
         {
             Name = request.Name,
-            Description = request.Description,
+            Description = request.Description ?? "",
             UserId = existingUser.Id,
             Amount = request.Amount,
             IsPercent = request.IsPercent,
