@@ -34,22 +34,10 @@ namespace NievoEasyFin.Application.Data.Views
         public bool Active { get; set; }
 
         /// <summary>
-        /// ParentCategoryName
+        /// ParentCategory
         /// </summary>
-        [JsonPropertyName("parent_category_name")]
-        public string? ParentCategoryName { get; set; }
-
-        /// <summary>
-        /// ParentCategoryDescription
-        /// </summary>
-        [JsonPropertyName("parent_category_description")]
-        public string? ParentCategoryDescription { get; set; }
-
-        /// <summary>
-        /// ParentCategoryActive
-        /// </summary>
-        [JsonPropertyName("parent_category_active")]
-        public bool? ParentCategoryActive { get; set; }
+        [JsonPropertyName("parent_category")]
+        public int? ParentCategory { get; set; }
 
         /// <summary>
         /// GoalName

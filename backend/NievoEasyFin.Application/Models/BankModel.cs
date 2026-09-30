@@ -49,6 +49,7 @@ namespace NievoEasyFin.Application.Models
                 where 
                     b.active = true
                     and bt.active = true
+                    order by b.id
                     limit @limit
                     offset @offset
             """);

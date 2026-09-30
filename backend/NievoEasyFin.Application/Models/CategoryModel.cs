@@ -83,27 +83,24 @@ namespace NievoEasyFin.Application.Models
                     c.name as Name,
                     c.description as Description,
                     c.active as Active,
-                    c2.name as ParentCategoryName,
-                    c2.description as ParentCategoryDescription,
-                    c2.active as ParentCategoryActive,
+                    c.parent_category as ParentCategory,
                     g.name as GoalName,
                     g.description as GoalDescription,
                     c.created_at as CreatedAt,
                     c.updated_at as UpdatedAt,
                     count(*) over() as Records
                 from goals.category c
-                    inner join goals.goals g
+                    left join goals.goals g
                         on c.goal_id = g.id
-                    left join goals.category c2
-                        on c.id = c2.parent_category
-                where g.user_id = @userId
-                and g.active = @active
+                where c.user_id = @userId
+                and c.active = @active
             ");
 
             param.Add("userId", userId);
             param.Add("active", active);
 
             query.Append(@"
+                order by c.id
                 limit @limit
                 offset @offset
             ");

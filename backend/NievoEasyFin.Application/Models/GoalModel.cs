@@ -93,6 +93,7 @@ namespace NievoEasyFin.Application.Models
             param.Add("active", active);
 
             query.Append(@"
+                order by g.id
                 limit @limit
                 offset @offset
             ");

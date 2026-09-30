@@ -47,6 +47,7 @@ namespace NievoEasyFin.Application.Models
             ");
 
             sql.Append(@"
+                order by bcf.id
                 limit @limit
                 offset @offset
             ");
