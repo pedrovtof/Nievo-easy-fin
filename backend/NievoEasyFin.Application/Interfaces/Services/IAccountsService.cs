@@ -66,13 +66,18 @@ namespace NievoEasyFin.Application.Interfaces.Services
         Task<IActionResult> GetUserCard([FromQuery] GetUserCardRequest request);
 
         /// <summary>
-        /// Create a user card
+        /// Create an user card
         /// </summary>
         Task<IActionResult> PostUserCard([FromBody] PostUserCardRequest request);
 
         /// <summary>
-        /// Create a user goal
+        /// Create an user goal
         /// </summary>
         Task<IActionResult> PostUserGoal([FromBody] PostUserGoalRequest request);
+
+        /// <summary>
+        /// Create an user category
+        /// </summary>
+        Task<IActionResult> PostUserCategory([FromBody] PostUserCategoryRequest request);
     }
 }

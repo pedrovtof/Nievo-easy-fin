@@ -40,6 +40,8 @@ namespace NievoEasyFin.Application.Services.Base
 
         private readonly GoalModel _goalModel;
 
+        private readonly CategoryModel _categoryModel;
+
         public AccountsService(
             BankModel bankModel,
             AuthDbCacheService authDbCacheService,
@@ -50,7 +52,8 @@ namespace NievoEasyFin.Application.Services.Base
             BankCardTypeModel bankCardTypeModel,
             UserBankCardModel userBankCardModel,
             BankCardFlagModel bankCardFlag,
-            GoalModel goalModel
+            GoalModel goalModel,
+            CategoryModel categoryModel
         )
         {
             _bankModel = bankModel;
@@ -63,6 +66,7 @@ namespace NievoEasyFin.Application.Services.Base
             _userBankCardModel = userBankCardModel;
             _bankCardFlagModel = bankCardFlag;
             _goalModel = goalModel;
+            _categoryModel = categoryModel;
         }
 
         /// <summary>
@@ -513,6 +517,50 @@ namespace NievoEasyFin.Application.Services.Base
             );
 
             return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERGOALASYNC_CORESERVICE_200_GOAL_CREATED.GetDescription()));
+        }
+
+        /// <summary>
+        /// Post user category
+        /// </summary>
+        /// <param name="request">PostUserCategoryRequest</param>
+        public async Task<IActionResult> PostUserCategory(PostUserCategoryRequest request)
+        {
+            var validatorResult = await new PostUserCategoryValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            if (request.ParentCategory != null)
+            {
+                var parentCategory = await _categoryModel.GetCategoryValidById((int)request.ParentCategory);
+                if (parentCategory == null)
+                    return NotFound(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_404_PARENTCATEGORY_NOT_FOUND.GetDescription() }
+                    ));
+            }
+
+            var category = await _categoryModel.GetCategoryValidByNameAndUserId(request.Name, user.Id);
+            if (category != null)
+                return BadRequest(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ALREADY_EXIST.GetDescription() }
+                    ));
+
+            category = await _categoryModel.CreateCategory(
+                request.Name,
+                request.Description,
+                user.Id,
+                request.ParentCategory,
+                request.Goal
+            );
+
+            return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_200_CREATED.GetDescription()));
         }
     }
 }

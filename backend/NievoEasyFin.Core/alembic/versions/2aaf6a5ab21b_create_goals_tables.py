@@ -40,7 +40,7 @@ def upgrade() -> None:
             description VARCHAR(255),
             active bool DEFAULT true NOT NULL,
             user_id INT,
-            goals_id INT,
+            goal_id INT,
             parrent_category INT,
             created_at TIMESTAMP without time zone DEFAULT now() NOT NULL,
             updated_at TIMESTAMP without time zone
