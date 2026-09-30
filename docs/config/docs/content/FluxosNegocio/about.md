@@ -89,7 +89,7 @@ sequenceDiagram
     participant Frontend as Frontend (React / Vite)
     participant Kong as Kong API Gateway
     participant Core as CoreService (C#)
-    participant DB as Postgres (bank)
+    participant DB as Postgres (accounts)
 
     Usuario->>Frontend: Seleciona Banco e insere apelido da conta
     Frontend->>Kong: POST /api/public/v1/Accounts/user-banks (Bearer JWT)
@@ -97,7 +97,7 @@ sequenceDiagram
     Kong->>Core: Encaminha DTO + claim email
     Core->>DB: Verifica existência do banco e usuário
     alt Banco e Usuário válidos
-        Core->>DB: Insere registro em bank.user_banks
+        Core->>DB: Insere registro em accounts.user_bank
         DB-->>Core: Confirmação de criação
         Core-->>Frontend: Retorna HTTP 200 OK (Criado com Sucesso)
         Frontend-->>Usuario: Exibe confirmação na tela
@@ -105,6 +105,32 @@ sequenceDiagram
         Core-->>Frontend: Retorna HTTP 400 Bad Request
         Frontend-->>Usuario: Exibe mensagem de erro
     end
+```
+
+#### Fluxo de Criação de Metas e Categorias Financeiras
+
+```mermaid
+sequenceDiagram
+    participant Usuario as Usuário
+    participant Frontend as Frontend (React / Vite)
+    participant Kong as Kong API Gateway
+    participant Core as CoreService (C#)
+    participant DB as Postgres (goals)
+
+    Usuario->>Frontend: Cadastra Meta de Economia (nome, valor, prazo)
+    Frontend->>Kong: POST /api/public/v1/Accounts/user:goal (Bearer JWT)
+    Kong->>Core: Encaminha requisição autenticada
+    Core->>DB: Valida regras e insere em goals.goals (GoalModel)
+    DB-->>Core: Confirmação de persistência
+    Core-->>Frontend: Retorna HTTP 200 OK (Meta Criada)
+
+    Usuario->>Frontend: Cria Categoria vinculando à Meta recém-criada
+    Frontend->>Kong: POST /api/public/v1/Accounts/user:category (goal_id, name)
+    Kong->>Core: Encaminha requisição autenticada
+    Core->>DB: Valida exclusividade mútua e insere em goals.category (CategoryModel)
+    DB-->>Core: Confirmação de persistência
+    Core-->>Frontend: Retorna HTTP 200 OK (Categoria Criada)
+    Frontend-->>Usuario: Atualiza árvore orçamentária no Dashboard
 ```
 
 #### Fluxo de Consulta Analítica de Gastos

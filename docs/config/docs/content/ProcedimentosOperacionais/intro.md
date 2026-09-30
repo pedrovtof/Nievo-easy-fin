@@ -63,13 +63,21 @@ make web-exec
 
 ---
 
-## 🧪 4. Execução de Suíte de Testes
+## 🧪 4. Execução de Suíte de Testes e CI/CD
 
+### Execução Local:
 Para rodar a suíte completa de testes unitários e de integração do backend:
 
 ```bash
 make dotnet-test
+# ou diretamente via CLI .NET:
+dotnet test backend/NievoEasyFin.Tests/test.csproj
 ```
+
+### Integração Contínua (CI/CD no GitHub Actions):
+- O repositório possui uma pipeline automatizada em `.github/workflows/backend-tests.yml` que é acionada em todo **Pull Request**.
+- A pipeline provisiona o runner `ubuntu-latest`, instala o .NET 10.0.x, restaura pacotes NuGet, compila a suíte e executa todos os testes de `test.csproj` com nível de verbosidade normal.
+- **Configuração de Ambiente dos Testes:** Os testes utilizam a classe auxiliar `NievoEasyFin.Tests/Mocks/Helpers/TestEnvironment.cs`, que injeta em memória todas as variáveis de ambiente necessárias (JWT Secret, conexões de banco de teste, etc.), eliminando a necessidade de arquivos físicos `.env` no ambiente de CI.
 
 ---
 

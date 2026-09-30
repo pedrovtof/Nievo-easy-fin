@@ -183,10 +183,61 @@ erDiagram
 
 ---
 
-### 🎯 Schemas `goals` e `payment`
+### 🎯 Schema `goals` (Metas Financeiras e Categorias)
 
-- **Schema `goals`:** Reservado para o planejamento financeiro, metas de economia e tetos orçamentários por categoria.
-- **Schema `payment`:** Reservado para o registro detalhado de transações, parcelamentos e fluxo de caixa.
+O schema `goals` armazena as metas de economia e tetos orçamentários definidos pelos usuários, assim como a árvore de categorias financeiras associadas.
+
+```mermaid
+erDiagram
+    goals ||--o{ category : "goal_id"
+    category ||--o{ category : "parent_category"
+
+    goals {
+        int id PK "SERIAL"
+        string name "VARCHAR(150)"
+        string description "VARCHAR(255)"
+        bool active "BOOLEAN DEFAULT true"
+        int user_id "INTEGER (idx_goals_user)"
+        int amount "INTEGER"
+        bool is_percent "BOOLEAN"
+        date expire_at "DATE (idx_goals_expire_at)"
+        datetime created_at "TIMESTAMP DEFAULT now()"
+        datetime updated_at "TIMESTAMP"
+    }
+
+    category {
+        int id PK "SERIAL"
+        string name "VARCHAR(150)"
+        string description "VARCHAR(255)"
+        bool active "BOOLEAN DEFAULT true (idx_goals_category_active)"
+        int user_id "INTEGER (idx_goals_category_user)"
+        int goal_id FK "INTEGER (fk_goals_category)"
+        int parent_category FK "INTEGER (idx_goals_category_parent)"
+        datetime created_at "TIMESTAMP DEFAULT now()"
+        datetime updated_at "TIMESTAMP"
+    }
+```
+
+#### 📌 Índices e Otimizações de Performance:
+- **`goals.goals`:**
+  - `idx_goals_user`: Otimiza buscas e filtros por usuário (`user_id`).
+  - `idx_goals_active`: Filtra metas ativas vs arquivadas (`active`).
+  - `idx_goals_expire_at`: Otimiza ordenações e alertas de metas com prazo de expiração (`expire_at`).
+- **`goals.category`:**
+  - `idx_goals_category_parent`: Acelera a navegação hierárquica na árvore de subcategorias (`parent_category`).
+  - `idx_goals_category_active`: Filtra categorias ativas (`active`).
+  - `idx_goals_category_user`: Garante agilidade em listagens e validações de unicidade por usuário (`user_id`).
+
+#### 🔒 Permissões e Segurança de Banco:
+- O schema concede `USAGE` para o usuário `cross_database_user` e `app_core_service_efn`.
+- Permissões de `SELECT, INSERT, UPDATE` concedidas para `app_core_service_efn` nas tabelas `goals.goals` e `goals.category`.
+- Permissões de `SELECT, USAGE` em todas as *sequences* concedidas para `app_core_service_efn`.
+
+---
+
+### 💳 Schema `payment` (Transações e Fluxo de Caixa)
+
+- **Schema `payment`:** Reservado para o registro detalhado de lançamentos financeiros, despesas, receitas, parcelamentos e fluxo de caixa.
 
 ---
 
@@ -254,6 +305,51 @@ WHERE ubc.user_id = @userId
     AND bc.active = true
     AND bct.active = true
     AND bcf.active = true
+LIMIT @limit OFFSET @offset;
+```
+
+### D. Consulta Paginada de Metas do Usuário (`GoalModel.cs`)
+Executa consulta direta via Dapper na tabela `goals.goals` calculando o total de registros com *Window Function*:
+
+```sql
+SELECT 
+    g.id AS Id,
+    g.name AS Name,
+    g.description AS Description,
+    g.active AS Active,
+    g.amount AS Amount,
+    g.is_percent AS IsPercent,
+    g.expire_at AS ExpireAt,
+    g.created_at AS CreatedAt,
+    g.updated_at AS UpdatedAt,
+    COUNT(*) OVER() AS Records
+FROM goals.goals g
+WHERE g.user_id = @userId
+    AND g.active = @active
+ORDER BY g.id
+LIMIT @limit OFFSET @offset;
+```
+
+### E. Consulta Paginada de Categorias com Metas Associadas (`CategoryModel.cs`)
+Realiza um `LEFT JOIN` entre `goals.category` e `goals.goals` para trazer o nome e a descrição da meta vinculada (quando houver), com contagem total de registros via *Window Function*:
+
+```sql
+SELECT 
+    c.id AS Id,
+    c.name AS Name,
+    c.description AS Description,
+    c.active AS Active,
+    c.parent_category AS ParentCategory,
+    g.name AS GoalName,
+    g.description AS GoalDescription,
+    c.created_at AS CreatedAt,
+    c.updated_at AS UpdatedAt,
+    COUNT(*) OVER() AS Records
+FROM goals.category c
+    LEFT JOIN goals.goals g ON c.goal_id = g.id
+WHERE c.user_id = @userId
+    AND c.active = @active
+ORDER BY c.id
 LIMIT @limit OFFSET @offset;
 ```
 

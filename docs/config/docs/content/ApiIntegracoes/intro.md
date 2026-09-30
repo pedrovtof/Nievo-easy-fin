@@ -84,4 +84,4 @@ Para garantir a previsibilidade na integração do frontend, todos os endpoints 
 Consulte as seções detalhadas a seguir para verificar os contratos completos, payloads de entrada, parâmetros de consulta e códigos de retorno de cada microsserviço:
 
 - **[Endpoints de Autenticação (Auth)](auth_endpoints.md):** Rotas do microsserviço `NievoEasyFin.Auth`.
-- **[Endpoints de Contas e Cartões (Core)](core_endpoints.md):** Rotas do Monólito `NievoEasyFin.Core`.
+- **[Endpoints de Contas, Cartões, Metas e Categorias (Core)](core_endpoints.md):** Rotas do Monólito `NievoEasyFin.Core`.

@@ -17,18 +17,50 @@ timeline
         Abril 2026 : Google SSO (OAuth2) : Tokens JWT (HS256) : Reset de Senha via SMTP/Redis
         Maio 2026 : Monólito Core Service : Migração Frontend para Vite + MUI
         Junho 2026 : Aceite de Termos de Uso (Auditoria Host/UserAgent) : Suíte de Testes
-    section Q3 2026 (Domínio Core & Accounts)
+    section Q3 2026 (Domínio Core, Accounts, Goals & CI/CD)
         Julho 2026 : AccountsService : PostUserBanks : GetBanks Paginado
         Agosto 2026 : Catálogo de Cartões : Tipos, Bandeiras e UserBankCard
-        Setembro 2026 : Makefile Infra-Down : Ajustes de Rota Pública : Documentação Global
+        Setembro 2026 : Schema Goals (Alembic) : Metas e Categorias : Pacotes .NET : CI/CD GitHub Actions : Documentação
 ```
 
 ---
 
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
 
-### 📅 Setembro / 2026 — Ajustes de Rota, Infraestrutura e Documentação Global
-* **Revisão e Expansão da Documentação (2026-09-06):** Reorganização total do MkDocs com inclusão da arquitetura de schemas do Alembic (`user_details`, `journey`, `accounts`, `goals`, `payment`), detalhamento dos JOINs dos Models C#, contratos de API e arquitetura do Frontend React/Vite/MUI.
+### 📅 Setembro / 2026 — Domínio de Metas & Categorias, Pipeline de CI/CD e Infraestrutura
+* **PR #48 — `Feat(build): add a ci-cd test` (`7b96f62`):**
+  - Implementação da pipeline automatizada de integração contínua (CI/CD) no GitHub Actions (`.github/workflows/backend-tests.yml`), acionada em todo Pull Request com setup de runner .NET 10.0.x, restore, build e execução de `dotnet test`.
+  - Criação da classe auxiliar `NievoEasyFin.Tests/Mocks/Helpers/TestEnvironment.cs` para injeção idempotente de variáveis de ambiente em memória, desacoplando a suíte de testes de arquivos `.env` em disco.
+  - Refatoração das classes de teste base (`AuthenticatorServiceTestBase`, `UsersServiceTestBase`, `AccountsServiceTestBase`) para garantir execução isolada.
+* **PR #47 — `Feat/get goals and categories` (`78101a2`):**
+  - Implementação dos endpoints de consulta paginada `GET /api/public/v1/Accounts/user:goal` e `GET /api/public/v1/Accounts/user:category` no `AccountsController`.
+  - Criação de views de leitura otimizadas com Dapper:
+    - `UserGoalView`: paginação via *window function* `count(*) over() as Records`, ordenação por ID e filtros por estado ativo.
+    - `UserCategoryView`: `LEFT JOIN` entre `goals.category` e `goals.goals` retornando o nome e descrição da meta vinculada.
+  - Adição de DTOs (`GetUserGoalRequest`, `GetUserGoalResponse`, `GetUserCategoryRequest`, `GetUserCategoryResponse`) e validadores FluentValidation (`GetUserGoalValidatorAsync`, `GetUserCategoryValidatorAsync`).
+  - Criação de builders de requisição (`GetUserGoalRequestBuilder`, `GetUserCategoryRequestBuilder`) e suíte completa de testes unitários (`GetUserGoalAsyncTest.cs`, `GetUserCategoryAsyncTest.cs`).
+* **PR #46 — `Feat/category` (`f8007ae`):**
+  - Criação do endpoint de cadastro de categorias financeiras do usuário (`POST /api/public/v1/Accounts/user:category`).
+  - Mapeamento da entidade `CategoryEntity` na tabela `goals.category` e implementação do modelo `CategoryModel`.
+  - Implementação da **regra de negócio de exclusividade mútua**: uma categoria deve ser vinculada obrigatoriamente a uma meta (`goal > 0`) OU a uma categoria pai (`parent_category > 0`), sendo rejeitadas requisições com ambos ou nenhum (`POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ONLY_CAN_BE_CREATED_WITH_ONE_GOAL_OR_PARENT`).
+  - Validação de existência da categoria pai, unicidade de nome ativo por usuário e testes unitários com builder (`PostUserCategoryAsyncTest.cs`).
+  - Registro de `DbSet<CategoryEntity> Category` em `AuthDbContext.cs` e injeção no container DI do `NievoEasyFin.Core/Startup.cs`.
+* **PR #45 — `Feat/goals` (`9166a18`):**
+  - Criação do endpoint de cadastro de metas orçamentárias (`POST /api/public/v1/Accounts/user:goal`).
+  - Mapeamento da entidade `GoalEntity` na tabela `goals.goals` e modelo `GoalModel`.
+  - Criação de DTOs e validações: `PostUserGoalRequest`, `PostUserGoalValidatorAsync` (validação de `amount > 0`, prazo futuro `expire_at > DateTime.Today` e nome de 2 a 99 caracteres).
+  - Regra de unicidade de nome para metas ativas por usuário (`POSTUSERGOALASYNC_CORESERVICE_400_GOAL_ALREADY_EXIST`).
+  - Registro de `DbSet<GoalEntity> Goal` em `AuthDbContext.cs`, injeção em `Startup.cs` e suíte de testes com builder (`PostUserGoalAsyncTest.cs`).
+* **PR #44 — `Update(dotnet): package` (`86a87e8`):**
+  - Atualização abrangente de pacotes NuGet em todos os projetos da solução (`NievoEasyFin.Application`, `NievoEasyFin.Auth`, `NievoEasyFin.Core` e `NievoEasyFin.Tests`), alinhando dependências com o .NET 10.
+* **PR #43 — `Feat(alembic): add new tables for schema goals` (`091475c`):**
+  - Criação das migrações Alembic `2aaf6a5ab21b_create_goals_tables.py` e `7159b0d736ad_create_goals_constrains.py`.
+  - Definição estrutural das tabelas `goals.goals` e `goals.category`.
+  - Criação da constraint relacional `fk_goals_category` conectando `goals.category(goals_id)` a `goals.goals(id)`.
+  - Criação de índices de busca (`idx_goals_category_parent`, `idx_goals_category_active`, `idx_goals_category_user`, `idx_goals_user`, `idx_goals_active`, `idx_goals_expire_at`).
+  - Atribuição de permissões de `USAGE`, DML e sequences aos usuários de banco `cross_database_user` e `app_core_service_efn`.
+* **PR #42 — `Docs: update docs and chancelog using the current state of the project and the history (git)` (`a50bae5`):**
+  - Revisão e reorganização global da documentação técnica no MkDocs com inclusão de diagramas Mermaid, mapeamento de persistência poliglota, catálogo de APIs e histórico detalhado.
 * **PR #41 — `Update/get-banks-path-to-public` (`b3b2c0f`, `4132338`):** Alteração da rota do endpoint de listagem de bancos para o caminho público (`/api/public/v1/Accounts/banks`).
 * **PR #40 — `add/ci-compose-infra-down` (`9c0375b`, `7acd1f1`):** Inclusão de novas opções no `Makefile` para derrubar a infraestrutura (`make infra-down`) e atualização das variáveis de ambiente de exemplo.
 
