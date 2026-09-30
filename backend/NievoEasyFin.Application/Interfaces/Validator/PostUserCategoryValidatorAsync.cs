@@ -22,6 +22,7 @@ namespace NievoEasyFin.Application.Interfaces.Validator
 
             RuleFor(x => x.Goal)
                 .GreaterThan(0)
+                .When(x => x.Goal != null)
                 .WithErrorCode(EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_400_INVALID_GOAL.ToString());
 
             RuleFor(x => x.ParentCategory)

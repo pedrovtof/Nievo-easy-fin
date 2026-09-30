@@ -151,6 +151,21 @@ public class AccountsController : Controller
     }
 
     /// <summary>
+    /// Get user goals
+    /// </summary>
+    [HttpGet("user:goal")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetUserGoal([FromHeader] string authorization, [FromQuery] GetUserGoalRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.GetUserGoal(request);
+    }
+
+    /// <summary>
     /// Create an user category
     /// </summary>
     [HttpPost("user:category")]
@@ -163,5 +178,20 @@ public class AccountsController : Controller
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
         return await _accountsService.PostUserCategory(request);
+    }
+
+    /// <summary>
+    /// Get user category
+    /// </summary>
+    [HttpGet("user:category")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetUserCategory([FromHeader] string authorization, [FromQuery] GetUserCategoryRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _accountsService.GetUserCategory(request);
     }
 }

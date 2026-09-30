@@ -41,7 +41,7 @@ def upgrade() -> None:
             active bool DEFAULT true NOT NULL,
             user_id INT,
             goal_id INT,
-            parrent_category INT,
+            parent_category INT,
             created_at TIMESTAMP without time zone DEFAULT now() NOT NULL,
             updated_at TIMESTAMP without time zone
         );

@@ -20,7 +20,7 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// Goal
         /// </summary>
         [JsonPropertyName("goal")]
-        public int Goal { get; set; }
+        public int? Goal { get; set; }
 
         /// <summary>
         /// Parent category

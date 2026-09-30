@@ -1,6 +1,9 @@
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using NievoEasyFin.Application.Data.Views;
+using System.Text;
+using Dapper;
 
 namespace NievoEasyFin.Application.Models
 {
@@ -61,6 +64,51 @@ namespace NievoEasyFin.Application.Models
             await _CoreMainNodeDatabase.SaveChangesAsync();
 
             return goal;
+        }
+
+        public async Task<(List<UserGoalView>, int)> GetUserGoal(int userId, bool active, int page, int pageSize)
+        {
+            List<UserGoalView> items = new();
+            StringBuilder query = new();
+            DynamicParameters param = new();
+
+            query.Append(@"
+                select 
+                    g.id as Id,
+                    g.name as Name,
+                    g.description as Description,
+                    g.active as Active,
+                    g.amount as Amount,
+                    g.is_percent as IsPercent,
+                    g.expire_at as ExpireAt,
+                    g.created_at as CreatedAt,
+                    g.updated_at as UpdatedAt,
+                    count(*) over() as Records
+                from goals.goals g
+                where g.user_id = @userId
+                and g.active  = @active
+            ");
+
+            param.Add("userId", userId);
+            param.Add("active", active);
+
+            query.Append(@"
+                limit @limit
+                offset @offset
+            ");
+
+            param.Add("limit", pageSize);
+            param.Add("offset", (page - 1) * pageSize);
+
+            var connection = _CoreReplicaNodeDatabase.Database.GetDbConnection();
+            items.AddRange(
+                await connection.QueryAsync<UserGoalView>(
+                    query.ToString(),
+                    param
+                )
+            );
+
+            return (items, items.Any() ? items.FirstOrDefault().Records : 0);
         }
     }
 }

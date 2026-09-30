@@ -519,6 +519,43 @@ namespace NievoEasyFin.Application.Services.Base
             return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERGOALASYNC_CORESERVICE_200_GOAL_CREATED.GetDescription()));
         }
 
+        public async Task<IActionResult> GetUserGoal(GetUserGoalRequest request)
+        {
+            var validatorResult = await new GetUserGoalValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.GETUSERGOALASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var (items, records) = await _goalModel.GetUserGoal(user.Id, request.Active, request.Page, request.PageSize);
+            if (!items.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new ResponsePaginationBase<UserGoalView>(
+                        request.Page,
+                        request.PageSize,
+                        0,
+                        new()
+                    ))
+                );
+            }
+
+            GetUserGoalResponse response = new(
+               request.Page,
+               request.PageSize,
+               records,
+               items
+           );
+
+            return Ok(new ResponseApiSucess(response));
+        }
+
         /// <summary>
         /// Post user category
         /// </summary>
@@ -536,6 +573,17 @@ namespace NievoEasyFin.Application.Services.Base
                 return NotFound(new ResponseApiError(
                     new List<string>() { EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
                 ));
+
+            if (request.Goal != null && request.ParentCategory != null)
+                return BadRequest(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ONLY_CAN_BE_CREATED_WITH_ONE_GOAL_OR_PARENT.GetDescription() }
+                    ));
+            else if (request.Goal > 0 && request.ParentCategory == null) { }
+            else if (request.Goal == null && request.ParentCategory > 0) { }
+            else
+                return BadRequest(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ONLY_CAN_BE_CREATED_WITH_ONE_GOAL_OR_PARENT.GetDescription() }
+                    ));
 
             if (request.ParentCategory != null)
             {
@@ -561,6 +609,43 @@ namespace NievoEasyFin.Application.Services.Base
             );
 
             return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_200_CREATED.GetDescription()));
+        }
+
+        public async Task<IActionResult> GetUserCategory(GetUserCategoryRequest request)
+        {
+            var validatorResult = await new GetUserCategoryValidatorAsync().ValidateAsync(request);
+            if (!validatorResult.IsValid)
+                return BadRequest(
+                    new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+                );
+
+            var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+            if (user == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.GETUSERCATEGORYASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+                ));
+
+            var (items, records) = await _categoryModel.GetUserCategory(user.Id, request.Active, request.Page, request.PageSize);
+            if (!items.Any())
+            {
+                return Ok(
+                    new ResponseApiSucess(new ResponsePaginationBase<UserCategoryView>(
+                        request.Page,
+                        request.PageSize,
+                        0,
+                        new()
+                    ))
+                );
+            }
+
+            GetUserCategoryResponse response = new(
+               request.Page,
+               request.PageSize,
+               records,
+               items
+           );
+
+            return Ok(new ResponseApiSucess(response));
         }
     }
 }

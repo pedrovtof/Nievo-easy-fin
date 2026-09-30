@@ -1,6 +1,9 @@
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using NievoEasyFin.Application.Data.Views;
+using System.Text;
+using Dapper;
 
 namespace NievoEasyFin.Application.Models
 {
@@ -47,7 +50,7 @@ namespace NievoEasyFin.Application.Models
             string description,
             int userId,
             int? parentCategory,
-            int goal
+            int? goal
         )
         {
             CategoryEntity category = new()
@@ -55,7 +58,7 @@ namespace NievoEasyFin.Application.Models
                 Name = name,
                 Description = description,
                 UserId = userId,
-                ParrentCategory = parentCategory,
+                ParentCategory = parentCategory,
                 GoalId = goal,
                 Active = true,
                 CreatedAt = DateTime.Now,
@@ -66,6 +69,57 @@ namespace NievoEasyFin.Application.Models
             await _CoreMainNodeDatabase.SaveChangesAsync();
 
             return category;
+        }
+
+        public async Task<(List<UserCategoryView>, int)> GetUserCategory(int userId, bool active, int page, int pageSize)
+        {
+            List<UserCategoryView> items = new();
+            StringBuilder query = new();
+            DynamicParameters param = new();
+
+            query.Append(@"
+                select 
+                    c.id as Id,
+                    c.name as Name,
+                    c.description as Description,
+                    c.active as Active,
+                    c2.name as ParentCategoryName,
+                    c2.description as ParentCategoryDescription,
+                    c2.active as ParentCategoryActive,
+                    g.name as GoalName,
+                    g.description as GoalDescription,
+                    c.created_at as CreatedAt,
+                    c.updated_at as UpdatedAt,
+                    count(*) over() as Records
+                from goals.category c
+                    inner join goals.goals g
+                        on c.goal_id = g.id
+                    left join goals.category c2
+                        on c.id = c2.parent_category
+                where g.user_id = @userId
+                and g.active = @active
+            ");
+
+            param.Add("userId", userId);
+            param.Add("active", active);
+
+            query.Append(@"
+                limit @limit
+                offset @offset
+            ");
+
+            param.Add("limit", pageSize);
+            param.Add("offset", (page - 1) * pageSize);
+
+            var connection = _CoreReplicaNodeDatabase.Database.GetDbConnection();
+            items.AddRange(
+                await connection.QueryAsync<UserCategoryView>(
+                    query.ToString(),
+                    param
+                )
+            );
+
+            return (items, items.Any() ? items.FirstOrDefault().Records : 0);
         }
     }
 }
