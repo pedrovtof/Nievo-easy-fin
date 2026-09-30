@@ -52,7 +52,7 @@ public class GoalEntity
     /// </summary>
     [JsonPropertyName("amount")]
     [Column("amount", TypeName = "INTEGER")]
-    public int? Amount { get; set; }
+    public int Amount { get; set; }
 
     /// <summary>
     /// IsPercent
@@ -66,7 +66,7 @@ public class GoalEntity
     /// </summary>
     [JsonPropertyName("expire_at")]
     [Column("expire_at", TypeName = "DATE")]
-    public DateTime? ExpireAt { get; set; }
+    public DateTime ExpireAt { get; set; }
 
     /// <summary>
     /// CreatedAt

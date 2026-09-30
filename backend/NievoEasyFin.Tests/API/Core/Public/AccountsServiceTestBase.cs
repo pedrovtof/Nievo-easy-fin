@@ -159,7 +159,7 @@ public abstract class AccountsServiceTestBase : IDisposable
                     active INTEGER,
                     user_id INTEGER,
                     goal_id INTEGER,
-                    parrent_category INTEGER,
+                    parent_category INTEGER,
                     created_at TEXT,
                     updated_at TEXT
                 );

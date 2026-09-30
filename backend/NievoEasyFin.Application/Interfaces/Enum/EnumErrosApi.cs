@@ -830,6 +830,26 @@ public enum EnumErrosApi
 
     #endregion
 
+    #region GetUserGoal
+
+    #endregion
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETUSERGOALASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETUSERGOALASYNC_CORESERVICE_400_INVALID_PAGESIZE,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    GETUSERGOALASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
     #region PostUserCategory
 
     /// <summary>
@@ -882,10 +902,36 @@ public enum EnumErrosApi
     POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ALREADY_EXIST,
 
     /// <summary>
+    /// You may only create a category with a goal or a parent category.
+    /// </summary>
+    [Description("You may only create a category with a goal or a parent category.")]
+    POSTUSERCATEGORYASYNC_CORESERVICE_400_CATEGORY_ONLY_CAN_BE_CREATED_WITH_ONE_GOAL_OR_PARENT,
+
+    /// <summary>
     /// Created with sucess.
     /// </summary>
     [Description("Created with sucess.")]
     POSTUSERCATEGORYASYNC_CORESERVICE_200_CREATED,
+
+    #endregion
+
+    #region GetUserCategory
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETUSERCATEGORYASYNC_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETUSERCATEGORYASYNC_CORESERVICE_400_INVALID_PAGESIZE,
+
+    /// <summary>
+    /// User not found
+    /// </summary>
+    [Description("There isn't any user with that email, try again with another one.")]
+    GETUSERCATEGORYASYNC_CORESERVICE_404_USER_NOT_FOUND,
 
     #endregion
 }

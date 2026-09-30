@@ -56,9 +56,9 @@ public class CategoryEntity
     /// <summary>
     /// ParrentCategory
     /// </summary>
-    [JsonPropertyName("parrent_category")]
-    [Column("parrent_category", TypeName = "INTEGER")]
-    public int? ParrentCategory { get; set; }
+    [JsonPropertyName("parent_category")]
+    [Column("parent_category", TypeName = "INTEGER")]
+    public int? ParentCategory { get; set; }
 
     /// <summary>
     /// CreatedAt

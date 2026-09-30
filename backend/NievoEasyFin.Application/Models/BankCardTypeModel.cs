@@ -54,6 +54,7 @@ namespace NievoEasyFin.Application.Models
             ");
 
             sql.Append(@"
+                order by id
                 limit @limit
                 offset @offset
             ");

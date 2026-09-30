@@ -31,7 +31,7 @@ def upgrade() -> None:
 
         GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA goals TO app_core_service_efn;
 
-        CREATE INDEX IF NOT EXISTS idx_goals_category_parent ON  goals.category (parrent_category);
+        CREATE INDEX IF NOT EXISTS idx_goals_category_parent ON  goals.category (parent_category);
 
         CREATE INDEX IF NOT EXISTS idx_goals_category_active ON  goals.category (active);
 

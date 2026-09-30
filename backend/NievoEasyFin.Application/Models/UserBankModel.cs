@@ -54,7 +54,8 @@ namespace NievoEasyFin.Application.Models
                     ub.user_id = @userId
                     and ub.active = @Active
                     and b.active = @Active
-                    and bt.active = @Active;
+                    and bt.active = @Active
+                order by ub.id;
             ");
 
             param.Add("userId", userId);

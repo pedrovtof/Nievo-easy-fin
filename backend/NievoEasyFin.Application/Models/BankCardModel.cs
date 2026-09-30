@@ -130,6 +130,7 @@ namespace NievoEasyFin.Application.Models
             }
 
             query.Append(@"
+                order by bc.id
                 limit @limit
                 offset @offset
             ");

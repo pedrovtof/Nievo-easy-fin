@@ -111,6 +111,7 @@ namespace NievoEasyFin.Application.Models
             }
 
             query.Append(@"
+                order by ubc.id
                 limit @limit
                 offset @offset
             ");
