@@ -18,7 +18,7 @@ namespace NievoEasyFin.Tests.API.Core.Public;
 public abstract class AccountsTestBase
 {
     protected readonly IAccountsService MockService;
-    protected readonly AccountsController Controller;
+    protected readonly UserController Controller;
     protected readonly ITestOutputHelper Output;
     protected readonly JsonWebTokenService JwtService;
 
@@ -28,7 +28,7 @@ public abstract class AccountsTestBase
         MockService = Substitute.For<IAccountsService>();
 
         JwtService = new JsonWebTokenService(null!);
-        Controller = new AccountsController(MockService, JwtService);
+        Controller = new UserController(MockService, JwtService);
     }
 
     /// <summary>

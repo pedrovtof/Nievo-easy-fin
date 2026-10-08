@@ -5,45 +5,42 @@ using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Services.Security;
 
-namespace NievoEasyFin.Core.Controllers.Private;
+namespace NievoEasyFin.Core.Controllers.Public;
 
 /// <summary>
-/// Controller responsible for managing user accounts and bank accounts operations.
+/// Controller responsible for managing card.
 /// </summary>
 [ApiController]
-[Route("api/private/v1/[controller]")]
-public class AccountsController : Controller
+[Route("api/public/v1/[controller]")]
+public class CardController : Controller
 {
     private readonly IAccountsService _accountsService;
 
     private readonly JsonWebTokenService _jsonWebTokenService;
 
-    public AccountsController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
+    public CardController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
     {
         _accountsService = accountsService;
         _jsonWebTokenService = jsonWebTokenService;
     }
 
     /// <summary>
-    /// Creates a new bank account.
+    /// Get card types
     /// </summary>
-    /// <param name="request">The bank account creation request data.</param>
-    /// <response code = "200">Return created with sucess</response>
-    /// <response code = "400">BadRequest</response>
-    [HttpPost("banks")]
+    [HttpGet("type")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostAccountsBanks([FromBody] PostAccountsBanksRequest request)
-        => await _accountsService.PostAccountsBanks(request);
+    public async Task<IActionResult> GetCardType([FromQuery] GetCardTypeRequest request)
+        => await _accountsService.GetCardType(request);
 
     /// <summary>
-    /// Create an bank card
+    /// Get card flags
     /// </summary>
-    [HttpPost("bank-card")]
+    [HttpGet("flag")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostBankCard([FromBody] PostBankCardRequest request)
-        => await _accountsService.PostBankCard(request);
+    public async Task<IActionResult> GetCardFlag([FromQuery] GetCardFlagRequest request)
+        => await _accountsService.GetCardFlag(request);
 }

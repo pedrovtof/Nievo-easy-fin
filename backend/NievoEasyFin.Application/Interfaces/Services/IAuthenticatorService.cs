@@ -24,20 +24,6 @@ public interface IAuthenticatorService
     Task<IActionResult> PostLoginUserSsoAsync(PostLogiPostLoginUserSsoRequest request);
 
     /// <summary>
-    /// Initiates the password reset process by sending a reset token to the user's email.
-    /// </summary>
-    /// <param name="request">The request containing the user's email.</param>
-    /// <returns>An IActionResult indicating if the reset process was successfully initiated.</returns>
-    Task<IActionResult> PostResetPasswordAsync(PostResetPasswordRequest request);
-
-    /// <summary>
-    /// Completes the password reset process using a reset token and a new password.
-    /// </summary>
-    /// <param name="request">The request containing the email, reset token, and new password.</param>
-    /// <returns>An IActionResult indicating the result of the password update.</returns>
-    Task<IActionResult> PatchResetPasswordAsync(PatchResetPasswordRequest request);
-
-    /// <summary>
     /// Completes the verification of the user email.
     /// </summary>
     /// <param name="request">The request containing the email and token.</param>

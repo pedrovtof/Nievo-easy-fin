@@ -77,4 +77,44 @@ public class UsersController : Controller
 
         return await _usersService.PostCreateUserSsoAsync(request);
     }
+
+    /// <summary>
+    /// Endpoint to create token for reset password
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST v1/Users/password-reset
+    ///     {
+    ///        "email": "Joe.Black@example.com"
+    ///     }
+    /// </remarks>
+    /// <param name="request">request.email</param>
+    [HttpPost("password-reset")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostResetPasswordAsync([FromBody] PostResetPasswordRequest request)
+        => await _usersService.PostResetPasswordAsync(request);
+
+    /// <summary>
+    /// Endpoint to reset password with token
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     PATCH v1/Users/password-reset
+    ///     {
+    ///        "email": "Joe.Black@example.com",
+    ///        "pin_token": "111111",
+    ///        "password": "1Meet-Death"
+    ///     }
+    /// </remarks>
+    /// <param name="request">request.pin_token and request.email</param>
+    [HttpPatch("password-reset")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PatchResetPasswordAsync([FromBody] PatchResetPasswordRequest request)
+        => await _usersService.PatchResetPasswordAsync(request);
 }

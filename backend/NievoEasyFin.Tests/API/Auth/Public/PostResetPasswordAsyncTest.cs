@@ -12,7 +12,7 @@ using NievoEasyFin.Tests.Build.Request;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
-public class PostResetPasswordAsyncTest : AuthenticatorServiceTestBase
+public class PostResetPasswordAsyncTest : UsersServiceTestBase
 {
     public PostResetPasswordAsyncTest(WireMockFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
@@ -44,7 +44,7 @@ public class PostResetPasswordAsyncTest : AuthenticatorServiceTestBase
 
         await DbContextMockFactory.SyncToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, cacheService, smtpMock);
+        var service = CreateService(origin, replica, smtpMock, cacheService);
 
         // Act
         Output.WriteLine("Executing PostResetPasswordAsync.");
