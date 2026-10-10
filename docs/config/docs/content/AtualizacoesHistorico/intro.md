@@ -20,12 +20,31 @@ timeline
     section Q3 2026 (Domínio Core, Accounts, Goals & CI/CD)
         Julho 2026 : AccountsService : PostUserBanks : GetBanks Paginado
         Agosto 2026 : Catálogo de Cartões : Tipos, Bandeiras e UserBankCard
-        Setembro 2026 : Schema Goals (Alembic) : Metas e Categorias : Pacotes .NET : CI/CD GitHub Actions : Documentação
+        Setembro 2026 : Schema Goals (Alembic) : Metas e Categorias : Pacotes .NET : CI/CD GitHub Actions
+    section Q4 2026 (SOLID & APIs RESTful)
+        Outubro 2026 : SOLID nas Interfaces (ISP/SRP) : Endpoints RESTful : Versionamento v1 Controllers
 ```
 
 ---
 
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
+
+### 📅 Outubro / 2026 — Refatoração SOLID de Interfaces, Endpoints RESTful e Versionamento v1
+* **Branch `fix/endpoint-services-filepath` (`390e5f4`, `bf34034`):**
+  - **Adequação aos Princípios SOLID:**
+    - **Interface Segregation Principle (ISP):** Desacoplamento da interface monolítica `IAccountsService` em interfaces granulares com responsabilidades estritas: `ICardService` (tipos e bandeiras), `IPublicBankService` (consulta de bancos e cartões de bancos), `IPrivateBankService` (criação de bancos e cartões no catálogo global) e `IUserService` (recursos do usuário autenticado: contas bancárias, cartões, metas e categorias).
+    - **Composição de Interfaces:** Criação de `IBankService` (unindo `IPublicBankService` e `IPrivateBankService`) e `IAccountsService` (herdando `ICardService`, `IBankService` e `IUserService`) mantendo alta coesão e baixo acoplamento.
+    - **Single Responsibility Principle (SRP):** Segregação de responsabilidades no serviço de autenticação entre `IUsersService` (criação de usuários tradicionais e SSO, além do ciclo de redefinição de senha com PIN) e `IAuthenticatorService` (autenticação de sessão, validação de e-mail e consulta de termos).
+    - **Injeção de Dependências (DIP):** Registro individualizado de `ICardService`, `IPublicBankService`, `IPrivateBankService`, `IUserService` e `IAccountsService` no container IoC do `Startup.cs` do Core.
+  - **Padrões de API RESTful e Versionamento v1:**
+    - **Descentralização dos Controllers:** Divisão do antigo `AccountsController` monolítico em controladores temáticos orientados a recursos:
+      - `UserController` (`/api/public/v1/User`): rotas `/banks`, `/bank-card`, `/goal` e `/category` para manipulação de recursos do usuário logado.
+      - `BankController` Público (`/api/public/v1/Bank`): rotas `/` e `/card` para consulta de catálogo.
+      - `CardController` (`/api/public/v1/Card`): rotas `/type` e `/flag` para metadados de cartões.
+      - `BankController` Privado (`/api/private/v1/Bank`): rotas `/` e `/card` para cadastro administrativo de bancos e produtos de cartão.
+    - **Ajustes de Rotas em Auth:** Migração do fluxo de redefinição de senha (`password-reset`) do `AuthenticatorController` para o `UsersController` (`/api/public/v1/Users/password-reset` para POST e PATCH).
+    - **Organização Física dos Controllers:** Reestruturação da árvore de diretórios dos controladores com pastas explícitas de versão (`Controllers/Public/v1/`, `Controllers/Private/v1/`, `Controllers/Admin/v1/`).
+    - **Atualização da Suíte de Testes:** Atualização das classes base e testes unitários (`AccountsTestBase`, `UsersServiceTestBase`, `PatchResetPasswordAsyncTest`, `PostResetPasswordAsyncTest`) para refletir a nova injeção de dependência das interfaces segregadas.
 
 ### 📅 Setembro / 2026 — Domínio de Metas & Categorias, Pipeline de CI/CD e Infraestrutura
 * **PR #48 — `Feat(build): add a ci-cd test` (`7b96f62`):**

@@ -6,10 +6,33 @@ Para garantir a manutenibilidade, testabilidade, legibilidade e segurança do c�
 
 ## 🏛️ 1. Padrões de Arquitetura Backend (C# / .NET)
 
+### 🧱 Princípios SOLID em Serviços e Interfaces
+Todo o design de contratos e controllers deve respeitar rigorosamente os princípios do SOLID:
+
+- **Single Responsibility Principle (SRP):** Cada controlador e serviço possui uma única responsabilidade de domínio:
+  - `UsersController` / `IUsersService`: Cadastro de contas e ciclo de recuperação de credenciais (`password-reset`).
+  - `AuthenticatorController` / `IAuthenticatorService`: Autenticação ativa de sessão (`singin`), validação de e-mail por PIN e consulta de termos.
+  - `UserController` / `IUserService`: Gerenciamento de entidades vinculadas ao usuário logado (contas bancárias, cartões, metas orçamentárias e categorias).
+  - `BankController` / `IPublicBankService` & `IPrivateBankService`: Catálogo de instituições financeiras e cartões disponíveis.
+  - `CardController` / `ICardService`: Consulta de tipos e bandeiras de cartões.
+- **Interface Segregation Principle (ISP):** Interfaces finas e especializadas. Nenhum controller deve ser forçado a depender de métodos de serviço que não utiliza. A interface agregada `IAccountsService` herda de contratos segregados (`ICardService`, `IBankService`, `IUserService`), permitindo injeção granular ou agrupada conforme a necessidade.
+- **Dependency Inversion Principle (DIP):** Controladores dependem estritamente de abstrações (interfaces) injetadas no construtor via container de IoC/DI (`Startup.cs`). É terminantemente proibido instanciar ou injetar classes concretas em controllers.
+
+### 🌐 Padrões de API RESTful e Versionamento
+- **Versionamento Explícito de Rotas:** Todos os endpoints devem declarar explicitamente a versão da API na rota (ex: `/api/public/v1/[controller]`, `/api/private/v1/[controller]`, `/api/admin/v1/[controller]`).
+- **Organização de Diretórios de Controllers:** A árvore de diretórios dos controllers deve espelhar o versionamento e a visibilidade de acesso:
+  - `Controllers/Public/v1/`
+  - `Controllers/Private/v1/`
+  - `Controllers/Admin/v1/`
+- **Nomenclatura Orientada a Recursos:** As rotas devem representar substantivos e recursos da aplicação, evitando verbos ou separadores ad-hoc no caminho:
+  - Preferir `/api/public/v1/User/banks` em vez de `/api/public/Accounts/user-banks`.
+  - Preferir `/api/public/v1/User/goal` e `/api/public/v1/User/category` em vez de rotas com dois pontos (`user:goal`, `user:category`).
+  - Manter verbos HTTP semânticos: `GET` para consultas idempotentes, `POST` para criação de recursos, `PATCH` para alterações parciais de estado.
+
 ### 🧩 Separação em Camadas e Injeção de Dependências
-- **Interfaces (`NievoEasyFin.Application/Interfaces`):** Todos os serviços, repositórios e clientes externos devem ser expostos via interfaces. É expressamente proibido injetar implementações concretas diretamente nos controllers.
-- **DTOs de Requisição e Resposta:** Controllers devem aceitar estritamente objetos Request DTO (`PostCreateUserRequest`, `PostUserBanksRequest`) e retornar DTOs de resposta (`ResponseApiSucess`, `ResponseApiError`). Entidades EF Core do banco de dados nunca devem ser expostas na API.
-- **FluentValidation:** Todas as validações de DTOs de entrada devem ser isoladas em validadores assíncronos que implementam `AbstractValidator<T>` (ex: `PostCreateUserValidator`, `PostUserBanksValidatorAsync`).
+- **Interfaces (`NievoEasyFin.Application/Interfaces`):** Todos os serviços, repositórios e clientes externos devem ser expostos via interfaces em `Interfaces/Services`.
+- **DTOs de Requisição e Resposta:** Controllers devem aceitar estritamente objetos Request DTO (`PostCreateUserRequest`, `PostUserBanksRequest`, etc.) e retornar DTOs padronizados (`ResponseApiSucess`, `ResponseApiError`). Entidades do banco de dados (EF Core) nunca devem ser expostas na camada externa da API.
+- **FluentValidation:** Todas as validações de DTOs de entrada devem ser isoladas em validadores assíncronos que implementam `AbstractValidator<T>` (ex: `PostCreateUserValidator`, `PostUserBanksValidatorAsync`, `PostUserGoalValidatorAsync`).
 
 ---
 

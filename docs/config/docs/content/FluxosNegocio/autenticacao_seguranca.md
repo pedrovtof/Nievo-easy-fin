@@ -14,7 +14,7 @@ sequenceDiagram
     participant DB as Postgres (user_details.user)
     participant JWT as JsonWebTokenService
 
-    Frontend->>Auth: POST /singin (email, password)
+    Frontend->>Auth: POST /api/public/v1/Authenticator/singin (email, password)
     Auth->>DB: GetUserByEmailAsync(email, statusId = 2)
     alt Usuário não encontrado ou status != 2 (ACTIVE)
         DB-->>Auth: Retorna null
@@ -45,7 +45,7 @@ sequenceDiagram
     participant Google as Google OAuth2 API
     participant DB as Postgres (user_details & journey)
 
-    Frontend->>Auth: POST /singin-sso (provider: "google", provider_access_token)
+    Frontend->>Auth: POST /api/public/v1/Authenticator/singin-sso (provider: "google", provider_access_token)
     Auth->>Google: ValidateProviderAsync (valida token e aud = GOOGLE_ID_CLIENT)
     Google-->>Auth: Retorna payload (email, sub, name)
     Auth->>DB: GetUserByProviderSubAndIdAsync (JOIN user_details.user + journey.user_provider_sso)
@@ -61,5 +61,7 @@ sequenceDiagram
 
 ## 🔄 3. Redefinição de Senha por PIN
 
-1. **Solicitação (`POST /password-reset`):** O usuário informa o e-mail. Se existir na tabela `user_details.user`, é gerado um PIN de 6 dígitos salvo no Redis (chave `reset_password:{email}`, TTL de 15 min) e enviado via `SmtpProvider`.
-2. **Confirmação (`PATCH /password-reset`):** O usuário envia e-mail, PIN e nova senha. O sistema valida o PIN no Redis, gera o novo hash PBKDF2 e atualiza a coluna `password` na tabela `user_details.user` via `UpdateUserPasswordAsync`.
+Operação gerenciada pelo controlador RESTful `UsersController` (`/api/public/v1/Users`):
+
+1. **Solicitação (`POST /api/public/v1/Users/password-reset`):** O usuário informa o e-mail. Se existir na tabela `user_details.user`, é gerado um PIN de 6 dígitos salvo no Redis (chave `reset_password:{email}`, TTL de 15 min) e enviado via `SmtpProvider`.
+2. **Confirmação (`PATCH /api/public/v1/Users/password-reset`):** O usuário envia e-mail, PIN e nova senha. O sistema valida o PIN no Redis, gera o novo hash PBKDF2 e atualiza a coluna `password` na tabela `user_details.user` via `UpdateUserPasswordAsync`.
