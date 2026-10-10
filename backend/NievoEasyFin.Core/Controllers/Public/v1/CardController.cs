@@ -14,13 +14,13 @@ namespace NievoEasyFin.Core.Controllers.Public;
 [Route("api/public/v1/[controller]")]
 public class CardController : Controller
 {
-    private readonly IAccountsService _accountsService;
+    private readonly ICardService _cardService;
 
     private readonly JsonWebTokenService _jsonWebTokenService;
 
-    public CardController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
+    public CardController(ICardService cardService, JsonWebTokenService jsonWebTokenService)
     {
-        _accountsService = accountsService;
+        _cardService = cardService;
         _jsonWebTokenService = jsonWebTokenService;
     }
 
@@ -32,7 +32,7 @@ public class CardController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetCardType([FromQuery] GetCardTypeRequest request)
-        => await _accountsService.GetCardType(request);
+        => await _cardService.GetCardType(request);
 
     /// <summary>
     /// Get card flags
@@ -42,5 +42,5 @@ public class CardController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetCardFlag([FromQuery] GetCardFlagRequest request)
-        => await _accountsService.GetCardFlag(request);
+        => await _cardService.GetCardFlag(request);
 }

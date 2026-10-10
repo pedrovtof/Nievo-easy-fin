@@ -12,7 +12,7 @@ namespace NievoEasyFin.Auth.Controllers.Admin;
 /// Class created for validate status from the server
 /// </summary>
 [ApiController]
-[Route("api/private/v1/[controller]")]
+[Route("api/admin/v1/[controller]")]
 public class HealthCheckController : ControllerBase
 {
     private readonly AuthOrigin _AuthMainNodeDatabase;

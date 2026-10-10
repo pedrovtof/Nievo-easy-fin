@@ -14,13 +14,13 @@ namespace NievoEasyFin.Core.Controllers.Public;
 [Route("api/public/v1/[controller]")]
 public class BankController : Controller
 {
-    private readonly IAccountsService _accountsService;
+    private readonly IPublicBankService _bankService;
 
     private readonly JsonWebTokenService _jsonWebTokenService;
 
-    public BankController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
+    public BankController(IPublicBankService bankService, JsonWebTokenService jsonWebTokenService)
     {
-        _accountsService = accountsService;
+        _bankService = bankService;
         _jsonWebTokenService = jsonWebTokenService;
     }
 
@@ -32,7 +32,7 @@ public class BankController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetBanks([FromQuery] GetBanksRequest request)
-        => await _accountsService.GetBanks(request);
+        => await _bankService.GetBanks(request);
 
     /// <summary>
     /// Get bank cards
@@ -46,6 +46,6 @@ public class BankController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.GetBankCard(request);
+        return await _bankService.GetBankCard(request);
     }
 }

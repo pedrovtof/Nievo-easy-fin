@@ -14,13 +14,13 @@ namespace NievoEasyFin.Core.Controllers.Private;
 [Route("api/private/v1/[controller]")]
 public class BankController : Controller
 {
-    private readonly IAccountsService _accountsService;
+    private readonly IPrivateBankService _bankService;
 
     private readonly JsonWebTokenService _jsonWebTokenService;
 
-    public BankController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
+    public BankController(IPrivateBankService bankService, JsonWebTokenService jsonWebTokenService)
     {
-        _accountsService = accountsService;
+        _bankService = bankService;
         _jsonWebTokenService = jsonWebTokenService;
     }
 
@@ -35,7 +35,7 @@ public class BankController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostAccountsBanks([FromBody] PostAccountsBanksRequest request)
-        => await _accountsService.PostAccountsBanks(request);
+        => await _bankService.PostAccountsBanks(request);
 
     /// <summary>
     /// Create an bank card
@@ -45,5 +45,5 @@ public class BankController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostBankCard([FromBody] PostBankCardRequest request)
-        => await _accountsService.PostBankCard(request);
+        => await _bankService.PostBankCard(request);
 }
