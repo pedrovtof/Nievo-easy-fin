@@ -61,6 +61,6 @@ Para fins de conformidade legal, o aceite dos termos é persistido com evidênci
 1. **Status Pendente:** O usuário é gravado em `user_details.user` com `status_id = 1` (`INVALID`).
 2. **Cache do PIN:** O `AuthDbCacheService` cria o token de 6 dígitos no Redis com a chave `singup_token:{email}` (TTL de 15 min).
 3. **Envio de E-mail:** O `SmtpProvider` envia a mensagem em HTML contendo o PIN.
-4. **Ativação (`POST /validate:email`):**
+4. **Ativação (`POST /api/public/v1/Authenticator/validate:email`):**
    - O usuário envia e-mail e `pin_token`.
    - Havendo correspondência com o cache, o status é alterado para `status_id = 2` (`ACTIVE`) no PostgreSQL via `UpdateUserStatusAsync`.

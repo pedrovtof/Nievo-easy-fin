@@ -8,19 +8,19 @@ using NievoEasyFin.Application.Services.Security;
 namespace NievoEasyFin.Core.Controllers.Public;
 
 /// <summary>
-/// Controller responsible for managing user accounts and bank accounts operations.
+/// Controller responsible for managing user.
 /// </summary>
 [ApiController]
 [Route("api/public/v1/[controller]")]
-public class AccountsController : Controller
+public class UserController : Controller
 {
-    private readonly IAccountsService _accountsService;
+    private readonly IUserService _userService;
 
     private readonly JsonWebTokenService _jsonWebTokenService;
 
-    public AccountsController(IAccountsService accountsService, JsonWebTokenService jsonWebTokenService)
+    public UserController(IUserService userService, JsonWebTokenService jsonWebTokenService)
     {
-        _accountsService = accountsService;
+        _userService = userService;
         _jsonWebTokenService = jsonWebTokenService;
     }
 
@@ -30,7 +30,7 @@ public class AccountsController : Controller
     /// <param name="authorization">Token JWT</param>
     /// <param name="request">PostUserBanksRequest</param>
     /// <returns>IActionResult</returns>
-    [HttpPost("user-banks")]
+    [HttpPost("banks")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -39,18 +39,8 @@ public class AccountsController : Controller
         request.SetEmail(
             await _jsonWebTokenService.GetClaimValue(authorization, "email")
         );
-        return await _accountsService.PostUserBanks(request);
+        return await _userService.PostUserBanks(request);
     }
-
-    /// <summary>
-    /// Get list of banks
-    /// </summary>
-    [HttpGet("banks")]
-    [Authorize]
-    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetBanks([FromQuery] GetBanksRequest request)
-        => await _accountsService.GetBanks(request);
 
     /// <summary>
     /// Get user bank accounts.
@@ -58,7 +48,7 @@ public class AccountsController : Controller
     /// <param name="authorization">Token JWT</param>
     /// <param name="request">GetUserBanksRequest</param>
     /// <returns>IActionResult</returns>
-    [HttpGet("user-banks")]
+    [HttpGet("banks")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -67,48 +57,13 @@ public class AccountsController : Controller
         request.SetEmail(
             await _jsonWebTokenService.GetClaimValue(authorization, "email")
         );
-        return await _accountsService.GetUserBanks(request);
-    }
-
-    /// <summary>
-    /// Get card types
-    /// </summary>
-    [HttpGet("card-type")]
-    [Authorize]
-    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetCardType([FromQuery] GetCardTypeRequest request)
-        => await _accountsService.GetCardType(request);
-
-    /// <summary>
-    /// Get card flags
-    /// </summary>
-    [HttpGet("card-flag")]
-    [Authorize]
-    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetCardFlag([FromQuery] GetCardFlagRequest request)
-        => await _accountsService.GetCardFlag(request);
-
-    /// <summary>
-    /// Get bank cards
-    /// </summary>
-    [HttpGet("bank-card")]
-    [Authorize]
-    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetBankCard([FromHeader] string authorization, [FromQuery] GetBankCardRequest request)
-    {
-        request.SetEmail(
-           await _jsonWebTokenService.GetClaimValue(authorization, "email")
-       );
-        return await _accountsService.GetBankCard(request);
+        return await _userService.GetUserBanks(request);
     }
 
     /// <summary>
     /// Get user card banks
     /// </summary>
-    [HttpGet("user:bank-card")]
+    [HttpGet("bank-card")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -117,13 +72,13 @@ public class AccountsController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.GetUserCard(request);
+        return await _userService.GetUserCard(request);
     }
 
     /// <summary>
     /// Create user card banks
     /// </summary>
-    [HttpPost("user:bank-card")]
+    [HttpPost("bank-card")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -132,13 +87,13 @@ public class AccountsController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.PostUserCard(request);
+        return await _userService.PostUserCard(request);
     }
 
     /// <summary>
     /// Create an user goals
     /// </summary>
-    [HttpPost("user:goal")]
+    [HttpPost("goal")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -147,13 +102,13 @@ public class AccountsController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.PostUserGoal(request);
+        return await _userService.PostUserGoal(request);
     }
 
     /// <summary>
     /// Get user goals
     /// </summary>
-    [HttpGet("user:goal")]
+    [HttpGet("goal")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -162,13 +117,13 @@ public class AccountsController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.GetUserGoal(request);
+        return await _userService.GetUserGoal(request);
     }
 
     /// <summary>
     /// Create an user category
     /// </summary>
-    [HttpPost("user:category")]
+    [HttpPost("category")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -177,13 +132,13 @@ public class AccountsController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.PostUserCategory(request);
+        return await _userService.PostUserCategory(request);
     }
 
     /// <summary>
     /// Get user category
     /// </summary>
-    [HttpGet("user:category")]
+    [HttpGet("category")]
     [Authorize]
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
@@ -192,6 +147,6 @@ public class AccountsController : Controller
         request.SetEmail(
            await _jsonWebTokenService.GetClaimValue(authorization, "email")
        );
-        return await _accountsService.GetUserCategory(request);
+        return await _userService.GetUserCategory(request);
     }
 }

@@ -9,6 +9,7 @@ using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using WireMock.Server;
 using Xunit.Abstractions;
+using NievoEasyFin.Application.Services.Cache;
 
 namespace NievoEasyFin.Tests.API.Auth.Public;
 
@@ -37,7 +38,11 @@ public abstract class UsersServiceTestBase : IDisposable
         // No need to stop server here as it's static, but could reset
     }
 
-    protected UsersService CreateService(AuthOrigin authOrigin, AuthReplica authReplica, SmtpModelMock? smtpMock = null)
+    protected UsersService CreateService(
+        AuthOrigin authOrigin,
+        AuthReplica authReplica,
+        SmtpModelMock? smtpMock = null,
+        AuthDbCacheService? cache = null)
     {
         var userModel = new UserModel(authOrigin, authReplica);
         var userProviderSsoModel = new UserProviderSsoModel(authOrigin, authReplica);
@@ -45,13 +50,7 @@ public abstract class UsersServiceTestBase : IDisposable
         var acceptTermsModel = new AcceptTermsModel(authOrigin, authReplica);
         var usersAcceptedTermsModel = new UsersAcceptedTermsModel(authOrigin, authReplica);
 
-        var dbMock = new Mock<IDatabase>();
-        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
-              .ReturnsAsync(RedisValue.Null);
-        dbMock.Setup(d => d.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
-              .ReturnsAsync(true);
-
-        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+        var cacheService = cache ?? CreateDefaultCacheService();
 
         return new UsersService(
             _cryptoPasswordService,
@@ -63,5 +62,16 @@ public abstract class UsersServiceTestBase : IDisposable
             acceptTermsModel,
             usersAcceptedTermsModel
         );
+    }
+
+    private static AuthDbCacheService CreateDefaultCacheService()
+    {
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(RedisValue.Null);
+        dbMock.Setup(d => d.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(true);
+
+        return MockHelper.CreateMockedCacheService(dbMock);
     }
 }

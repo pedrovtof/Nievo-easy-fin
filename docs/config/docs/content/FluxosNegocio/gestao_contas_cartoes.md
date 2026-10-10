@@ -1,6 +1,6 @@
 # Fluxo de Gestão de Contas Bancárias e Cartões
 
-A gestão de contas e cartões no **Nievo EasyFin** é coordenada pelo Monólito `NievoEasyFin.Core` atuando sobre o esquema **`accounts`** do PostgreSQL.
+A gestão de contas e cartões no **Nievo EasyFin** é coordenada pelo Monólito `NievoEasyFin.Core` atuando sobre o esquema **`accounts`** do PostgreSQL, estruturada em controladores RESTful específicos (`UserController`, `BankController` e `CardController`).
 
 ---
 
@@ -8,9 +8,9 @@ A gestão de contas e cartões no **Nievo EasyFin** é coordenada pelo Monólito
 
 ```mermaid
 flowchart TD
-    User["Usuário no Frontend"] --> SearchBank["Consulta Lista de Bancos (GET /Accounts/banks)"]
+    User["Usuário no Frontend"] --> SearchBank["Consulta Lista de Bancos (GET /api/public/v1/Bank)"]
     SearchBank --> SelectBank["Seleciona o Banco (accounts.bank) e digita Apelido"]
-    SelectBank --> PostUserBank["POST /Accounts/user-banks (Bearer JWT)"]
+    SelectBank --> PostUserBank["POST /api/public/v1/User/banks (Bearer JWT)"]
     
     PostUserBank --> CheckAuth{"Token JWT Válido?"}
     CheckAuth -->|Não| HTTP401["HTTP 401 Unauthorized"]
@@ -32,9 +32,9 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    User["Usuário no Frontend"] --> GetOptions["Consulta Tipos (accounts.bank_card_type) e Bandeiras (accounts.bank_card_flag)"]
-    GetOptions --> GetBankCards["Consulta Cartões do Banco (accounts.bank_card)"]
-    GetBankCards --> PostUserCard["POST /Accounts/user:bank-card"]
+    User["Usuário no Frontend"] --> GetOptions["Consulta Tipos (GET /api/public/v1/Card/type) e Bandeiras (GET /api/public/v1/Card/flag)"]
+    GetOptions --> GetBankCards["Consulta Cartões do Banco (GET /api/public/v1/Bank/card)"]
+    GetBankCards --> PostUserCard["POST /api/public/v1/User/bank-card (Bearer JWT)"]
 
     PostUserCard --> ValCard{"Cartão (card_id) e Banco (bank_id) válidos?"}
     ValCard -->|Não| HTTP404["HTTP 404 Not Found (Banco ou Cartão não encontrado)"]
@@ -54,7 +54,7 @@ flowchart TD
 
 ---
 
-## 🛡️ 3. Operações Administrativas (`/api/private/v1/Accounts`)
+## 🛡️ 3. Operações Administrativas (`/api/private/v1/Bank`)
 
-- **`POST /api/private/v1/Accounts/banks`:** Insere registros na tabela `accounts.bank`.
-- **`POST /api/private/v1/Accounts/bank-card`:** Insere produtos no catálogo `accounts.bank_card`.
+- **`POST /api/private/v1/Bank`:** Insere registros de instituições financeiras na tabela `accounts.bank`.
+- **`POST /api/private/v1/Bank/card`:** Insere novos produtos no catálogo de cartões `accounts.bank_card`.

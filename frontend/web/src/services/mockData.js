@@ -70,7 +70,7 @@ export const setupMockAdapter = (apiClient) => {
       } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request."] } };
       }
-    } else if (config.url.includes('/auth/change-password') || (config.url.includes('/Authenticator/password-reset') && config.method === 'patch')) {
+    } else if (config.url.includes('/auth/change-password') || (config.url.includes('/Users/password-reset') && config.method === 'patch')) {
       try {
         const body = JSON.parse(config.data);
         // Real API body: { email, pin_token, password }
@@ -89,7 +89,7 @@ export const setupMockAdapter = (apiClient) => {
       } catch {
         error.mockData = { status: 400, data: { success: false, messages: ["Bad request"] } };
       }
-    } else if (config.url.includes('/auth/forgot-password') || (config.url.includes('/Authenticator/password-reset') && config.method === 'post')) {
+    } else if (config.url.includes('/auth/forgot-password') || (config.url.includes('/Users/password-reset') && config.method === 'post')) {
       try {
         typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
         // In a real app we don't usually leak if the email exists, we just return 200.

@@ -92,7 +92,7 @@ sequenceDiagram
     participant DB as Postgres (accounts)
 
     Usuario->>Frontend: Seleciona Banco e insere apelido da conta
-    Frontend->>Kong: POST /api/public/v1/Accounts/user-banks (Bearer JWT)
+    Frontend->>Kong: POST /api/public/v1/User/banks (Bearer JWT)
     Kong->>Kong: Valida JWT token
     Kong->>Core: Encaminha DTO + claim email
     Core->>DB: Verifica existência do banco e usuário
@@ -118,14 +118,14 @@ sequenceDiagram
     participant DB as Postgres (goals)
 
     Usuario->>Frontend: Cadastra Meta de Economia (nome, valor, prazo)
-    Frontend->>Kong: POST /api/public/v1/Accounts/user:goal (Bearer JWT)
+    Frontend->>Kong: POST /api/public/v1/User/goal (Bearer JWT)
     Kong->>Core: Encaminha requisição autenticada
     Core->>DB: Valida regras e insere em goals.goals (GoalModel)
     DB-->>Core: Confirmação de persistência
     Core-->>Frontend: Retorna HTTP 200 OK (Meta Criada)
 
     Usuario->>Frontend: Cria Categoria vinculando à Meta recém-criada
-    Frontend->>Kong: POST /api/public/v1/Accounts/user:category (goal_id, name)
+    Frontend->>Kong: POST /api/public/v1/User/category (goal_id, name)
     Kong->>Core: Encaminha requisição autenticada
     Core->>DB: Valida exclusividade mútua e insere em goals.category (CategoryModel)
     DB-->>Core: Confirmação de persistência

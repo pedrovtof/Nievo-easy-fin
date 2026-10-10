@@ -30,7 +30,7 @@ public class HealthCheckController : ControllerBase
     /// Method created for validate status server it is alive
     /// </summary>
     /// <response code = "200">Return ALIVE message</response>
-    [HttpGet("check")]
+    [HttpGet("")]
     [AllowAnonymous]
     public IActionResult HealthCheck()
     {
@@ -43,7 +43,7 @@ public class HealthCheckController : ControllerBase
     /// </summary>
     /// <response code = "200">1</response>
     /// <response code = "400">BadRequest</response>
-    [HttpGet("database/pgsql/main-node")]
+    [HttpGet("pgsql:main-node")]
     [Authorize]
     public async Task<IActionResult> HealthCheckDatabasePgsqlMainNodeAsync()
     {
@@ -63,7 +63,7 @@ public class HealthCheckController : ControllerBase
     /// </summary>
     /// <response code = "200">1</response>
     /// <response code = "400">BadRequest</response>
-    [HttpGet("database/pgsql/replica-node")]
+    [HttpGet("pgsql:replica-node")]
     [Authorize]
     public async Task<IActionResult> HealthCheckDatabasePgsqlReplicaNodeAsync()
     {

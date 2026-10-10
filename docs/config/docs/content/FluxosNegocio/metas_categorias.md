@@ -1,6 +1,6 @@
 # Fluxo de Planejamento Financeiro: Metas e Categorias
 
-O planejamento financeiro e a classificação de despesas no **Nievo EasyFin** são gerenciados pelo Monólito `NievoEasyFin.Core` operando sobre o esquema **`goals`** do PostgreSQL.
+O planejamento financeiro e a classificação de despesas no **Nievo EasyFin** são gerenciados pelo Monólito `NievoEasyFin.Core` através do controlador RESTful `UserController` operando sobre o esquema **`goals`** do PostgreSQL.
 
 ---
 
@@ -11,7 +11,7 @@ As metas financeiras permitem que o usuário defina objetivos de economia (ex: R
 ```mermaid
 flowchart TD
     User["Usuário no Frontend"] --> InputGoal["Preenche Nome, Descrição, Valor, % e Data de Expiração"]
-    InputGoal --> PostGoal["POST /api/public/v1/Accounts/user:goal (Bearer JWT)"]
+    InputGoal --> PostGoal["POST /api/public/v1/User/goal (Bearer JWT)"]
     
     PostGoal --> ValToken{"Token JWT Válido?"}
     ValToken -->|Não| HTTP401["HTTP 401 Unauthorized"]
@@ -31,7 +31,7 @@ flowchart TD
 ```
 
 ### 📋 Consulta de Metas
-- Endpoint: `GET /api/public/v1/Accounts/user:goal`
+- Endpoint: `GET /api/public/v1/User/goal`
 - Suporta filtros por metas ativas/inativas (`active=true|false`) e paginação (`page`, `page_size`).
 - Utiliza consulta Dapper otimizada com a *window function* `count(*) over() as Records` para obter o total de registros e os itens paginados em uma única viagem ao banco de réplica (`CoreReplica`).
 
@@ -50,7 +50,7 @@ Uma categoria **só pode ser criada com exatamente um vínculo**:
 ```mermaid
 flowchart TD
     User["Usuário no Frontend"] --> InputCat["Informa Nome, Descrição e Vínculo (Meta OU Categoria Pai)"]
-    InputCat --> PostCat["POST /api/public/v1/Accounts/user:category (Bearer JWT)"]
+    InputCat --> PostCat["POST /api/public/v1/User/category (Bearer JWT)"]
     
     PostCat --> ValAuth{"Token JWT Válido?"}
     ValAuth -->|Não| HTTP401["HTTP 401 Unauthorized"]
@@ -76,7 +76,7 @@ flowchart TD
 
 ## 🌳 3. Estrutura em Árvore e Consulta Paginada
 
-Ao listar as categorias do usuário via `GET /api/public/v1/Accounts/user:category`, o serviço realiza um `LEFT JOIN` entre `goals.category` e `goals.goals`:
+Ao listar as categorias do usuário via `GET /api/public/v1/User/category`, o serviço realiza um `LEFT JOIN` entre `goals.category` e `goals.goals`:
 
 ```mermaid
 graph TD
