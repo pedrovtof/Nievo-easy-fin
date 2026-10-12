@@ -15,7 +15,7 @@ jobs:
         uses: sshnaidm/gemini-code-review-action@v2
         with:
           gemini-key: ${{ secrets.GEMINI_API_KEY }}
-          model: "gemini-1.5-pro"
+          model: "gemini-2.5-flash"
           prompt: |
             Você é um engenheiro de software sênior. Revise este PR com foco em:
             - Aplicação de princípios SOLID, ciclo de vida e injeção de dependência.
