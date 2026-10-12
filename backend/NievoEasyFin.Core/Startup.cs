@@ -105,11 +105,11 @@ public class Startup
         services.AddScoped<CategoryModel>();
 
         // Service 
-        services.AddScoped<ICardService, AccountsService>();
-        services.AddScoped<IPublicBankService, AccountsService>();
-        services.AddScoped<IPrivateBankService, AccountsService>();
-        services.AddScoped<IUserService, AccountsService>();
-        services.AddScoped<IAccountsService, AccountsService>();
+        services.AddScoped<ICardService, CardService>();
+        services.AddScoped<IPublicBankService, BankService>();
+        services.AddScoped<IPrivateBankService, BankService>();
+        services.AddScoped<IBankService, BankService>();
+        services.AddScoped<IUserService, UserService>();
     }
 
     // Use this method to configure the HTTP request pipeline.

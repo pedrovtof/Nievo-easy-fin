@@ -21,7 +21,7 @@ public class GetCardFlagAsyncTest : AccountsServiceTestBase
         var request = new GetCardFlagRequestBuilder { Page = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardFlag(request);
@@ -40,7 +40,7 @@ public class GetCardFlagAsyncTest : AccountsServiceTestBase
         var request = new GetCardFlagRequestBuilder { PageSize = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardFlag(request);
@@ -68,7 +68,7 @@ public class GetCardFlagAsyncTest : AccountsServiceTestBase
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardFlag(request);

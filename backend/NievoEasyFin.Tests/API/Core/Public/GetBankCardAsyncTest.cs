@@ -21,7 +21,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder { Page = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -40,7 +40,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder { PageSize = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -60,7 +60,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         request.SetEmail(string.Empty);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -79,7 +79,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder().WithInvalidEmail();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -98,7 +98,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder { BankId = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -117,7 +117,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder { CardType = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -140,7 +140,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         var request = new GetBankCardRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -187,7 +187,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);
@@ -236,7 +236,7 @@ public class GetBankCardAsyncTest : AccountsServiceTestBase
             BankId = bank.Id,
             CardType = cardType.Id
         };
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBankCard(request);

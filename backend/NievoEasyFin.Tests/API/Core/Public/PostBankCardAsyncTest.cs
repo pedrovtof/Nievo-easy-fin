@@ -22,7 +22,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         var request = new PostBankCardRequestBuilder { Name = "" };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);
@@ -41,7 +41,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         var request = new PostBankCardRequestBuilder { BankId = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);
@@ -60,7 +60,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         var request = new PostBankCardRequestBuilder { CardType = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);
@@ -79,7 +79,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         var request = new PostBankCardRequestBuilder { BankId = 999 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);
@@ -104,7 +104,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         origin.Bank.Add(existingBank);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);
@@ -140,7 +140,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
 
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);
@@ -172,7 +172,7 @@ public class PostBankCardAsyncTest : AccountsServiceTestBase
         origin.BankCardFlag.Add(existingFlag);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostBankCard(request);

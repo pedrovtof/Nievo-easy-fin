@@ -25,7 +25,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         request.BankType = 0;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -46,7 +46,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         request.BankName = "";
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -67,7 +67,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         request.SetEmail("");
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -88,7 +88,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         request.SetEmail("invalid-email");
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -132,7 +132,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         origin.UserBank.Add(existingUserBank);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -157,7 +157,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         request.SetEmail("notfound@test.com");
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -186,7 +186,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         await authOrigin.SaveChangesAsync();
         await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);
@@ -226,7 +226,7 @@ public class PostUserBanksAsyncTest : AccountsServiceTestBase
         origin.Bank.Add(existingBank);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserBanks(request);

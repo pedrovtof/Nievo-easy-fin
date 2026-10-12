@@ -49,7 +49,7 @@ public class GetUserGoalAsyncTest : AccountsServiceTestBase
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserGoal(request);
@@ -84,7 +84,7 @@ public class GetUserGoalAsyncTest : AccountsServiceTestBase
 
         var request = new GetUserGoalRequestBuilder().WithEmail(existingUser.Email);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserGoal(request);
@@ -114,7 +114,7 @@ public class GetUserGoalAsyncTest : AccountsServiceTestBase
         var request = new GetUserGoalRequestBuilder().WithInvalidPage();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserGoal(request);
@@ -135,7 +135,7 @@ public class GetUserGoalAsyncTest : AccountsServiceTestBase
         var request = new GetUserGoalRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserGoal(request);
