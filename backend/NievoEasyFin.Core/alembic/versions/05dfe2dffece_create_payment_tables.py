@@ -23,6 +23,8 @@ def upgrade() -> None:
     op.execute("""
         CREATE TABLE IF NOT EXISTS payment.transaction (
             id SERIAL  PRIMARY KEY,
+            name VARCHAR(150),
+            description VARCHAR(255),
             user_id INT,
             transaction_status_id INT,
             categorie_id INT,
@@ -49,6 +51,7 @@ def upgrade() -> None:
             id SERIAL  PRIMARY KEY,
             name VARCHAR(150),
             description VARCHAR(255),
+            cron_tab VARCHAR(50),
             active bool DEFAULT true NOT NULL,
             created_at TIMESTAMP without time zone DEFAULT now() NOT NULL,
             updated_at TIMESTAMP without time zone
@@ -58,7 +61,6 @@ def upgrade() -> None:
             id SERIAL  PRIMARY KEY,
             name VARCHAR(150),
             description VARCHAR(255),
-            cron_tab VARCHAR(50),
             active bool DEFAULT true NOT NULL,
             created_at TIMESTAMP without time zone DEFAULT now() NOT NULL,
             updated_at TIMESTAMP without time zone

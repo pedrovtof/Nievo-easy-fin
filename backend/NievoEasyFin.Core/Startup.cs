@@ -106,6 +106,7 @@ public class Startup
 
         // Service 
         services.AddScoped<ICardService, AccountsService>();
+        services.AddScoped<IPaymentService, AccountsService>();
         services.AddScoped<IPublicBankService, AccountsService>();
         services.AddScoped<IPrivateBankService, AccountsService>();
         services.AddScoped<IUserService, AccountsService>();

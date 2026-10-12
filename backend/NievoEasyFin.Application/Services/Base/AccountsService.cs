@@ -1,5 +1,3 @@
-
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Views;
@@ -11,7 +9,6 @@ using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Interfaces.Validator;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Cache;
-using Org.BouncyCastle.Ocsp;
 
 namespace NievoEasyFin.Application.Services.Base
 {
@@ -611,6 +608,10 @@ namespace NievoEasyFin.Application.Services.Base
             return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_200_CREATED.GetDescription()));
         }
 
+        /// <summary>
+        /// Get user category
+        /// </summary>
+        /// <param name="request">GetUserCategoryRequest</param>
         public async Task<IActionResult> GetUserCategory(GetUserCategoryRequest request)
         {
             var validatorResult = await new GetUserCategoryValidatorAsync().ValidateAsync(request);
@@ -646,6 +647,15 @@ namespace NievoEasyFin.Application.Services.Base
            );
 
             return Ok(new ResponseApiSucess(response));
+        }
+
+        /// <summary>
+        /// Post Payment transaction
+        /// </summary>
+        /// <param name="request"></param>
+        public async Task<IActionResult> PostPaymentTransaction(PostPaymentTransactionRequest request)
+        {
+            return Ok(new ResponseApiSucess(null));
         }
     }
 }
