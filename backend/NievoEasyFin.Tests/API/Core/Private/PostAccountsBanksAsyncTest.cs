@@ -28,7 +28,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         request.BankType = 0;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -58,7 +58,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         origin.Bank.Add(existingBank);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -80,7 +80,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         request.BankType = 99;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);
@@ -116,7 +116,7 @@ public class PostAccountsBanksAsyncTest : AccountsServiceTestBase
         origin.BankType.Add(existingBankType);
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostAccountsBanks(request);

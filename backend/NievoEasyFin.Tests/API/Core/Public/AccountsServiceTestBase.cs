@@ -170,18 +170,13 @@ public abstract class AccountsServiceTestBase : IDisposable
         return (origin, replica);
     }
 
-    protected AccountsService CreateService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
+    protected BankService CreateBankService(CoreOrigin origin, CoreReplica replica, AuthOrigin? authOrigin = null, AuthReplica? authReplica = null)
     {
         var bankModel = new BankModel(origin, replica);
         var bankTypeModel = new BankTypeModel(origin, replica);
-        var userModel = new UserModel(authOrigin, authReplica);
-        var userBankModel = new UserBankModel(origin, replica);
         var bankCardModel = new BankCardModel(origin, replica);
         var bankCardTypeModel = new BankCardTypeModel(origin, replica);
-        var userBankCardModel = new UserBankCardModel(origin, replica);
         var bankCardFlagModel = new BankCardFlagModel(origin, replica);
-        var goalModel = new GoalModel(origin, replica);
-        var categoryModel = new CategoryModel(origin, replica);
 
         var dbMock = new Mock<IDatabase>();
         dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
@@ -191,7 +186,36 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new AccountsService(bankModel, cacheService, bankTypeModel, userModel, userBankModel, bankCardModel, bankCardTypeModel, userBankCardModel, bankCardFlagModel, goalModel, categoryModel);
+        return new BankService(bankModel, cacheService, bankTypeModel, bankCardModel, bankCardTypeModel, bankCardFlagModel);
+    }
+
+    protected CardService CreateCardService(CoreOrigin origin, CoreReplica replica, AuthOrigin? authOrigin = null, AuthReplica? authReplica = null)
+    {
+        var bankCardTypeModel = new BankCardTypeModel(origin, replica);
+        var bankCardFlagModel = new BankCardFlagModel(origin, replica);
+
+        return new CardService(bankCardTypeModel, bankCardFlagModel);
+    }
+
+    protected UserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
+    {
+        var userModel = new UserModel(authOrigin, authReplica);
+        var userBankModel = new UserBankModel(origin, replica);
+        var userBankCardModel = new UserBankCardModel(origin, replica);
+        var goalModel = new GoalModel(origin, replica);
+        var categoryModel = new CategoryModel(origin, replica);
+        var bankModel = new BankModel(origin, replica);
+        var bankCardModel = new BankCardModel(origin, replica);
+
+        var dbMock = new Mock<IDatabase>();
+        dbMock.Setup(d => d.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(RedisValue.Null);
+        dbMock.Setup(d => d.StringSetAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<TimeSpan?>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
+              .ReturnsAsync(true);
+
+        var cacheService = MockHelper.CreateMockedCacheService(dbMock);
+
+        return new UserService(userModel, userBankModel, userBankCardModel, goalModel, categoryModel, bankModel, cacheService, bankCardModel);
     }
 
     protected async System.Threading.Tasks.Task SyncCoreToAttachedDatabasesAsync(CoreOrigin context)

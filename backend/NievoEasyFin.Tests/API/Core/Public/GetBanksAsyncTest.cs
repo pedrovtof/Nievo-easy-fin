@@ -22,7 +22,7 @@ public class GetBanksAsyncTest : AccountsServiceTestBase
         request.Page = 0;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBanks(request);
@@ -43,7 +43,7 @@ public class GetBanksAsyncTest : AccountsServiceTestBase
         request.PageSize = 51;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBanks(request);
@@ -67,7 +67,7 @@ public class GetBanksAsyncTest : AccountsServiceTestBase
         var request = new GetBanksRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBanks(request);
@@ -109,7 +109,7 @@ public class GetBanksAsyncTest : AccountsServiceTestBase
             cmd.ExecuteNonQuery();
         }
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateBankService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetBanks(request);

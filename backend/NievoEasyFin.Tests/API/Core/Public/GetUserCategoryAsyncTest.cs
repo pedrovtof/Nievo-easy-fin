@@ -46,7 +46,7 @@ public class GetUserCategoryAsyncTest : AccountsServiceTestBase
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserCategory(request);
@@ -81,7 +81,7 @@ public class GetUserCategoryAsyncTest : AccountsServiceTestBase
 
         var request = new GetUserCategoryRequestBuilder().WithEmail(existingUser.Email);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserCategory(request);
@@ -111,7 +111,7 @@ public class GetUserCategoryAsyncTest : AccountsServiceTestBase
         var request = new GetUserCategoryRequestBuilder().WithInvalidPage();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserCategory(request);
@@ -132,7 +132,7 @@ public class GetUserCategoryAsyncTest : AccountsServiceTestBase
         var request = new GetUserCategoryRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetUserCategory(request);

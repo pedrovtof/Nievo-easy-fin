@@ -5,8 +5,7 @@ using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
 using NievoEasyFin.Application.Services.Security;
 
-namespace NievoEasyFin.Core.Controllers.Public.v1
-;
+namespace NievoEasyFin.Core.Controllers.Public;
 
 /// <summary>
 /// Controller responsible for payment.
