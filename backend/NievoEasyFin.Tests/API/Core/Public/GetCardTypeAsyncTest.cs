@@ -19,7 +19,7 @@ public class GetCardTypeAsyncTest : AccountsServiceTestBase
         var request = new GetCardTypeRequestBuilder { Page = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardType(request);
@@ -38,7 +38,7 @@ public class GetCardTypeAsyncTest : AccountsServiceTestBase
         var request = new GetCardTypeRequestBuilder { PageSize = 0 };
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardType(request);
@@ -57,7 +57,7 @@ public class GetCardTypeAsyncTest : AccountsServiceTestBase
         var request = new GetCardTypeRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardType(request);
@@ -83,7 +83,7 @@ public class GetCardTypeAsyncTest : AccountsServiceTestBase
         origin.BankCardType.Add(BankCardTypeEntityFaker.Create().Generate());
         await origin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateCardService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.GetCardType(request);

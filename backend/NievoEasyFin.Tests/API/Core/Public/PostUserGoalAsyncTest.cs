@@ -32,7 +32,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
         authOrigin.Users.Add(existingUser);
         await authOrigin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserGoal(request);
@@ -67,7 +67,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
         request.Amount = -1;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserGoal(request);
@@ -88,7 +88,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
         var request = new PostUserGoalRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserGoal(request);
@@ -133,7 +133,7 @@ public class PostUserGoalAsyncTest : AccountsServiceTestBase
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserGoal(request);

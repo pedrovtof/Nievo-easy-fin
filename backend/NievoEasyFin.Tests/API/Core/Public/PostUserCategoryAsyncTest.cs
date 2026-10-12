@@ -32,7 +32,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
         authOrigin.Users.Add(existingUser);
         await authOrigin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserCategory(request);
@@ -85,7 +85,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
             .WithGoal(null)
             .WithParentCategory(parentCategory.Id);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserCategory(request);
@@ -116,7 +116,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
             .WithGoal(0);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserCategory(request);
@@ -137,7 +137,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
         var request = new PostUserCategoryRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserCategory(request);
@@ -167,7 +167,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
         authOrigin.Users.Add(existingUser);
         await authOrigin.SaveChangesAsync();
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserCategory(request);
@@ -209,7 +209,7 @@ public class PostUserCategoryAsyncTest : AccountsServiceTestBase
         await origin.SaveChangesAsync();
         await SyncCoreToAttachedDatabasesAsync(origin);
 
-        var service = CreateService(origin, replica, authOrigin, authReplica);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
 
         // Act
         var result = await service.PostUserCategory(request);
