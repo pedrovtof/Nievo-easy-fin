@@ -29,7 +29,7 @@ def upgrade() -> None:
             transaction_status_id INT,
             categorie_id INT,
             pay_date TIMESTAMP,
-            amount INT,
+            amount BIGINT,
             card_id INT,
             bank_id INT,
             transaction_type_id INT,

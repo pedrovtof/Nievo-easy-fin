@@ -33,6 +33,10 @@ public abstract class EasyFinDbContext : DbContext
     public DbSet<BankCardFlagEntity> BankCardFlag { get; set; }
     public DbSet<GoalEntity> Goal { get; set; }
     public DbSet<CategoryEntity> Category { get; set; }
+    public DbSet<TransactionEntity> Transaction { get; set; }
+    public DbSet<TransactionStatusEntity> TransactionStatus { get; set; }
+    public DbSet<SchedulerTypeEntity> SchedulerType { get; set; }
+    public DbSet<TransactionTypeEntity> TransactionType { get; set; }
 
     protected EasyFinDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {
