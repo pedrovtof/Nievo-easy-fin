@@ -110,6 +110,7 @@ public class Startup
         services.AddScoped<IPrivateBankService, BankService>();
         services.AddScoped<IBankService, BankService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IPaymentService, PaymentService>();
     }
 
     // Use this method to configure the HTTP request pipeline.
