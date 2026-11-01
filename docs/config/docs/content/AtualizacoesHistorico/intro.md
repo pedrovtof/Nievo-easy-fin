@@ -30,7 +30,7 @@ timeline
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
 
 ### 📅 Outubro / 2026 — Refatoração SOLID de Interfaces, Endpoints RESTful e Versionamento v1
-* **Branch `fix/endpoint-services-filepath` (`390e5f4`, `bf34034`):**
+* **Branch `fix/endpoint-services-filepath` (`390e5f4`, `bf34034`, `c27d6d0`):**
   - **Adequação aos Princípios SOLID:**
     - **Interface Segregation Principle (ISP):** Desacoplamento da interface monolítica `IAccountsService` em interfaces granulares com responsabilidades estritas: `ICardService` (tipos e bandeiras), `IPublicBankService` (consulta de bancos e cartões de bancos), `IPrivateBankService` (criação de bancos e cartões no catálogo global) e `IUserService` (recursos do usuário autenticado: contas bancárias, cartões, metas e categorias).
     - **Composição de Interfaces:** Criação de `IBankService` (unindo `IPublicBankService` e `IPrivateBankService`) e `IAccountsService` (herdando `ICardService`, `IBankService` e `IUserService`) mantendo alta coesão e baixo acoplamento.
@@ -45,6 +45,20 @@ timeline
     - **Ajustes de Rotas em Auth:** Migração do fluxo de redefinição de senha (`password-reset`) do `AuthenticatorController` para o `UsersController` (`/api/public/v1/Users/password-reset` para POST e PATCH).
     - **Organização Física dos Controllers:** Reestruturação da árvore de diretórios dos controladores com pastas explícitas de versão (`Controllers/Public/v1/`, `Controllers/Private/v1/`, `Controllers/Admin/v1/`).
     - **Atualização da Suíte de Testes:** Atualização das classes base e testes unitários (`AccountsTestBase`, `UsersServiceTestBase`, `PatchResetPasswordAsyncTest`, `PostResetPasswordAsyncTest`) para refletir a nova injeção de dependência das interfaces segregadas.
+    - **Atualização das Rotas no Frontend:** Endpoint path no frontend atualizados (`c27d6d0`).
+
+* **Branch `add-gemini-pr-review` (`378c1a0`):**
+  - **Update Gemini model:** Atualizado o modelo do Gemini para `2.5-flash`.
+
+* **PR #53 — Branch `Fix/change-responsability-from-account-service` (`01627aa`, `d225a03`):**
+  - **Segregação de Responsabilidades (AccountsService):**
+    - Desmembramento do serviço monolítico `AccountsService` de acordo com as responsabilidades dos controladores em `BankService`, `CardService` e `UserService`.
+    - Remoção de `AccountsService` e da interface `IAccountsService`.
+    - Atualização das configurações de Injeção de Dependência (DI) no `Startup.cs` do Core e Auth com ligações diretas `AddScoped`.
+    - Adição de testes para `BankController`, `CardController` e serviços individuais segregados.
+
+* **Branch `Feat/Payment` (`c7f013f`):**
+  - **Resolução de Conflitos e Extração de PaymentService:** Extraído o `PaymentService` para resolver conflitos da segregação do `AccountsService` na branch de Payment.
 
 ### 📅 Setembro / 2026 — Domínio de Metas & Categorias, Pipeline de CI/CD e Infraestrutura
 * **PR #48 — `Feat(build): add a ci-cd test` (`7b96f62`):**
