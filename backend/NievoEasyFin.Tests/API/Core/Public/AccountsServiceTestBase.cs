@@ -75,7 +75,7 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         using (var cmd = _connection.CreateCommand())
         {
-            cmd.CommandText = "ATTACH DATABASE ':memory:' AS user_details; ATTACH DATABASE ':memory:' AS journey; ATTACH DATABASE ':memory:' AS accounts; ATTACH DATABASE ':memory:' AS goals;";
+            cmd.CommandText = "ATTACH DATABASE ':memory:' AS user_details; ATTACH DATABASE ':memory:' AS journey; ATTACH DATABASE ':memory:' AS accounts; ATTACH DATABASE ':memory:' AS goals; ATTACH DATABASE ':memory:' AS payment;";
             cmd.ExecuteNonQuery();
         }
 
@@ -166,6 +166,47 @@ public abstract class AccountsServiceTestBase : IDisposable
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS payment.transaction_status (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS payment.transaction_type (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS payment.scheduler_type (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    cron_tab TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS payment.""transaction"" (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    user_id INTEGER,
+                    transaction_status_id INTEGER,
+                    categorie_id INTEGER,
+                    pay_date TEXT,
+                    amount INTEGER,
+                    card_id INTEGER,
+                    bank_id INTEGER,
+                    transaction_type_id INTEGER,
+                    scheduler_id INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
             ";
             cmd.ExecuteNonQuery();
         }
@@ -198,6 +239,16 @@ public abstract class AccountsServiceTestBase : IDisposable
         var bankCardFlagModel = new BankCardFlagModel(origin, replica);
 
         return new CardService(bankCardTypeModel, bankCardFlagModel);
+    }
+
+    protected PaymentService CreatePaymentService(CoreOrigin origin, CoreReplica replica, AuthOrigin? authOrigin = null, AuthReplica? authReplica = null)
+    {
+        var schedulerTypeModel = new SchedulerTypeModel(origin, replica);
+        var transactionModel = new TransactionModel(origin, replica);
+        var transactionStatusModel = new TransactionStatusModel(origin, replica);
+        var transactionTypeModel = new TransactionTypeModel(origin, replica);
+
+        return new PaymentService(schedulerTypeModel, transactionModel, transactionStatusModel, transactionTypeModel);
     }
 
     protected CoreUserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
@@ -247,6 +298,10 @@ public abstract class AccountsServiceTestBase : IDisposable
                 INSERT OR REPLACE INTO accounts.bank_card_flag SELECT * FROM main.bank_card_flag;
                 INSERT OR REPLACE INTO goals.goals SELECT * FROM main.goals;
                 INSERT OR REPLACE INTO goals.category SELECT * FROM main.category;
+                INSERT OR REPLACE INTO payment.transaction_status SELECT * FROM main.transaction_status;
+                INSERT OR REPLACE INTO payment.transaction_type SELECT * FROM main.transaction_type;
+                INSERT OR REPLACE INTO payment.scheduler_type SELECT * FROM main.scheduler_type;
+                INSERT OR REPLACE INTO payment.""transaction"" SELECT * FROM main.""transaction"";
             ";
             await cmd.ExecuteNonQueryAsync();
         }
