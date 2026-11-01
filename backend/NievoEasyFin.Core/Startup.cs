@@ -94,6 +94,10 @@ public class Startup
         services.AddScoped<SmtpModel>();
         services.AddScoped<AuthDbCacheService>();
         services.AddScoped<UserModel>();
+        services.AddScoped<TransactionModel>();
+        services.AddScoped<TransactionStatusModel>();
+        services.AddScoped<TransactionTypeModel>();
+        services.AddScoped<SchedulerTypeModel>();
         services.AddScoped<BankModel>();
         services.AddScoped<BankTypeModel>();
         services.AddScoped<UserBankModel>();

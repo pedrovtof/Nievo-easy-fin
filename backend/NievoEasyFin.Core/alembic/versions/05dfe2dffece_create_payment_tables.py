@@ -65,6 +65,18 @@ def upgrade() -> None:
             created_at TIMESTAMP without time zone DEFAULT now() NOT NULL,
             updated_at TIMESTAMP without time zone
         );
+
+        GRANT USAGE ON SCHEMA payment TO cross_database_user;
+        
+        GRANT USAGE ON SCHEMA payment TO app_core_service_efn;
+
+        GRANT SELECT,INSERT,UPDATE ON TABLE payment."transaction" TO app_core_service_efn;
+
+        GRANT SELECT,INSERT,UPDATE ON TABLE payment."transaction_status" TO app_core_service_efn;
+
+        GRANT SELECT,INSERT,UPDATE ON TABLE payment."scheduler_type" TO app_core_service_efn;
+
+        GRANT SELECT,INSERT,UPDATE ON TABLE payment."transaction_type" TO app_core_service_efn;
     """)
     pass
 
