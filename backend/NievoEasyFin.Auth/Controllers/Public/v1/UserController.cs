@@ -8,13 +8,13 @@ namespace NievoEasyFin.Auth.Controllers.Public;
 
 [ApiController]
 [Route("api/public/v1/[controller]")]
-public class UsersController : Controller
+public class UserController : Controller
 {
-    private readonly IUsersService _usersService;
+    private readonly IAuthUserService _userService;
 
-    public UsersController(IUsersService users)
+    public UserController(IAuthUserService user)
     {
-        _usersService = users;
+        _userService = user;
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class UsersController : Controller
         request.SetUserAgent(UserAgent);
         request.SetHost(Host);
 
-        return await _usersService.PostCreateUserAsync(request);
+        return await _userService.PostCreateUserAsync(request);
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public class UsersController : Controller
         request.SetUserAgent(UserAgent);
         request.SetHost(Host);
 
-        return await _usersService.PostCreateUserSsoAsync(request);
+        return await _userService.PostCreateUserSsoAsync(request);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ public class UsersController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostResetPasswordAsync([FromBody] PostResetPasswordRequest request)
-        => await _usersService.PostResetPasswordAsync(request);
+        => await _userService.PostResetPasswordAsync(request);
 
     /// <summary>
     /// Endpoint to reset password with token
@@ -116,5 +116,5 @@ public class UsersController : Controller
     [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PatchResetPasswordAsync([FromBody] PatchResetPasswordRequest request)
-        => await _usersService.PatchResetPasswordAsync(request);
+        => await _userService.PatchResetPasswordAsync(request);
 }

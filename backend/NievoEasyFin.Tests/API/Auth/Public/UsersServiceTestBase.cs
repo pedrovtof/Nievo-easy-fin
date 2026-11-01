@@ -1,6 +1,6 @@
 using Moq;
 using NievoEasyFin.Application.Models;
-using NievoEasyFin.Application.Services.Base.Users;
+using NievoEasyFin.Application.Services.Base;
 using NievoEasyFin.Application.Services.Security;
 using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Data.Context.Database;
@@ -38,7 +38,7 @@ public abstract class UsersServiceTestBase : IDisposable
         // No need to stop server here as it's static, but could reset
     }
 
-    protected UsersService CreateService(
+    protected AuthUserService CreateService(
         AuthOrigin authOrigin,
         AuthReplica authReplica,
         SmtpModelMock? smtpMock = null,
@@ -52,15 +52,15 @@ public abstract class UsersServiceTestBase : IDisposable
 
         var cacheService = cache ?? CreateDefaultCacheService();
 
-        return new UsersService(
+        return new AuthUserService(
             _cryptoPasswordService,
-            userModel,
             userProviderSsoModel,
             ssoProviderAuth,
             smtpMock ?? new SmtpModelMock(),
-            cacheService,
             acceptTermsModel,
-            usersAcceptedTermsModel
+            usersAcceptedTermsModel,
+            userModel,
+            cacheService
         );
     }
 

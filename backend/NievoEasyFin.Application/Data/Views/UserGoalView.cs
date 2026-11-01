@@ -13,7 +13,7 @@ namespace NievoEasyFin.Application.Data.Views
         /// Id
         /// </summary>
         [JsonPropertyName("id")]
-        public bool Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// IsPercent

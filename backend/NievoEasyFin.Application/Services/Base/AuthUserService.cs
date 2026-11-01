@@ -1,57 +1,51 @@
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Interfaces.Request;
-using NievoEasyFin.Application.Interfaces.Enum;
-using NievoEasyFin.Application.Interfaces.Validator;
-using NievoEasyFin.Application.Interfaces.Response;
+using NievoEasyFin.Application.Data.Entities;
+using NievoEasyFin.Application.Data.Views;
 using NievoEasyFin.Application.Extensions.Enum;
-using NievoEasyFin.Application.Services.Security;
-using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Infrastructure.Auth;
+using NievoEasyFin.Application.Interfaces.Enum;
+using NievoEasyFin.Application.Interfaces.Request;
+using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
+using NievoEasyFin.Application.Interfaces.Validator;
+using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Cache;
+using NievoEasyFin.Application.Services.Security;
 
-namespace NievoEasyFin.Application.Services.Base.Users;
+namespace NievoEasyFin.Application.Services.Base;
 
 /// <summary>
-/// Service responsible for user management, including standard and SSO registration.
+/// Service responsible for user operations, including user bank accounts, cards, goals, and categories.
 /// </summary>
-public class UsersService : Controller, IUsersService
+public class AuthUserService : Controller, IAuthUserService
 {
-    private readonly CryptoPasswordService _cryptoPasswordService;
-
-    private readonly UserModel _userModel;
-
-    private readonly SSoProviderAuth _ssoProviderAuth;
-
     private readonly UserProviderSsoModel _userProviderSsoModel;
-
     private readonly SmtpModel _smtpModel;
-
+    private readonly AcceptTermsModel _acceptTermsmodel;
+    private readonly UsersAcceptedTermsModel _usersAcceptedTermsModel;
+    private readonly SSoProviderAuth _ssoProviderAuth;
+    private readonly CryptoPasswordService _cryptoPasswordService;
+    private readonly UserModel _userModel;
     private readonly AuthDbCacheService _authDbCacheService;
 
-    private readonly AcceptTermsModel _acceptTermsmodel;
-
-    private readonly UsersAcceptedTermsModel _usersAcceptedTermsModel;
-
-    public UsersService(
+    public AuthUserService(
         CryptoPasswordService cryptoPasswordService,
-        UserModel userModel,
         UserProviderSsoModel userProviderSsoModel,
         SSoProviderAuth ssoProviderAuth,
         SmtpModel smtpModel,
-        AuthDbCacheService authDbCacheService,
         AcceptTermsModel acceptTermsmodel,
-        UsersAcceptedTermsModel usersAcceptedTermsModel
-    )
+        UsersAcceptedTermsModel usersAcceptedTermsModel,
+        UserModel userModel,
+        AuthDbCacheService authDbCacheService)
     {
         _cryptoPasswordService = cryptoPasswordService;
-        _userModel = userModel;
         _userProviderSsoModel = userProviderSsoModel;
         _ssoProviderAuth = ssoProviderAuth;
         _smtpModel = smtpModel;
-        _authDbCacheService = authDbCacheService;
         _acceptTermsmodel = acceptTermsmodel;
         _usersAcceptedTermsModel = usersAcceptedTermsModel;
+        _userModel = userModel;
+        _authDbCacheService = authDbCacheService;
     }
 
     /// <summary>
@@ -251,4 +245,3 @@ public class UsersService : Controller, IUsersService
         ));
     }
 }
-

@@ -4,9 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
+using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base;
+using NievoEasyFin.Application.Services.Security;
 using NievoEasyFin.Tests.Mocks.Helpers;
+using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using NSubstitute;
 using Xunit.Abstractions;
@@ -197,7 +200,7 @@ public abstract class AccountsServiceTestBase : IDisposable
         return new CardService(bankCardTypeModel, bankCardFlagModel);
     }
 
-    protected UserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
+    protected CoreUserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
     {
         var userModel = new UserModel(authOrigin, authReplica);
         var userBankModel = new UserBankModel(origin, replica);
@@ -215,7 +218,16 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new UserService(userModel, userBankModel, userBankCardModel, goalModel, categoryModel, bankModel, cacheService, bankCardModel);
+        return new CoreUserService(
+            userModel,
+            userBankModel,
+            userBankCardModel,
+            goalModel,
+            categoryModel,
+            bankModel,
+            cacheService,
+            bankCardModel
+        );
     }
 
     protected async System.Threading.Tasks.Task SyncCoreToAttachedDatabasesAsync(CoreOrigin context)

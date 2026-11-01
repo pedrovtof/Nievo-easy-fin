@@ -109,7 +109,7 @@ public class Startup
         services.AddScoped<IPublicBankService, BankService>();
         services.AddScoped<IPrivateBankService, BankService>();
         services.AddScoped<IBankService, BankService>();
-        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICoreUserService, CoreUserService>();
         services.AddScoped<IPaymentService, PaymentService>();
     }
 

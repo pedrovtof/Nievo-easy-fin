@@ -15,7 +15,7 @@ namespace NievoEasyFin.Application.Services.Base;
 /// <summary>
 /// Service responsible for user operations, including user bank accounts, cards, goals, and categories.
 /// </summary>
-public class UserService : Controller, IUserService
+public class CoreUserService : Controller, ICoreUserService
 {
     private readonly UserModel _userModel;
     private readonly UserBankModel _userBankModel;
@@ -26,7 +26,7 @@ public class UserService : Controller, IUserService
     private readonly AuthDbCacheService _authDbCacheService;
     private readonly BankCardModel _bankCardModel;
 
-    public UserService(
+    public CoreUserService(
         UserModel userModel,
         UserBankModel userBankModel,
         UserBankCardModel userBankCardModel,
