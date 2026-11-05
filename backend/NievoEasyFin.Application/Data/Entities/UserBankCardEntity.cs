@@ -23,7 +23,7 @@ namespace NievoEasyFin.Application.Data.Entities
         /// </summary>
         [JsonPropertyName("bank_id")]
         [Column("bank_id", TypeName = "INT")]
-        public int? BankId { get; set; }
+        public int BankId { get; set; }
 
         /// <summary>
         /// Name

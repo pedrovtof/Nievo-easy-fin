@@ -22,7 +22,7 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.execute("""
         CREATE TABLE IF NOT EXISTS payment.transaction (
-            id SERIAL  PRIMARY KEY,
+            id UUID PRIMARY KEY,
             name VARCHAR(150),
             description VARCHAR(255),
             user_id INT,

@@ -192,7 +192,7 @@ public abstract class AccountsServiceTestBase : IDisposable
                     updated_at TEXT
                 );
                 CREATE TABLE IF NOT EXISTS payment.""transaction"" (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id TEXT PRIMARY KEY,
                     name TEXT,
                     description TEXT,
                     user_id INTEGER,
@@ -204,6 +204,17 @@ public abstract class AccountsServiceTestBase : IDisposable
                     bank_id INTEGER,
                     transaction_type_id INTEGER,
                     scheduler_id INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS accounts.user_bank_card (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    bank_id INTEGER,
+                    name TEXT,
+                    card_id INTEGER,
+                    active INTEGER,
+                    user_id INTEGER,
+                    expired_at TEXT,
                     created_at TEXT,
                     updated_at TEXT
                 );
@@ -247,8 +258,21 @@ public abstract class AccountsServiceTestBase : IDisposable
         var transactionModel = new TransactionModel(origin, replica);
         var transactionStatusModel = new TransactionStatusModel(origin, replica);
         var transactionTypeModel = new TransactionTypeModel(origin, replica);
+        var userModel = new UserModel(authOrigin!, authReplica!);
+        var userBankCardModel = new UserBankCardModel(origin, replica);
+        var categoryModel = new CategoryModel(origin, replica);
+        var userBankModel = new UserBankModel(origin, replica);
 
-        return new PaymentService(schedulerTypeModel, transactionModel, transactionStatusModel, transactionTypeModel);
+        return new PaymentService(
+            schedulerTypeModel,
+            transactionModel,
+            transactionStatusModel,
+            transactionTypeModel,
+            userModel,
+            userBankCardModel,
+            categoryModel,
+            userBankModel
+        );
     }
 
     protected CoreUserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
@@ -296,6 +320,7 @@ public abstract class AccountsServiceTestBase : IDisposable
                 INSERT OR REPLACE INTO accounts.bank_card SELECT * FROM main.bank_card;
                 INSERT OR REPLACE INTO accounts.bank_card_type SELECT * FROM main.bank_card_type;
                 INSERT OR REPLACE INTO accounts.bank_card_flag SELECT * FROM main.bank_card_flag;
+                INSERT OR REPLACE INTO accounts.user_bank_card SELECT * FROM main.user_bank_card;
                 INSERT OR REPLACE INTO goals.goals SELECT * FROM main.goals;
                 INSERT OR REPLACE INTO goals.category SELECT * FROM main.category;
                 INSERT OR REPLACE INTO payment.transaction_status SELECT * FROM main.transaction_status;

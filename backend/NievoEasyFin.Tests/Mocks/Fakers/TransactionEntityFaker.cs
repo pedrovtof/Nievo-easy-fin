@@ -8,7 +8,7 @@ public static class TransactionEntityFaker
     public static Faker<TransactionEntity> Create()
     {
         return new Faker<TransactionEntity>()
-            .RuleFor(t => t.Id, f => f.Random.Int(1, 100000))
+            .RuleFor(t => t.Id, f => f.Random.Guid())
             .RuleFor(t => t.Name, f => f.Commerce.ProductName())
             .RuleFor(t => t.Description, f => f.Commerce.ProductDescription())
             .RuleFor(t => t.UserId, f => f.Random.Int(1, 10000))

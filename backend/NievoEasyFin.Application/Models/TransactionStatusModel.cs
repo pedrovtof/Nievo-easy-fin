@@ -20,6 +20,14 @@ namespace NievoEasyFin.Application.Models
         }
 
         /// <summary>
+        /// Get a valid transaction status
+        /// </summary>
+        /// <param name="transaction_status"></param>
+        /// <returns>TransactionTypeEntity</returns>
+        public async Task<TransactionStatusEntity> GetTransactionStatusByIdAsync(int transaction_status)
+            => await _CoreReplicaNodeDatabase.TransactionStatus.FirstOrDefaultAsync(x => x.Id == transaction_status && x.Active == true);
+
+        /// <summary>
         /// Method to search for transaction status
         /// </summary>
         /// <param name="page"></param>

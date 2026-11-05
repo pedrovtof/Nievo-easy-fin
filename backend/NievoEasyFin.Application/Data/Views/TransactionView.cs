@@ -39,7 +39,7 @@ public class TransactionView
     /// Id
     /// </summary>
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Name

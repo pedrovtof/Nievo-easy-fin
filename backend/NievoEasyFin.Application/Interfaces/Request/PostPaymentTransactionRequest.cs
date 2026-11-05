@@ -17,8 +17,8 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// <summary>
         /// Category
         /// </summary>
-        [JsonPropertyName("category")]
-        public int Category { get; set; }
+        [JsonPropertyName("category_name")]
+        public string CategoryName { get; set; }
 
         /// <summary>
         /// Pay date
@@ -33,16 +33,16 @@ namespace NievoEasyFin.Application.Interfaces.Request
         public long Amount { get; set; }
 
         /// <summary>
-        /// Card
-        /// </summary>
-        [JsonPropertyName("card")]
-        public int Card { get; set; }
-
-        /// <summary>
         /// Bank
         /// </summary>
         [JsonPropertyName("bank")]
         public int Bank { get; set; }
+
+        /// <summary>
+        /// Card
+        /// </summary>
+        [JsonPropertyName("card")]
+        public int Card { get; set; }
 
         /// <summary>
         /// Type of transaction

@@ -20,6 +20,14 @@ namespace NievoEasyFin.Application.Models
         }
 
         /// <summary>
+        /// Get a valid scheduler type
+        /// </summary>
+        /// <param name="scheduler"></param>
+        /// <returns></returns>
+        public async Task<SchedulerTypeEntity> GetSchedulerTypeAsync(int scheduler)
+            => await _CoreReplicaNodeDatabase.SchedulerType.FirstOrDefaultAsync(x => x.Id == scheduler && x.Active == true);
+
+        /// <summary>
         /// Method to search for scheduler types
         /// </summary>
         /// <param name="page"></param>

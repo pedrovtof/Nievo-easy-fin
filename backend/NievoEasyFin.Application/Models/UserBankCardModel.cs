@@ -50,6 +50,15 @@ namespace NievoEasyFin.Application.Models
         }
 
         /// <summary>
+        /// Get a valid card by cardId and userId
+        /// </summary>
+        /// <param name="card_id"></param>
+        /// <param name="user_id"></param>
+        /// <returns></returns>
+        public async Task<UserBankCardEntity> GetUserBankCardByCardIdAndUserId(int card_id, int user_id)
+            => await _CoreReplicaNodeDatabase.UserBankCard.FirstOrDefaultAsync(x => x.CardId == card_id && x.UserId == user_id && x.Active == true);
+
+        /// <summary>
         /// Search for a list of user bank card
         /// </summary>
         /// <param name="page">int</param>

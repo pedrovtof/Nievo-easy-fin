@@ -10,11 +10,11 @@ namespace NievoEasyFin.Application.Interfaces.Validator
         {
             RuleFor(x => x.Page)
                 .Must(x => x > 0)
-                    .WithErrorCode(EnumErrosApi.GETCARDTYPEASYNC_CORESERVICE_400_INVALID_PAGE.ToString());
+                    .WithErrorCode(EnumErrosApi.GETPAYMENTSCHEDULER_CORESERVICE_400_INVALID_PAGE.ToString());
 
             RuleFor(x => x.PageSize)
                 .Must(x => x > 0 && x <= 50)
-                    .WithErrorCode(EnumErrosApi.GETCARDTYPEASYNC_CORESERVICE_400_INVALID_PAGE_SIZE.ToString());
+                    .WithErrorCode(EnumErrosApi.GETPAYMENTSCHEDULER_CORESERVICE_400_INVALID_PAGESIZE.ToString());
         }
     }
 }

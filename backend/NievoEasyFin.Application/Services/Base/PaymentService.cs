@@ -1,5 +1,9 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
+using NievoEasyFin.Application.Data.Entities;
+using NievoEasyFin.Application.Data.Views;
+using NievoEasyFin.Application.Extensions.Enum;
+using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Application.Interfaces.Services;
@@ -17,18 +21,30 @@ public class PaymentService : Controller, IPaymentService
     private readonly TransactionModel _transactionModel;
     private readonly TransactionStatusModel _transactionStatusModel;
     private readonly TransactionTypeModel _transactionTypeModel;
+    private readonly UserModel _userModel;
+    private readonly UserBankCardModel _userBankCardModel;
+    private readonly CategoryModel _categoryModel;
+    private readonly UserBankModel _userBankModel;
 
     public PaymentService(
         SchedulerTypeModel schedulerTypeModel,
         TransactionModel transactionModel,
         TransactionStatusModel transactionStatusModel,
-        TransactionTypeModel transactionTypeModel
+        TransactionTypeModel transactionTypeModel,
+        UserModel userModel,
+        UserBankCardModel userBankCardModel,
+        CategoryModel categoryModel,
+        UserBankModel userBankModel
     )
     {
         _schedulerTypeModel = schedulerTypeModel;
         _transactionModel = transactionModel;
         _transactionStatusModel = transactionStatusModel;
         _transactionTypeModel = transactionTypeModel;
+        _userModel = userModel;
+        _userBankCardModel = userBankCardModel;
+        _categoryModel = categoryModel;
+        _userBankModel = userBankModel;
     }
 
     /// <summary>
@@ -44,7 +60,71 @@ public class PaymentService : Controller, IPaymentService
                 new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        return Ok(new ResponseApiSucess(null));
+        var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+        if (user == null)
+            return NotFound(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+            ));
+
+        var bank = await _userBankModel.GetUserBankByUserAndBankAsync(user.Id, request.Bank);
+        if (bank == null)
+            return NotFound(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_BANK_NOT_FOUND.GetDescription() }
+            ));
+
+        UserBankCardEntity? card = null;
+        if (request.Card > 0)
+        {
+            card = await _userBankCardModel.GetUserBankCardByCardIdAndUserId(request.Card, user.Id);
+            if (card == null)
+                return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_USER_CARD_NOT_FOUND.GetDescription() }
+                ));
+        }
+
+        var transactionType = await _transactionTypeModel.GetTransactionTypeByIdAsync(request.TransactionType);
+        if (transactionType == null)
+            return NotFound(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_TRANSACTION_TYPE_NOT_FOUND.GetDescription() }
+            ));
+
+        var transactionStatus = await _transactionStatusModel.GetTransactionStatusByIdAsync(request.TransactionStatus);
+        if (transactionStatus == null)
+            return NotFound(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_TRANSACTION_STATUS_NOT_FOUND.GetDescription() }
+            ));
+
+        SchedulerTypeEntity? scheduler = null;
+        if (request.Scheduler > 0)
+        {
+            scheduler = await _schedulerTypeModel.GetSchedulerTypeAsync(request.Scheduler);
+            if (scheduler == null)
+                return NotFound(new ResponseApiError(
+                        new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SCHEDULER_NOT_FOUND.GetDescription() }
+                    ));
+        }
+
+        var category = await _categoryModel.GetCategoryValidByNameAndUserId(request.CategoryName, user.Id);
+        if (category == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_CATEGORY_NOT_FOUND.GetDescription() }
+                ));
+
+        var paymentTransaction = await _transactionModel.CreatePaymentTransaction(
+            request.Name,
+            request.Description,
+            user.Id,
+            transactionStatus.Id,
+            transactionType.Id,
+            category.Id,
+            request.PayDate,
+            request.Amount,
+            request.Card > 0 ? card.Id : null,
+            bank.Id,
+            request.Scheduler > 0 ? scheduler.Id : null
+        );
+
+        return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS.GetDescription()));
     }
 
     /// <summary>

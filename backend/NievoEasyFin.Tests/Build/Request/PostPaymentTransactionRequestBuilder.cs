@@ -14,7 +14,7 @@ public class PostPaymentTransactionRequestBuilder : PostPaymentTransactionReques
     {
         SetEmail(_faker.Person.Email);
         TransactionStatus = _faker.Random.Int(1, 10);
-        Category = _faker.Random.Int(1, 10);
+        CategoryName = _faker.Commerce.Categories(1)[0];
         PayDate = _faker.Date.Recent();
         Amount = _faker.Random.Long(100, 100000);
         Card = _faker.Random.Int(1, 10);
@@ -37,9 +37,9 @@ public class PostPaymentTransactionRequestBuilder : PostPaymentTransactionReques
         return this;
     }
 
-    public PostPaymentTransactionRequestBuilder WithCategory(int category)
+    public PostPaymentTransactionRequestBuilder WithCategoryName(string categoryName)
     {
-        Category = category;
+        CategoryName = categoryName;
         return this;
     }
 

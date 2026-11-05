@@ -15,8 +15,8 @@ public class TransactionEntity
     /// </summary>
     [JsonPropertyName("id")]
     [Key]
-    [Column("id", TypeName = "SERIAL")]
-    public int Id { get; set; }
+    [Column("id", TypeName = "Guid")]
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Name

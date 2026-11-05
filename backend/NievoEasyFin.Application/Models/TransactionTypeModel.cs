@@ -20,6 +20,14 @@ namespace NievoEasyFin.Application.Models
         }
 
         /// <summary>
+        /// Get a valid transaction type
+        /// </summary>
+        /// <param name="transaction_id"></param>
+        /// <returns>TransactionTypeEntity</returns>
+        public async Task<TransactionTypeEntity> GetTransactionTypeByIdAsync(int transaction_id)
+            => await _CoreReplicaNodeDatabase.TransactionType.FirstOrDefaultAsync(x => x.Id == transaction_id && x.Active == true);
+
+        /// <summary>
         /// Method to search for transaction Type
         /// </summary>
         /// <param name="page"></param>
