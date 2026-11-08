@@ -65,10 +65,11 @@ namespace NievoEasyFin.Application.Models
                     ubc.name as UserCardName,
                     ub.nick_name as UserBankNickName,
                     b.name as BankName,
-                    cast(t.created_at as date) CreatedAt 
+                    cast(t.created_at as date) CreatedAt,
+                    count(*) over() as Records
                 from payment.""transaction"" t 
                     left join payment.scheduler_type st 
-                        on t.scheduler_id =t.scheduler_id
+                        on t.scheduler_id = st.id
                     left join payment.transaction_status ts 
                         on t.transaction_status_id = ts.id 
                     left join payment.transaction_type tt 
@@ -119,7 +120,7 @@ namespace NievoEasyFin.Application.Models
                 query.Append(@"
                     and ubc.id = @userBankCard
                 ");
-                parameters.Add("userBankCard", transactionType);
+                parameters.Add("userBankCard", userBankCard);
             }
 
             if (category != null)

@@ -17,7 +17,7 @@ public class PostUserGoalRequestBuilder : PostUserGoalRequest
         Description = _faker.Commerce.ProductDescription();
         Amount = _faker.Random.Int(100, 10000);
         IsPercent = false;
-        ExpireAt = _faker.Date.Future();
+        ExpireAt = _faker.Date.Future(1, DateTime.Today.AddDays(1));
     }
 
     public PostUserGoalRequestBuilder WithEmail(string email)
