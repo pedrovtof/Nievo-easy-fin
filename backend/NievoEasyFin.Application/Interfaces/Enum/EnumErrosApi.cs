@@ -1126,5 +1126,11 @@ public enum EnumErrosApi
     /// </summary>
     GETPAYMENTTRANSACTION_CORESERVICE_400_INVALID_PAGESIZE,
 
+    /// <summary>
+    /// Not found a valid user.
+    /// </summary>
+    [Description("Not found a valid user.")]
+    GETPAYMENTTRANSACTION_CORESERVICE_404_USER_NOT_FOUND,
+
     #endregion
 }

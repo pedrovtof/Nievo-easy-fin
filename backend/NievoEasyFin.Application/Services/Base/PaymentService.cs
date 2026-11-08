@@ -251,6 +251,44 @@ public class PaymentService : Controller, IPaymentService
                 new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
             );
 
-        return Ok(new ResponseApiSucess(null));
+        var user = await _userModel.GetUserByEmailAsync(request.GetEmail());
+        if (user == null)
+            return NotFound(new ResponseApiError(
+                new List<string>() { EnumErrosApi.GETPAYMENTTRANSACTION_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+            ));
+
+        var (transactions, records) = await _transactionModel.GetPaymentTransactionAsync(
+            request.Page,
+            request.PageSize,
+            user.Id,
+            request.UserBankCard,
+            request.SchedulerExists,
+            request.TransactionStatusId,
+            request.TransactionTypeId,
+            request.Category,
+            request.PayDateStart,
+            request.PayDateEnd
+        );
+
+        List<GetPaymentTransactionAsyncResponse> items = new();
+
+        if (!transactions.Any())
+            return Ok(
+                new ResponseApiSucess(new ResponsePaginationBase<GetPaymentTransactionAsyncResponse>(
+                request.Page,
+                request.PageSize,
+                0,
+                items
+                ))
+            );
+
+        var response = new ResponsePaginationBase<GetPaymentTransactionAsyncResponse>(
+            request.Page,
+            request.PageSize,
+            records,
+            transactions.Select(x => new GetPaymentTransactionAsyncResponse(x)).ToList()
+        );
+
+        return Ok(new ResponseApiSucess(response));
     }
 }

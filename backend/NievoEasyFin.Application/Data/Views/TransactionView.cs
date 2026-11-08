@@ -22,17 +22,9 @@ public class TransactionView
         Id = entity.Id;
         Name = entity.Name;
         Description = entity.Description;
-        UserId = entity.UserId;
-        TransactionStatusId = entity.TransactionStatusId;
-        CategorieId = entity.CategorieId;
         PayDate = entity.PayDate;
         Amount = entity.Amount;
-        CardId = entity.CardId;
-        BankId = entity.BankId;
-        TransactionTypeId = entity.TransactionTypeId;
-        SchedulerId = entity.SchedulerId;
         CreatedAt = entity.CreatedAt;
-        UpdatedAt = entity.UpdatedAt;
     }
 
     /// <summary>
@@ -54,106 +46,64 @@ public class TransactionView
     public string? Description { get; set; }
 
     /// <summary>
-    /// User id
-    /// </summary>
-    [JsonPropertyName("user_id")]
-    public int UserId { get; set; }
-
-    /// <summary>
-    /// Transaction status id
-    /// </summary>
-    [JsonPropertyName("transaction_status_id")]
-    public int TransactionStatusId { get; set; }
-
-    /// <summary>
-    /// Transaction status name
-    /// </summary>
-    [JsonPropertyName("transaction_status_name")]
-    public string? TransactionStatusName { get; set; }
-
-    /// <summary>
-    /// Category id
-    /// </summary>
-    [JsonPropertyName("categorie_id")]
-    public int? CategorieId { get; set; }
-
-    /// <summary>
-    /// Category name
-    /// </summary>
-    [JsonPropertyName("category_name")]
-    public string? CategoryName { get; set; }
-
-    /// <summary>
-    /// Pay date
-    /// </summary>
-    [JsonPropertyName("pay_date")]
-    public DateTime PayDate { get; set; }
-
-    /// <summary>
     /// Amount
     /// </summary>
     [JsonPropertyName("amount")]
     public long Amount { get; set; }
 
     /// <summary>
-    /// Card id
+    /// Cron Tab
     /// </summary>
-    [JsonPropertyName("card_id")]
-    public int? CardId { get; set; }
+    [JsonPropertyName("cron_tab")]
+    public string CronTab { get; set; }
 
     /// <summary>
-    /// Card name
+    /// Status
     /// </summary>
-    [JsonPropertyName("card_name")]
-    public string? CardName { get; set; }
+    [JsonPropertyName("status")]
+    public string Status { get; set; }
 
     /// <summary>
-    /// Bank id
+    /// Type
     /// </summary>
-    [JsonPropertyName("bank_id")]
-    public int? BankId { get; set; }
+    [JsonPropertyName("type")]
+    public string Type { get; set; }
 
     /// <summary>
-    /// Bank name
+    /// Category
+    /// </summary>
+    [JsonPropertyName("category")]
+    public string Category { get; set; }
+
+    /// <summary>
+    /// PayDate
+    /// </summary>
+    [JsonPropertyName("pay_date")]
+    public DateTime PayDate { get; set; }
+
+    /// <summary>
+    /// UserCardName
+    /// </summary>
+    [JsonPropertyName("user_card_name")]
+    public string UserCardName { get; set; }
+
+    /// <summary>
+    /// UserBankNickName
+    /// </summary>
+    [JsonPropertyName("user_bank_nickname")]
+    public string UserBankNickName { get; set; }
+
+    /// <summary>
+    /// BankName
     /// </summary>
     [JsonPropertyName("bank_name")]
-    public string? BankName { get; set; }
+    public string BankName { get; set; }
 
     /// <summary>
-    /// Transaction type id
-    /// </summary>
-    [JsonPropertyName("transaction_type_id")]
-    public int TransactionTypeId { get; set; }
-
-    /// <summary>
-    /// Transaction type name
-    /// </summary>
-    [JsonPropertyName("transaction_type_name")]
-    public string? TransactionTypeName { get; set; }
-
-    /// <summary>
-    /// Scheduler id
-    /// </summary>
-    [JsonPropertyName("scheduler_id")]
-    public int? SchedulerId { get; set; }
-
-    /// <summary>
-    /// Scheduler name
-    /// </summary>
-    [JsonPropertyName("scheduler_name")]
-    public string? SchedulerName { get; set; }
-
-    /// <summary>
-    /// Created at
+    /// CreatedAt
     /// </summary>
     [JsonPropertyName("created_at")]
     public DateTime CreatedAt { get; set; }
-
-    /// <summary>
-    /// Updated at
-    /// </summary>
-    [JsonPropertyName("updated_at")]
-    public DateTime? UpdatedAt { get; set; }
 
     /// <summary>
     /// Records
