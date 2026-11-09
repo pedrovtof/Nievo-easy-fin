@@ -934,4 +934,203 @@ public enum EnumErrosApi
     GETUSERCATEGORYASYNC_CORESERVICE_404_USER_NOT_FOUND,
 
     #endregion
+
+    #region PostPaymentTransaction
+
+    /// <summary>
+    /// Empty email.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Invalid card.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_CARD,
+
+    /// <summary>
+    /// Invalid bank.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_BANK,
+
+    /// <summary>
+    /// Invalid Transaction status.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_STATUS,
+
+    /// <summary>
+    /// Invalid amount status.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_AMOUNT,
+
+    /// <summary>
+    /// Invalid Transaction type.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_TYPE,
+
+    /// <summary>
+    /// Invalid scheduler.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SCHEDULER,
+
+    /// <summary>
+    /// Invalid description.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_DESCRIPTION,
+
+    /// <summary>
+    /// Empty description.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_EMPTY_DESCRIPTION,
+
+    /// <summary>
+    /// Empty scheduler.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_EMPTY_SCHEDULER,
+
+    /// <summary>
+    /// Invalid name.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_NAME,
+
+    /// <summary>
+    /// Empty name.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_EMPTY_NAME,
+
+    /// <summary>
+    /// Invalid category.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_CATEGORY,
+
+    /// <summary>
+    /// Empty category.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_EMPTY_CATEGORY,
+
+    /// <summary>
+    /// Null pay date.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_NULL_PAYDATE,
+
+    /// <summary>
+    /// Invalid pay date.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_PAYDATE,
+
+    /// <summary>
+    /// Not found a valid user.
+    /// </summary>
+    [Description("Not found a valid user.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    /// <summary>
+    /// Not found a valid bank for the user.
+    /// </summary>
+    [Description("Not found a valid bank for the user.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_BANK_NOT_FOUND,
+
+    /// <summary>
+    /// Not found any card with this identification for the user.
+    /// </summary>
+    [Description("Not found any card with this identification for the user.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_USER_CARD_NOT_FOUND,
+
+    /// <summary>
+    /// Not found the type informed.
+    /// </summary>
+    [Description("Not found the type informed.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_TRANSACTION_TYPE_NOT_FOUND,
+
+    /// <summary>
+    /// Not found the status informed.
+    /// </summary>
+    [Description("Not found the status informed.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_TRANSACTION_STATUS_NOT_FOUND,
+
+    /// <summary>
+    /// Not found the scheduler informed.
+    /// </summary>
+    [Description("Not found the status informed.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SCHEDULER_NOT_FOUND,
+
+    /// <summary>
+    /// Not found the category informed.
+    /// </summary>
+    [Description("Not found the category informed.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_CATEGORY_NOT_FOUND,
+
+    /// <summary>
+    /// Created.
+    /// </summary>
+    [Description("Created")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS,
+
+    #endregion
+
+    #region GetPaymentTransactionStatus
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETPAYMENTTRANSACTIONSTATUS_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETPAYMENTTRANSACTIONSTATUS_CORESERVICE_400_INVALID_PAGESIZE,
+
+    #endregion
+
+    #region GetPaymentTransactionType
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETPAYMENTTRANSACTIONTYPE_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETPAYMENTTRANSACTIONTYPE_CORESERVICE_400_INVALID_PAGESIZE,
+
+    #endregion
+
+    #region GetPaymentScheduler
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETPAYMENTSCHEDULER_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETPAYMENTSCHEDULER_CORESERVICE_400_INVALID_PAGESIZE,
+
+    #endregion
+
+    #region GetPaymenTransaction
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETPAYMENTTRANSACTION_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETPAYMENTTRANSACTION_CORESERVICE_400_INVALID_PAGESIZE,
+
+    /// <summary>
+    /// Not found a valid user.
+    /// </summary>
+    [Description("Not found a valid user.")]
+    GETPAYMENTTRANSACTION_CORESERVICE_404_USER_NOT_FOUND,
+
+    #endregion
 }

@@ -1,0 +1,47 @@
+using System.Text.Json.Serialization;
+using NievoEasyFin.Application.Data.Views;
+
+namespace NievoEasyFin.Application.Interfaces.Response
+{
+    public class GetSchedulerTypeAsyncResponse
+    {
+        public GetSchedulerTypeAsyncResponse(SchedulerTypeView view)
+        {
+            Id = view.Id;
+            Name = view.Name;
+            Description = view.Description;
+            Active = view.Active;
+            CronTab = view.CronTab;
+        }
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Name
+        /// </summary>
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Description
+        /// </summary>
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Active
+        /// </summary>
+        [JsonPropertyName("active")]
+        public bool Active { get; set; }
+
+        /// <summary>
+        /// Cron tab
+        /// </summary>
+        [JsonPropertyName("cron_tab")]
+        public string? CronTab { get; set; }
+    }
+}

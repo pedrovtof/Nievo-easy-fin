@@ -1,7 +1,7 @@
 using System.Reflection;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Services.Cache;
-using NievoEasyFin.Application.Services.Base.Users;
+using NievoEasyFin.Application.Services.Base;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base.Authenticator;
 using NievoEasyFin.Application.Interfaces.Services;
@@ -101,7 +101,7 @@ public class Startup
         // Service 
         services.AddScoped<CryptoPasswordService>();
         services.AddScoped<IAuthenticatorService, AuthenticatorService>();
-        services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<IAuthUserService, AuthUserService>();
     }
 
     // Use this method to configure the HTTP request pipeline.

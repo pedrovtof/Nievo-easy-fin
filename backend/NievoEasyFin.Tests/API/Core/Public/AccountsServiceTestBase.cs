@@ -4,9 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
+using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base;
+using NievoEasyFin.Application.Services.Security;
 using NievoEasyFin.Tests.Mocks.Helpers;
+using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using NSubstitute;
 using Xunit.Abstractions;
@@ -72,7 +75,7 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         using (var cmd = _connection.CreateCommand())
         {
-            cmd.CommandText = "ATTACH DATABASE ':memory:' AS user_details; ATTACH DATABASE ':memory:' AS journey; ATTACH DATABASE ':memory:' AS accounts; ATTACH DATABASE ':memory:' AS goals;";
+            cmd.CommandText = "ATTACH DATABASE ':memory:' AS user_details; ATTACH DATABASE ':memory:' AS journey; ATTACH DATABASE ':memory:' AS accounts; ATTACH DATABASE ':memory:' AS goals; ATTACH DATABASE ':memory:' AS payment;";
             cmd.ExecuteNonQuery();
         }
 
@@ -163,6 +166,58 @@ public abstract class AccountsServiceTestBase : IDisposable
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS payment.transaction_status (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS payment.transaction_type (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS payment.scheduler_type (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    cron_tab TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS payment.""transaction"" (
+                    id TEXT PRIMARY KEY,
+                    name TEXT,
+                    description TEXT,
+                    user_id INTEGER,
+                    transaction_status_id INTEGER,
+                    categorie_id INTEGER,
+                    pay_date TEXT,
+                    amount INTEGER,
+                    card_id INTEGER,
+                    bank_id INTEGER,
+                    transaction_type_id INTEGER,
+                    scheduler_id INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS accounts.user_bank_card (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    bank_id INTEGER,
+                    name TEXT,
+                    card_id INTEGER,
+                    active INTEGER,
+                    user_id INTEGER,
+                    expired_at TEXT,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
             ";
             cmd.ExecuteNonQuery();
         }
@@ -197,7 +252,30 @@ public abstract class AccountsServiceTestBase : IDisposable
         return new CardService(bankCardTypeModel, bankCardFlagModel);
     }
 
-    protected UserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
+    protected PaymentService CreatePaymentService(CoreOrigin origin, CoreReplica replica, AuthOrigin? authOrigin = null, AuthReplica? authReplica = null)
+    {
+        var schedulerTypeModel = new SchedulerTypeModel(origin, replica);
+        var transactionModel = new TransactionModel(origin, replica);
+        var transactionStatusModel = new TransactionStatusModel(origin, replica);
+        var transactionTypeModel = new TransactionTypeModel(origin, replica);
+        var userModel = new UserModel(authOrigin!, authReplica!);
+        var userBankCardModel = new UserBankCardModel(origin, replica);
+        var categoryModel = new CategoryModel(origin, replica);
+        var userBankModel = new UserBankModel(origin, replica);
+
+        return new PaymentService(
+            schedulerTypeModel,
+            transactionModel,
+            transactionStatusModel,
+            transactionTypeModel,
+            userModel,
+            userBankCardModel,
+            categoryModel,
+            userBankModel
+        );
+    }
+
+    protected CoreUserService CreateUserService(CoreOrigin origin, CoreReplica replica, AuthOrigin authOrigin, AuthReplica authReplica)
     {
         var userModel = new UserModel(authOrigin, authReplica);
         var userBankModel = new UserBankModel(origin, replica);
@@ -215,7 +293,16 @@ public abstract class AccountsServiceTestBase : IDisposable
 
         var cacheService = MockHelper.CreateMockedCacheService(dbMock);
 
-        return new UserService(userModel, userBankModel, userBankCardModel, goalModel, categoryModel, bankModel, cacheService, bankCardModel);
+        return new CoreUserService(
+            userModel,
+            userBankModel,
+            userBankCardModel,
+            goalModel,
+            categoryModel,
+            bankModel,
+            cacheService,
+            bankCardModel
+        );
     }
 
     protected async System.Threading.Tasks.Task SyncCoreToAttachedDatabasesAsync(CoreOrigin context)
@@ -233,8 +320,13 @@ public abstract class AccountsServiceTestBase : IDisposable
                 INSERT OR REPLACE INTO accounts.bank_card SELECT * FROM main.bank_card;
                 INSERT OR REPLACE INTO accounts.bank_card_type SELECT * FROM main.bank_card_type;
                 INSERT OR REPLACE INTO accounts.bank_card_flag SELECT * FROM main.bank_card_flag;
+                INSERT OR REPLACE INTO accounts.user_bank_card SELECT * FROM main.user_bank_card;
                 INSERT OR REPLACE INTO goals.goals SELECT * FROM main.goals;
                 INSERT OR REPLACE INTO goals.category SELECT * FROM main.category;
+                INSERT OR REPLACE INTO payment.transaction_status SELECT * FROM main.transaction_status;
+                INSERT OR REPLACE INTO payment.transaction_type SELECT * FROM main.transaction_type;
+                INSERT OR REPLACE INTO payment.scheduler_type SELECT * FROM main.scheduler_type;
+                INSERT OR REPLACE INTO payment.""transaction"" SELECT * FROM main.""transaction"";
             ";
             await cmd.ExecuteNonQueryAsync();
         }

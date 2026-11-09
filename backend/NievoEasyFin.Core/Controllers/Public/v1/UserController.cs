@@ -14,11 +14,11 @@ namespace NievoEasyFin.Core.Controllers.Public;
 [Route("api/public/v1/[controller]")]
 public class UserController : Controller
 {
-    private readonly IUserService _userService;
+    private readonly ICoreUserService _userService;
 
     private readonly JsonWebTokenService _jsonWebTokenService;
 
-    public UserController(IUserService userService, JsonWebTokenService jsonWebTokenService)
+    public UserController(ICoreUserService userService, JsonWebTokenService jsonWebTokenService)
     {
         _userService = userService;
         _jsonWebTokenService = jsonWebTokenService;
