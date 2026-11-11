@@ -3,7 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
+import Banks from './pages/Banks';
+import Cards from './pages/Cards';
 import Budget from './pages/Budget';
+import Categories from './pages/Categories';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword/index';
 import Settings from './pages/Settings';
@@ -33,7 +36,10 @@ function App() {
         {/* Protected Routes (Wrapped in Layout and ProtectedRoute) */}
         <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/transactions" element={<ProtectedRoute><Layout><Transactions /></Layout></ProtectedRoute>} />
+        <Route path="/banks" element={<ProtectedRoute><Layout><Banks /></Layout></ProtectedRoute>} />
+        <Route path="/cards" element={<ProtectedRoute><Layout><Cards /></Layout></ProtectedRoute>} />
         <Route path="/budget" element={<ProtectedRoute><Layout><Budget /></Layout></ProtectedRoute>} />
+        <Route path="/categories" element={<ProtectedRoute><Layout><Categories /></Layout></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
 
         {/* Fallback */}

@@ -1,5 +1,5 @@
-import api from '../../services/api';
+import { coreApi } from '../../services/api';
 
 export const getDashboardData = () => {
-  return api.get('/dashboard');
+  return coreApi.get('/dashboard');
 };

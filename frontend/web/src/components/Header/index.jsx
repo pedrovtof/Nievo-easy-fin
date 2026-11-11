@@ -2,16 +2,21 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderView from './View';
 
+/**
+ * Header Navigation Controller
+ * Handles top-level quick actions such as navigating to transaction creation and logging out.
+ *
+ * @returns {JSX.Element} The rendered Header component.
+ */
 const Header = () => {
   const navigate = useNavigate();
 
-  // Logic could involve fetching user data or notifications
   const handleNewTransaction = () => {
-    console.log('New Transaction Clicked');
+    navigate('/transactions');
   };
 
   const handleNotifications = () => {
-    console.log('Notifications Clicked');
+    navigate('/budget');
   };
 
   const handleLogout = () => {

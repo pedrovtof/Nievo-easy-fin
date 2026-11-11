@@ -1,4 +1,4 @@
-import api from '../../services/api';
+import { authApi } from '../../services/api';
 
 export const getSettingsData = () => {
   return Promise.resolve({
@@ -24,5 +24,5 @@ export const updateSettings = (data) => {
 };
 
 export const changePassword = (email, oldPassword, newPassword) => {
-  return api.post('/auth/change-password', { email, oldPassword, newPassword });
+  return authApi.post('/auth/change-password', { email, oldPassword, newPassword });
 };

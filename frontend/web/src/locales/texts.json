@@ -34,19 +34,46 @@
     "recentTransactions": "Recent Transactions"
   },
   "Budget": {
-    "title": "Budget Management",
-    "addBudget": "Add Budget",
-    "totalBudget": "Total Budget",
-    "spent": "Spent",
-    "remaining": "Remaining"
+    "title": "Goals & Budget",
+    "subtitle": "Curate your financial targets and spending ceilings with intentional clarity.",
+    "addBudget": "New Goal",
+    "totalBudget": "Total Target Volume",
+    "activeGoals": "Active Goals",
+    "spent": "Target",
+    "remaining": "Expires"
+  },
+  "Categories": {
+    "title": "Categories",
+    "subtitle": "Organize your financial story by linking categories to your goals or parent groups.",
+    "addCategory": "New Category",
+    "totalCategories": "Active Categories",
+    "linkedToGoal": "Linked to Goal",
+    "subcategories": "Subcategories"
+  },
+  "Banks": {
+    "title": "Bank Accounts",
+    "subtitle": "Manage your linked financial institutions and browse the supported bank catalog.",
+    "addBank": "Link Bank Account",
+    "myAccounts": "My Linked Accounts",
+    "catalog": "Supported Institutions Catalog"
+  },
+  "Cards": {
+    "title": "Cards & Wallet",
+    "subtitle": "Manage your credit, debit, and multiple cards linked to your financial institutions.",
+    "addCard": "Add Card to Wallet",
+    "myCards": "My Active Cards",
+    "catalog": "Available Bank Cards"
   },
   "Transactions": {
     "title": "Transactions",
-    "addTransaction": "Add Transaction",
-    "date": "Date",
-    "description": "Description",
+    "subtitle": "Track and record your payment flow across accounts, cards, and categories.",
+    "addTransaction": "New Transaction",
+    "date": "Pay Date",
+    "description": "Transaction",
     "amount": "Amount",
-    "category": "Category"
+    "category": "Category",
+    "status": "Status",
+    "account": "Account & Card"
   },
   "Settings": {
     "title": "Settings",
@@ -56,8 +83,11 @@
   },
   "Navigation": {
     "dashboard": "Dashboard",
-    "budget": "Budget",
     "transactions": "Transactions",
+    "banks": "Banks",
+    "cards": "Cards",
+    "budget": "Goals & Budget",
+    "categories": "Categories",
     "settings": "Settings"
   },
   "Common": {
