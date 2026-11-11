@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import {
   Box, Typography, CircularProgress, Alert, Chip, Divider, IconButton, Tooltip,
 } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import GavelIcon from '@mui/icons-material/Gavel';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -173,7 +173,6 @@ const ProseContainer = styled(Box)(({ theme }) => ({
      error      {string}
 ══════════════════════════════════════════════════════════════════════════ */
 const TermsView = ({ content, version, isLoading, error }) => {
-  const theme = useTheme();
   const { mode, toggleColorMode } = useContext(ThemeContext);
 
   return (

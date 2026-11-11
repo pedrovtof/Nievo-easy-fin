@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Fab, Typography, Box, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Fab, Typography, Box, TextField, IconButton, Chip } from '@mui/material';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { FabContainer } from './styles';
@@ -40,14 +40,14 @@ const MockGuidePopupView = ({ open, mockData, onOpen, onClose, onCopy }) => {
 
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
         <DialogTitle>Mock Data Guide</DialogTitle>
-        <DialogContent dividers>
+        <DialogContent>
           <Typography variant="body2" gutterBottom mb={3}>
-            Here is the current state of the mock database. 
-            Any users created during this session will appear below, making it easy to copy their credentials.
+            Here is the current state of the in-memory mock database.
+            All Core API endpoints (Payments, Banks, Cards, Goals, and Categories) are intercepted in mock mode.
           </Typography>
           
           {mockData?.users?.map((user, idx) => (
-            <Box key={idx} mb={3} p={2} border="1px solid" borderColor="divider" borderRadius={1}>
+            <Box key={idx} mb={3} p={2.5} bgcolor="surface.main" borderRadius={2}>
               <Typography variant="subtitle2" color="primary" gutterBottom>
                 {idx === 0 ? "Default User" : `Created User ${idx}`}
               </Typography>
@@ -56,17 +56,32 @@ const MockGuidePopupView = ({ open, mockData, onOpen, onClose, onCopy }) => {
             </Box>
           ))}
 
-          <Typography variant="subtitle2" color="primary" gutterBottom mt={3}>
+          {mockData?.counts && (
+            <>
+              <Typography variant="subtitle2" color="primary" gutterBottom mt={2}>
+                Active Core Mock Entities
+              </Typography>
+              <Box display="flex" flexWrap="wrap" gap={1} mb={3} p={2} bgcolor="surface.main" borderRadius={2}>
+                <Chip label={`Banks: ${mockData.counts.userBanks}`} size="small" />
+                <Chip label={`Cards: ${mockData.counts.userCards}`} size="small" />
+                <Chip label={`Goals: ${mockData.counts.goals}`} size="small" />
+                <Chip label={`Categories: ${mockData.counts.categories}`} size="small" />
+                <Chip label={`Transactions: ${mockData.counts.transactions}`} size="small" />
+              </Box>
+            </>
+          )}
+
+          <Typography variant="subtitle2" color="primary" gutterBottom mt={2}>
             Dashboard Data
           </Typography>
-          <Box p={2} border="1px solid" borderColor="divider" borderRadius={1}>
+          <Box p={2.5} bgcolor="surface.main" borderRadius={2}>
             <MockField label="Total Balance" value={mockData?.dashboard?.totalBalance} onCopy={onCopy} />
             <MockField label="Income" value={mockData?.dashboard?.income} onCopy={onCopy} />
             <MockField label="Expenses" value={mockData?.dashboard?.expenses} onCopy={onCopy} />
           </Box>
 
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2.5 }}>
           <Button onClick={onClose} color="primary" variant="contained">
             Close
           </Button>

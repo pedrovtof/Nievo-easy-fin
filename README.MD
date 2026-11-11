@@ -87,7 +87,7 @@ As imagens do container serão as da comunidade, como no caso do Redish ou Click
 
 ### Front-end
 
-Desenvolvido em **React com Vite**, utilizando **MUI (Material UI)** como biblioteca de componentes e estilização. Provisionado em máquina virtual Debian Bookworm.
+Desenvolvido em **React com Vite**, utilizando **MUI (Material UI)** como biblioteca de componentes e estilização sob o Design System **"The Silent Navigator"**. Conta com navegação dedicada na Sidebar e integração completa com as APIs do Core (`Transactions / Payment`, `Banks`, `Cards`, `Goals & Budget` e `Categories`), além de suporte integral a dados simulados (`mockData.js`). Provisionado em máquina virtual Debian Bookworm.
 
 ### Back-end
 
@@ -233,7 +233,7 @@ The container images will be from the community, as in the case of Redis or Clic
 
 ### Front-end
 
-Developed in **React with Vite**, using **MUI (Material UI)** as the component and styling library. Provisioned on a Debian Bookworm virtual machine.
+Developed in **React with Vite**, using **MUI (Material UI)** as the component and styling library under **"The Silent Navigator"** Design System. It features dedicated Sidebar navigation and full integration with the Core APIs (`Transactions / Payment`, `Banks`, `Cards`, `Goals & Budget`, and `Categories`), alongside comprehensive in-memory mock support (`mockData.js`). Provisioned on a Debian Bookworm virtual machine.
 
 ### Back-end
 

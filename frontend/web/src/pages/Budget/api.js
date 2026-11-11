@@ -1,35 +1,21 @@
-/**
- * Budget API definitions
- * Export functions here that interact with the /budget endpoints.
- */
+import api from '../../services/api';
 
-export const getBudgetData = () => {
-  // For now we mock it directly if there's no endpoint.
-  return Promise.resolve({
-    data: {
-      totalBudget: 2400,
-      leftToSpend: 850,
-      categories: [
-        {
-          title: 'Grocery',
-          type: 'Essential',
-          icon: 'shopping_cart',
-          amountSpent: 350,
-          limit: 400,
-          percentage: 87.5,
-          status: 'normal',
-        },
-        {
-          title: 'Leisure',
-          type: 'Discretionary',
-          icon: 'theaters',
-          amountSpent: 120,
-          limit: 100,
-          percentage: 120,
-          status: 'over',
-          warning: 'Exceeded by $20.00'
-        }
-      ]
-    }
-  });
+/**
+ * Fetches paginated user financial goals and budgets.
+ *
+ * @param {Object} params - Query parameters ({ page, page_size, active }).
+ * @returns {Promise<Object>} Axios response containing user goals.
+ */
+export const getUserGoals = (params = { page: 1, page_size: 20, active: true }) => {
+  return api.get('/api/public/v1/User/goal', { params });
+};
+
+/**
+ * Creates a new financial goal or spending limit for the authenticated user.
+ *
+ * @param {Object} data - Payload ({ name, description, amount, is_percent, expire_at }).
+ * @returns {Promise<Object>} Axios response confirming creation.
+ */
+export const createUserGoal = (data) => {
+  return api.post('/api/public/v1/User/goal', data);
 };
