@@ -1,4 +1,4 @@
-import api from '../../services/api';
+import { coreApi } from '../../services/api';
 
 /**
  * Fetches the public catalog of supported banking institutions.
@@ -7,7 +7,7 @@ import api from '../../services/api';
  * @returns {Promise<Object>} Axios response containing paginated banks.
  */
 export const getCatalogBanks = (params = { page: 1, page_size: 20 }) => {
-  return api.get('/api/public/v1/Bank', { params });
+  return coreApi.get('/api/public/v1/Bank', { params });
 };
 
 /**
@@ -16,7 +16,7 @@ export const getCatalogBanks = (params = { page: 1, page_size: 20 }) => {
  * @returns {Promise<Object>} Axios response containing the user's linked bank accounts.
  */
 export const getUserBanks = () => {
-  return api.get('/api/public/v1/User/banks');
+  return coreApi.get('/api/public/v1/User/banks');
 };
 
 /**
@@ -26,5 +26,5 @@ export const getUserBanks = () => {
  * @returns {Promise<Object>} Axios response confirming creation.
  */
 export const createUserBank = (data) => {
-  return api.post('/api/public/v1/User/banks', data);
+  return coreApi.post('/api/public/v1/User/banks', data);
 };

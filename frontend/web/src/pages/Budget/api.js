@@ -1,4 +1,4 @@
-import api from '../../services/api';
+import { coreApi } from '../../services/api';
 
 /**
  * Fetches paginated user financial goals and budgets.
@@ -7,7 +7,7 @@ import api from '../../services/api';
  * @returns {Promise<Object>} Axios response containing user goals.
  */
 export const getUserGoals = (params = { page: 1, page_size: 20, active: true }) => {
-  return api.get('/api/public/v1/User/goal', { params });
+  return coreApi.get('/api/public/v1/User/goal', { params });
 };
 
 /**
@@ -17,5 +17,5 @@ export const getUserGoals = (params = { page: 1, page_size: 20, active: true }) 
  * @returns {Promise<Object>} Axios response confirming creation.
  */
 export const createUserGoal = (data) => {
-  return api.post('/api/public/v1/User/goal', data);
+  return coreApi.post('/api/public/v1/User/goal', data);
 };

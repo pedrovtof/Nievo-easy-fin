@@ -1,4 +1,4 @@
-import api from '../../services/api';
+import { coreApi } from '../../services/api';
 
 /**
  * Fetches paginated payment transactions with optional filters.
@@ -7,7 +7,7 @@ import api from '../../services/api';
  * @returns {Promise<Object>} Axios response containing paginated transactions.
  */
 export const getPaymentTransactions = (params = { page: 1, page_size: 20 }) => {
-  return api.get('/api/public/v1/Payment', { params });
+  return coreApi.get('/api/public/v1/Payment', { params });
 };
 
 /**
@@ -17,7 +17,7 @@ export const getPaymentTransactions = (params = { page: 1, page_size: 20 }) => {
  * @returns {Promise<Object>} Axios response confirming creation.
  */
 export const createPaymentTransaction = (data) => {
-  return api.post('/api/public/v1/Payment', data);
+  return coreApi.post('/api/public/v1/Payment', data);
 };
 
 /**
@@ -27,7 +27,7 @@ export const createPaymentTransaction = (data) => {
  * @returns {Promise<Object>} Axios response containing statuses.
  */
 export const getTransactionStatuses = (params = { page: 1, page_size: 20 }) => {
-  return api.get('/api/public/v1/Payment/status', { params });
+  return coreApi.get('/api/public/v1/Payment/status', { params });
 };
 
 /**
@@ -37,7 +37,7 @@ export const getTransactionStatuses = (params = { page: 1, page_size: 20 }) => {
  * @returns {Promise<Object>} Axios response containing types.
  */
 export const getTransactionTypes = (params = { page: 1, page_size: 20 }) => {
-  return api.get('/api/public/v1/Payment/type', { params });
+  return coreApi.get('/api/public/v1/Payment/type', { params });
 };
 
 /**
@@ -47,7 +47,7 @@ export const getTransactionTypes = (params = { page: 1, page_size: 20 }) => {
  * @returns {Promise<Object>} Axios response containing scheduler types.
  */
 export const getPaymentSchedulers = (params = { page: 1, page_size: 20 }) => {
-  return api.get('/api/public/v1/Payment/scheduler', { params });
+  return coreApi.get('/api/public/v1/Payment/scheduler', { params });
 };
 
 /**
@@ -57,7 +57,7 @@ export const getPaymentSchedulers = (params = { page: 1, page_size: 20 }) => {
  * @returns {Promise<Object>} Axios response containing user categories.
  */
 export const getUserCategories = (params = { page: 1, page_size: 30, active: true }) => {
-  return api.get('/api/public/v1/User/category', { params });
+  return coreApi.get('/api/public/v1/User/category', { params });
 };
 
 /**
@@ -66,7 +66,7 @@ export const getUserCategories = (params = { page: 1, page_size: 30, active: tru
  * @returns {Promise<Object>} Axios response containing user banks.
  */
 export const getUserBanks = () => {
-  return api.get('/api/public/v1/User/banks');
+  return coreApi.get('/api/public/v1/User/banks');
 };
 
 /**
@@ -76,7 +76,7 @@ export const getUserBanks = () => {
  * @returns {Promise<Object>} Axios response containing catalog banks.
  */
 export const getCatalogBanks = (params = { page: 1, page_size: 30 }) => {
-  return api.get('/api/public/v1/Bank', { params });
+  return coreApi.get('/api/public/v1/Bank', { params });
 };
 
 /**
@@ -86,5 +86,5 @@ export const getCatalogBanks = (params = { page: 1, page_size: 30 }) => {
  * @returns {Promise<Object>} Axios response containing user cards.
  */
 export const getUserCards = (params = { page: 1, page_size: 30, active: true }) => {
-  return api.get('/api/public/v1/User/bank-card', { params });
+  return coreApi.get('/api/public/v1/User/bank-card', { params });
 };

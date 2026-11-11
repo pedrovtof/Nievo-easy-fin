@@ -1,4 +1,4 @@
-import api from '../../services/api';
+import { coreApi } from '../../services/api';
 
 /**
  * Fetches the user's categories with their linked goal or parent hierarchy.
@@ -7,7 +7,7 @@ import api from '../../services/api';
  * @returns {Promise<Object>} Axios response containing paginated user categories.
  */
 export const getUserCategories = (params = { page: 1, page_size: 30, active: true }) => {
-  return api.get('/api/public/v1/User/category', { params });
+  return coreApi.get('/api/public/v1/User/category', { params });
 };
 
 /**
@@ -17,7 +17,7 @@ export const getUserCategories = (params = { page: 1, page_size: 30, active: tru
  * @returns {Promise<Object>} Axios response confirming creation.
  */
 export const createUserCategory = (data) => {
-  return api.post('/api/public/v1/User/category', data);
+  return coreApi.post('/api/public/v1/User/category', data);
 };
 
 /**
@@ -27,5 +27,5 @@ export const createUserCategory = (data) => {
  * @returns {Promise<Object>} Axios response containing user goals.
  */
 export const getUserGoals = (params = { page: 1, page_size: 30, active: true }) => {
-  return api.get('/api/public/v1/User/goal', { params });
+  return coreApi.get('/api/public/v1/User/goal', { params });
 };

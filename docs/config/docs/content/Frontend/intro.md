@@ -62,29 +62,33 @@ flowchart TD
 
 ---
 
-## 🔄 4. Fluxo de Integração Frontend ↔ Core API
+## 🔄 4. Fluxo de Integração Frontend ↔ Auth API (`5090`) & Core API (`5203`)
+
+O módulo [`src/services/api.js`](../../../../../frontend/web/src/services/api.js) expõe duas instâncias Axios pré-configuradas com interceptors de JWT e suporte a Mock:
+- **`authApi` (`VITE_BASE_AUTH_URL`, padrão `http://localhost:5090`):** Utilizada pelas páginas `Login`, `Register`, `ForgotPassword`, `ConfirmEmail`, `Terms` e `Settings` para comunicação com o serviço `NievoEasyFin.Auth`.
+- **`coreApi` (`VITE_BASE_CORE_URL`, padrão `http://localhost:5203`):** Utilizada pelas páginas `Transactions`, `Banks`, `Cards`, `Budget`, `Categories` e `Dashboard` para comunicação com o serviço `NievoEasyFin.Core`.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User as Usuário
     participant View as React View/Controller
-    participant Axios as Axios Client (api.js)
-    participant Core as NievoEasyFin.Core API
+    participant AuthAxios as authApi (VITE_BASE_AUTH_URL :5090)
+    participant CoreAxios as coreApi (VITE_BASE_CORE_URL :5203)
+    participant Auth as NievoEasyFin.Auth
+    participant Core as NievoEasyFin.Core
+
+    User->>View: Realiza login ou validação de conta
+    View->>AuthAxios: POST /api/public/v1/Authenticator/singin
+    AuthAxios->>Auth: HTTP POST (porta 5090)
+    Auth-->>AuthAxios: 200 OK (Token JWT)
 
     User->>View: Acessa rota na Sidebar (/transactions, /banks, /cards, /budget, /categories)
-    View->>Axios: Dispara chamadas GET paginadas (page, page_size)
-    Axios->>Core: HTTP GET + Header Authorization: Bearer <JWT>
-    Core-->>Axios: 200 OK ResponseApiSucess (items, records)
-    Axios-->>View: Retorna payload padronizado
+    View->>CoreAxios: Dispara chamadas GET paginadas (page, page_size)
+    CoreAxios->>Core: HTTP GET (porta 5203) + Header Authorization: Bearer <JWT>
+    Core-->>CoreAxios: 200 OK ResponseApiSucess (items, records)
+    CoreAxios-->>View: Retorna payload padronizado
     View-->>User: Renderiza superfícies tonais e listas sem divisores
-
-    User->>View: Abre modal e submete novo registro (POST)
-    View->>Axios: Envia payload validado
-    Axios->>Core: HTTP POST /api/public/v1/...
-    Core-->>Axios: 200 OK / 201 Created
-    Axios-->>View: Confirmação de sucesso
-    View->>Axios: Recarrega listagem atualizada
 ```
 
 ---
