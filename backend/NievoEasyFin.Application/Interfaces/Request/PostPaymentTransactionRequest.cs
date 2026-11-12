@@ -72,11 +72,5 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [JsonPropertyName("description")]
         public string Description { get; set; }
-
-        /// <summary>
-        /// Ingress
-        /// </summary>
-        [JsonPropertyName("income")]
-        public bool TransactionIngress { get; set; }
     }
 }

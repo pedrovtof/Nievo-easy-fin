@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ### Changelog
 
+2026-11-12 - [REFACTOR] - Remove obsolete TransactionIngress property from PostPaymentTransactionRequest (#65)
+
+Detalhes:
+
+- Remove unused TransactionIngress (income) boolean property from PostPaymentTransactionRequest in favor of TransactionSituation - pedrovotf - 2026-11-12 - #65 - PENDING
+
 2026-11-12 - [TEST] - Add outflow amount negation rule, update payment validator thresholds, tests, and docs (#65)
 
 Detalhes:
 
-- Add EnumTransactionSituation and negate transaction amount on Saida in PaymentService.PostPaymentTransaction, adjust PostPaymentTransactionValidatorAsync minimum bounds, update and add unit/integration tests in PostPaymentTransactionAsyncTest, and update MkDocs documentation and Mermaid diagrams - pedrovotf - 2026-11-12 - #65 - PENDING
+- Add EnumTransactionSituation and negate transaction amount on Saida in PaymentService.PostPaymentTransaction, adjust PostPaymentTransactionValidatorAsync minimum bounds, update and add unit/integration tests in PostPaymentTransactionAsyncTest, and update MkDocs documentation and Mermaid diagrams - pedrovotf - 2026-11-12 - #65 - 1da3629
 
 2026-11-12 - [NEW] - Add transaction situation (Entrada/Saida) to Payment API, database, and frontend Transactions page (#65)
 
