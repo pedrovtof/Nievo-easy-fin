@@ -13,13 +13,14 @@ public class PostPaymentTransactionRequestBuilder : PostPaymentTransactionReques
     public PostPaymentTransactionRequestBuilder()
     {
         SetEmail(_faker.Person.Email);
-        TransactionStatus = _faker.Random.Int(1, 10);
+        TransactionStatus = _faker.Random.Int(2, 10);
+        TransactionSituation = _faker.Random.Int(1, 10);
         CategoryName = _faker.Commerce.Categories(1)[0];
         PayDate = _faker.Date.Recent();
         Amount = _faker.Random.Long(100, 100000);
         Card = _faker.Random.Int(1, 10);
         Bank = _faker.Random.Int(1, 10);
-        TransactionType = _faker.Random.Int(1, 10);
+        TransactionType = _faker.Random.Int(2, 10);
         Scheduler = _faker.Random.Int(1, 10);
         Name = _faker.Commerce.ProductName();
         Description = _faker.Commerce.ProductDescription();
@@ -88,6 +89,12 @@ public class PostPaymentTransactionRequestBuilder : PostPaymentTransactionReques
     public PostPaymentTransactionRequestBuilder WithDescription(string description)
     {
         Description = description;
+        return this;
+    }
+
+    public PostPaymentTransactionRequestBuilder WithTransactionSituation(int transactionSituation)
+    {
+        TransactionSituation = transactionSituation;
         return this;
     }
 }

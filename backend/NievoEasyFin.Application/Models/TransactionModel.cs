@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Views;
-using Superpower.Parsers;
 
 namespace NievoEasyFin.Application.Models
 {
@@ -33,6 +32,7 @@ namespace NievoEasyFin.Application.Models
         /// <param name="category"></param>
         /// <param name="payDateStart"></param>
         /// <param name="payDateEnd"></param>
+        /// <param name="situationId"></param>
         /// <returns></returns>
         public async Task<(List<TransactionView>, int)> GetPaymentTransactionAsync(
             int page,
@@ -44,7 +44,8 @@ namespace NievoEasyFin.Application.Models
             int? transactionType,
             int? category,
             DateTime? payDateStart,
-            DateTime? payDateEnd
+            DateTime? payDateEnd,
+            int? situationId
         )
         {
             List<TransactionView> transactions = new();
@@ -65,6 +66,7 @@ namespace NievoEasyFin.Application.Models
                     ubc.name as UserCardName,
                     ub.nick_name as UserBankNickName,
                     b.name as BankName,
+                    tst.name as Situation,
                     cast(t.created_at as date) CreatedAt,
                     count(*) over() as Records
                 from payment.""transaction"" t 
@@ -74,6 +76,8 @@ namespace NievoEasyFin.Application.Models
                         on t.transaction_status_id = ts.id 
                     left join payment.transaction_type tt 
                         on t.transaction_type_id  = tt.id 
+                    left join payment.transaction_situation tst 
+                        on t.transaction_situation_id  = tst.id 
                     left join goals.category c 
                         on t.categorie_id = c.id
                     left join accounts.user_bank_card ubc 
@@ -94,6 +98,7 @@ namespace NievoEasyFin.Application.Models
                 query.Append(@"
                     and t.scheduler_id is not null
                 ");
+
             if (scheduler == false)
                 query.Append(@"
                     and t.scheduler_id is null
@@ -105,6 +110,14 @@ namespace NievoEasyFin.Application.Models
                     and ts.id = @transactionStatus
                 ");
                 parameters.Add("transactionStatus", transactionStatus);
+            }
+
+            if (situationId != null)
+            {
+                query.Append(@"
+                    and tst.id = @transactionSituation
+                ");
+                parameters.Add("transactionSituation", situationId);
             }
 
             if (transactionType != null)
@@ -179,6 +192,7 @@ namespace NievoEasyFin.Application.Models
         /// <param name="card"></param>
         /// <param name="bank"></param>
         /// <param name="scheduler"></param>
+        /// <param name="transaction_situation"></param>
         /// <returns></returns>
         public async Task<TransactionEntity> CreatePaymentTransaction(
             string name,
@@ -191,7 +205,8 @@ namespace NievoEasyFin.Application.Models
             long amount,
             int? card,
             int bank,
-            int? scheduler
+            int? scheduler,
+            int transaction_situation
         )
         {
             pay_date = new DateTime(pay_date.Ticks);
@@ -210,7 +225,8 @@ namespace NievoEasyFin.Application.Models
                 BankId = bank,
                 SchedulerId = scheduler,
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.Now,
+                TransactionSituationId = transaction_situation
             };
 
             await _CoreMainNodeDatabase.Transaction.AddAsync(entity);

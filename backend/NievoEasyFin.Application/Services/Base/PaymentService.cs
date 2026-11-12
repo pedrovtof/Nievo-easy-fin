@@ -1,7 +1,5 @@
-using System.Transactions;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Data.Entities;
-using NievoEasyFin.Application.Data.Views;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Request;
@@ -25,6 +23,7 @@ public class PaymentService : Controller, IPaymentService
     private readonly UserBankCardModel _userBankCardModel;
     private readonly CategoryModel _categoryModel;
     private readonly UserBankModel _userBankModel;
+    private readonly TransactionSituationModel _transactionSituationModel;
 
     public PaymentService(
         SchedulerTypeModel schedulerTypeModel,
@@ -34,7 +33,8 @@ public class PaymentService : Controller, IPaymentService
         UserModel userModel,
         UserBankCardModel userBankCardModel,
         CategoryModel categoryModel,
-        UserBankModel userBankModel
+        UserBankModel userBankModel,
+        TransactionSituationModel transactionSituationModel
     )
     {
         _schedulerTypeModel = schedulerTypeModel;
@@ -45,6 +45,7 @@ public class PaymentService : Controller, IPaymentService
         _userBankCardModel = userBankCardModel;
         _categoryModel = categoryModel;
         _userBankModel = userBankModel;
+        _transactionSituationModel = transactionSituationModel;
     }
 
     /// <summary>
@@ -110,6 +111,12 @@ public class PaymentService : Controller, IPaymentService
                     new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_CATEGORY_NOT_FOUND.GetDescription() }
                 ));
 
+        var situation = await _transactionSituationModel.GetTransactionSituationByIdAsync(request.TransactionSituation);
+        if (situation == null)
+            return NotFound(new ResponseApiError(
+                    new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SITUATION_NOT_FOUND.GetDescription() }
+                ));
+
         var paymentTransaction = await _transactionModel.CreatePaymentTransaction(
             request.Name,
             request.Description,
@@ -121,7 +128,8 @@ public class PaymentService : Controller, IPaymentService
             request.Amount,
             request.Card > 0 ? card.Id : null,
             bank.Id,
-            request.Scheduler > 0 ? scheduler.Id : null
+            request.Scheduler > 0 ? scheduler.Id : null,
+            situation.Id
         );
 
         return StatusCode(201, new ResponseApiSucess(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS.GetDescription()));
@@ -267,7 +275,8 @@ public class PaymentService : Controller, IPaymentService
             request.TransactionTypeId,
             request.Category,
             request.PayDateStart,
-            request.PayDateEnd
+            request.PayDateEnd,
+            request.TransactionSituationId
         );
 
         List<GetPaymentTransactionAsyncResponse> items = new();
@@ -287,6 +296,46 @@ public class PaymentService : Controller, IPaymentService
             request.PageSize,
             records,
             transactions.Select(x => new GetPaymentTransactionAsyncResponse(x)).ToList()
+        );
+
+        return Ok(new ResponseApiSucess(response));
+    }
+
+    /// <summary>
+    /// Search for situation transaction
+    /// </summary>
+    /// <param name="request">GetPaymentTransactionSituationRequest</param>
+    /// <returns>IActionResult</returns>
+    public async Task<IActionResult> GetPaymentTransactionSituation(GetPaymentTransactionSituationRequest request)
+    {
+        var validatorResult = await new GetPaymentTransactionSituationValidatorAsync().ValidateAsync(request);
+        if (!validatorResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        var (situation, records) = await _transactionSituationModel.GetTransactionSituationAsync(
+            request.Page,
+            request.PageSize
+        );
+
+        List<GetPaymentTransactionSituationAsyncResponse> items = new();
+
+        if (!situation.Any())
+            return Ok(
+                new ResponseApiSucess(new ResponsePaginationBase<GetPaymentTransactionSituationAsyncResponse>(
+                request.Page,
+                request.PageSize,
+                0,
+                items
+                ))
+            );
+
+        var response = new ResponsePaginationBase<GetPaymentTransactionSituationAsyncResponse>(
+            request.Page,
+            request.PageSize,
+            records,
+            situation.Select(x => new GetPaymentTransactionSituationAsyncResponse(x)).ToList()
         );
 
         return Ok(new ResponseApiSucess(response));

@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Response;
@@ -74,7 +73,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Card' must be greater than or equal to '0'."));
+        response.Messages.Should().Contain(e => e.Contains("'Card' must be greater than or equal to '1'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -94,7 +93,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Bank' must be greater than or equal to '0'."));
+        response.Messages.Should().Contain(e => e.Contains("'Bank' must be greater than or equal to '1'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -114,7 +113,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Transaction Status' must be greater than '0'."));
+        response.Messages.Should().Contain(e => e.Contains("'Transaction Status' must be greater than '1'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -154,7 +153,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Transaction Type' must be greater than '0'."));
+        response.Messages.Should().Contain(e => e.Contains("'Transaction Type' must be greater than '1'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -174,7 +173,27 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Scheduler' must be greater than or equal to '0'."));
+        response.Messages.Should().Contain(e => e.Contains("'Scheduler' must be greater than or equal to '1'."));
+        Output.WriteLine("Validation executed successfully.");
+    }
+
+    [Fact(DisplayName = "PostPaymentTransaction When TransactionSituation Is Invalid Returns BadRequest")]
+    public async Task PostPaymentTransaction_WhenTransactionSituationIsInvalid_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new PostPaymentTransactionRequestBuilder().WithTransactionSituation(0);
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostPaymentTransaction(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().Contain(e => e.Contains("'Transaction Situation' must be greater than or equal to '1'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -404,7 +423,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     public async Task PostPaymentTransaction_WhenTransactionTypeNotFound_ReturnsNotFound()
     {
         // Arrange
-        var request = new PostPaymentTransactionRequestBuilder().WithCard(0);
+        var request = new PostPaymentTransactionRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -417,6 +436,13 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         userBank.UserId = existingUser.Id;
         userBank.BankId = request.Bank;
         origin.UserBank.Add(userBank);
+
+        var userBankCard = UserBankCardEntityFaker.Create().Generate();
+        userBankCard.UserId = existingUser.Id;
+        userBankCard.CardId = request.Card;
+        userBankCard.BankId = request.Bank;
+        origin.UserBankCard.Add(userBankCard);
+
         await origin.SaveChangesAsync();
 
         var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
@@ -436,7 +462,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     public async Task PostPaymentTransaction_WhenTransactionStatusNotFound_ReturnsNotFound()
     {
         // Arrange
-        var request = new PostPaymentTransactionRequestBuilder().WithCard(0);
+        var request = new PostPaymentTransactionRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -449,6 +475,12 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         userBank.UserId = existingUser.Id;
         userBank.BankId = request.Bank;
         origin.UserBank.Add(userBank);
+
+        var userBankCard = UserBankCardEntityFaker.Create().Generate();
+        userBankCard.UserId = existingUser.Id;
+        userBankCard.CardId = request.Card;
+        userBankCard.BankId = request.Bank;
+        origin.UserBankCard.Add(userBankCard);
 
         var transactionType = TransactionTypeEntityFaker.Create().Generate();
         transactionType.Id = request.TransactionType;
@@ -473,7 +505,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     public async Task PostPaymentTransaction_WhenSchedulerNotFound_ReturnsNotFound()
     {
         // Arrange
-        var request = new PostPaymentTransactionRequestBuilder().WithCard(0).WithScheduler(999);
+        var request = new PostPaymentTransactionRequestBuilder().WithScheduler(999);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -486,6 +518,12 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         userBank.UserId = existingUser.Id;
         userBank.BankId = request.Bank;
         origin.UserBank.Add(userBank);
+
+        var userBankCard = UserBankCardEntityFaker.Create().Generate();
+        userBankCard.UserId = existingUser.Id;
+        userBankCard.CardId = request.Card;
+        userBankCard.BankId = request.Bank;
+        origin.UserBankCard.Add(userBankCard);
 
         var transactionType = TransactionTypeEntityFaker.Create().Generate();
         transactionType.Id = request.TransactionType;
@@ -514,7 +552,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     public async Task PostPaymentTransaction_WhenCategoryNotFound_ReturnsNotFound()
     {
         // Arrange
-        var request = new PostPaymentTransactionRequestBuilder().WithCard(0).WithScheduler(0);
+        var request = new PostPaymentTransactionRequestBuilder();
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -528,6 +566,12 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         userBank.BankId = request.Bank;
         origin.UserBank.Add(userBank);
 
+        var userBankCard = UserBankCardEntityFaker.Create().Generate();
+        userBankCard.UserId = existingUser.Id;
+        userBankCard.CardId = request.Card;
+        userBankCard.BankId = request.Bank;
+        origin.UserBankCard.Add(userBankCard);
+
         var transactionType = TransactionTypeEntityFaker.Create().Generate();
         transactionType.Id = request.TransactionType;
         origin.TransactionType.Add(transactionType);
@@ -535,6 +579,10 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         var transactionStatus = TransactionStatusEntityFaker.Create().Generate();
         transactionStatus.Id = request.TransactionStatus;
         origin.TransactionStatus.Add(transactionStatus);
+
+        var schedulerType = SchedulerTypeEntityFaker.Create().Generate();
+        schedulerType.Id = request.Scheduler;
+        origin.SchedulerType.Add(schedulerType);
 
         await origin.SaveChangesAsync();
 
@@ -548,6 +596,62 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         var notFound = (NotFoundObjectResult)result;
         var response = (ResponseApiError)notFound.Value!;
         response.Messages.Should().Contain(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_CATEGORY_NOT_FOUND.GetDescription());
+        Output.WriteLine("Validation executed successfully.");
+    }
+
+    [Fact(DisplayName = "PostPaymentTransaction When Situation Not Found Returns NotFound")]
+    public async Task PostPaymentTransaction_WhenSituationNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        var request = new PostPaymentTransactionRequestBuilder();
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var existingUser = UserEntityFaker.Create().Generate();
+        existingUser.Email = request.GetEmail()!;
+        authOrigin.Users.Add(existingUser);
+        await authOrigin.SaveChangesAsync();
+
+        var userBank = UserBankEntityFaker.Create().Generate();
+        userBank.UserId = existingUser.Id;
+        userBank.BankId = request.Bank;
+        origin.UserBank.Add(userBank);
+
+        var userBankCard = UserBankCardEntityFaker.Create().Generate();
+        userBankCard.UserId = existingUser.Id;
+        userBankCard.CardId = request.Card;
+        userBankCard.BankId = request.Bank;
+        origin.UserBankCard.Add(userBankCard);
+
+        var transactionType = TransactionTypeEntityFaker.Create().Generate();
+        transactionType.Id = request.TransactionType;
+        origin.TransactionType.Add(transactionType);
+
+        var transactionStatus = TransactionStatusEntityFaker.Create().Generate();
+        transactionStatus.Id = request.TransactionStatus;
+        origin.TransactionStatus.Add(transactionStatus);
+
+        var schedulerType = SchedulerTypeEntityFaker.Create().Generate();
+        schedulerType.Id = request.Scheduler;
+        origin.SchedulerType.Add(schedulerType);
+
+        var category = CategoryEntityFaker.Create().Generate();
+        category.UserId = existingUser.Id;
+        category.Name = request.CategoryName;
+        origin.Category.Add(category);
+
+        await origin.SaveChangesAsync();
+
+        var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostPaymentTransaction(request);
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SITUATION_NOT_FOUND.GetDescription());
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -596,6 +700,10 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         category.Name = request.CategoryName;
         origin.Category.Add(category);
 
+        var situation = TransactionSituationEntityFaker.Create().Generate();
+        situation.Id = request.TransactionSituation;
+        origin.TransactionSituation.Add(situation);
+
         await origin.SaveChangesAsync();
 
         var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
@@ -617,17 +725,18 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         transactionInDb!.Amount.Should().Be(request.Amount);
         transactionInDb.CardId.Should().Be(userBankCard.Id);
         transactionInDb.SchedulerId.Should().Be(schedulerType.Id);
+        transactionInDb.TransactionSituationId.Should().Be(situation.Id);
 
         Output.WriteLine("Success test executed correctly.");
     }
 
-    [Fact(DisplayName = "PostPaymentTransaction Without Card And Scheduler Returns Created")]
-    public async Task PostPaymentTransaction_WithoutCardAndScheduler_ReturnsCreated()
+    [Fact(DisplayName = "PostPaymentTransaction With Minimum Valid Request Returns Created")]
+    public async Task PostPaymentTransaction_WithMinimumValidRequest_ReturnsCreated()
     {
         // Arrange
         var request = new PostPaymentTransactionRequestBuilder()
-            .WithCard(0)
-            .WithScheduler(0);
+            .WithCard(1)
+            .WithScheduler(1);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -641,6 +750,12 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         userBank.BankId = request.Bank;
         origin.UserBank.Add(userBank);
 
+        var userBankCard = UserBankCardEntityFaker.Create().Generate();
+        userBankCard.UserId = existingUser.Id;
+        userBankCard.CardId = request.Card;
+        userBankCard.BankId = request.Bank;
+        origin.UserBankCard.Add(userBankCard);
+
         var transactionType = TransactionTypeEntityFaker.Create().Generate();
         transactionType.Id = request.TransactionType;
         origin.TransactionType.Add(transactionType);
@@ -649,10 +764,18 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         transactionStatus.Id = request.TransactionStatus;
         origin.TransactionStatus.Add(transactionStatus);
 
+        var schedulerType = SchedulerTypeEntityFaker.Create().Generate();
+        schedulerType.Id = request.Scheduler;
+        origin.SchedulerType.Add(schedulerType);
+
         var category = CategoryEntityFaker.Create().Generate();
         category.UserId = existingUser.Id;
         category.Name = request.CategoryName;
         origin.Category.Add(category);
+
+        var situation = TransactionSituationEntityFaker.Create().Generate();
+        situation.Id = request.TransactionSituation;
+        origin.TransactionSituation.Add(situation);
 
         await origin.SaveChangesAsync();
 
@@ -672,8 +795,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
 
         var transactionInDb = await origin.Transaction.FirstOrDefaultAsync(t => t.Name == request.Name && t.UserId == existingUser.Id);
         transactionInDb.Should().NotBeNull();
-        transactionInDb!.CardId.Should().BeNull();
-        transactionInDb.SchedulerId.Should().BeNull();
+        transactionInDb!.TransactionSituationId.Should().Be(situation.Id);
 
         Output.WriteLine("Success test executed correctly.");
     }

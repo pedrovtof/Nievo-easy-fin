@@ -106,6 +106,12 @@ public class TransactionView
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
+    /// Situation
+    /// </summary>
+    [JsonPropertyName("situation")]
+    public string Situation { get; set; }
+
+    /// <summary>
     /// Records
     /// </summary>
     [JsonIgnore]

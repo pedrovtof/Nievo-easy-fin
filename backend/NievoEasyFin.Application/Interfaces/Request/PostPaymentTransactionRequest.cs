@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace NievoEasyFin.Application.Interfaces.Request
@@ -13,6 +12,12 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [JsonPropertyName("transaction_status")]
         public int TransactionStatus { get; set; }
+
+        /// <summary>
+        /// Situation of the transaction
+        /// </summary>
+        [JsonPropertyName("transaction_situation")]
+        public int TransactionSituation { get; set; }
 
         /// <summary>
         /// Category
@@ -67,5 +72,11 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// </summary>
         [JsonPropertyName("description")]
         public string Description { get; set; }
+
+        /// <summary>
+        /// Ingress
+        /// </summary>
+        [JsonPropertyName("income")]
+        public bool TransactionIngress { get; set; }
     }
 }

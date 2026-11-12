@@ -46,4 +46,10 @@ public class GetPaymentTransactionRequestBuilder : GetPaymentTransactionRequest
         PageSize = 0;
         return this;
     }
+
+    public GetPaymentTransactionRequestBuilder WithTransactionSituationId(int? situationId)
+    {
+        TransactionSituationId = situationId;
+        return this;
+    }
 }

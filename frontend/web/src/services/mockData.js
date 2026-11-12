@@ -150,6 +150,11 @@ let mockTransactionStatuses = [
   { id: 3, name: 'Cancelled', description: 'Transaction voided or refunded', active: true },
 ];
 
+let mockTransactionSituations = [
+  { id: 1, name: 'Entrada', description: 'Entrada de valor', active: true },
+  { id: 2, name: 'Saida', description: 'Saida de valor', active: true },
+];
+
 let mockTransactionTypes = [
   { id: 1, name: 'Expense', description: 'Outflow payment or purchase', active: true },
   { id: 2, name: 'Income', description: 'Inflow deposit or earnings', active: true },
@@ -170,6 +175,7 @@ let mockPaymentTransactions = [
     amount: 285,
     cron_tab: '',
     status: 'Completed',
+    situation: 'Saida',
     type: 'Expense',
     category: 'Groceries & Market',
     pay_date: '2026-11-10T14:30:00Z',
@@ -185,6 +191,7 @@ let mockPaymentTransactions = [
     amount: 5400,
     cron_tab: '0 0 1 * *',
     status: 'Completed',
+    situation: 'Entrada',
     type: 'Income',
     category: 'Salary & Freelance',
     pay_date: '2026-11-05T09:00:00Z',
@@ -200,6 +207,7 @@ let mockPaymentTransactions = [
     amount: 195,
     cron_tab: '0 0 1 * *',
     status: 'Pending',
+    situation: 'Saida',
     type: 'Expense',
     category: 'Utilities & Bills',
     pay_date: '2026-11-15T10:00:00Z',
@@ -513,6 +521,8 @@ export const setupMockAdapter = (apiClient) => {
     // --- CORE: PAYMENT & TRANSACTIONS (/api/public/v1/Payment...) ---
     } else if (url.includes('/Payment/status')) {
       error.mockData = { status: 200, data: wrapPaginated(mockTransactionStatuses, params.page, params.page_size) };
+    } else if (url.includes('/Payment/situation')) {
+      error.mockData = { status: 200, data: wrapPaginated(mockTransactionSituations, params.page, params.page_size) };
     } else if (url.includes('/Payment/type')) {
       error.mockData = { status: 200, data: wrapPaginated(mockTransactionTypes, params.page, params.page_size) };
     } else if (url.includes('/Payment/scheduler')) {
@@ -523,6 +533,10 @@ export const setupMockAdapter = (apiClient) => {
         if (params.transaction_status_id) {
           const st = mockTransactionStatuses.find(s => Number(s.id) === Number(params.transaction_status_id));
           if (st) filtered = filtered.filter(t => t.status === st.name);
+        }
+        if (params.transaction_situation_id) {
+          const sit = mockTransactionSituations.find(s => Number(s.id) === Number(params.transaction_situation_id));
+          if (sit) filtered = filtered.filter(t => t.situation === sit.name);
         }
         if (params.transaction_type_id) {
           const tp = mockTransactionTypes.find(t => Number(t.id) === Number(params.transaction_type_id));
@@ -544,6 +558,7 @@ export const setupMockAdapter = (apiClient) => {
       } else if (method === 'post') {
         const body = parseBody(config.data);
         const st = mockTransactionStatuses.find(s => Number(s.id) === Number(body.transaction_status)) || mockTransactionStatuses[0];
+        const sit = mockTransactionSituations.find(s => Number(s.id) === Number(body.transaction_situation)) || mockTransactionSituations[0];
         const tp = mockTransactionTypes.find(t => Number(t.id) === Number(body.transaction_type)) || mockTransactionTypes[0];
         const sched = Number(body.scheduler) > 0 ? mockSchedulers.find(s => Number(s.id) === Number(body.scheduler)) : null;
         const userBank = mockUserBanks.find(b => Number(b.bank_id) === Number(body.bank) || Number(b.id) === Number(body.bank)) || mockUserBanks[0];
@@ -558,6 +573,7 @@ export const setupMockAdapter = (apiClient) => {
           amount: Number(body.amount),
           cron_tab: sched?.cron_tab || '',
           status: st.name,
+          situation: sit.name,
           type: tp.name,
           category: body.category_name,
           pay_date: body.pay_date || new Date().toISOString(),

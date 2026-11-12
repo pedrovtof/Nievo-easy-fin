@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changelog
 
+2026-11-12 - [NEW] - Add transaction situation (Entrada/Saida) to Payment API, database, and frontend Transactions page (#65)
+
+Detalhes:
+
+- Add payment.transaction_situation table and fk_payment_transaction_situation migration, implement GET /api/public/v1/Payment/situation endpoint and integrate transaction_situation into POST/GET /api/public/v1/Payment, update frontend Transactions page and mockData under The Silent Navigator design system, add backend and frontend unit/integration tests, and update MkDocs documentation and diagrams - pedrovotf - 2026-11-12 - #65 - PENDING
+
 2026-11-12 - [FIX] - Validate duplicate user bank card (card_id + user_id) in PostUserCard (#55)
 
 Detalhes:

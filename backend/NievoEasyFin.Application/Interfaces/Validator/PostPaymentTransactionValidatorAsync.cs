@@ -15,15 +15,15 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_EMAIL.ToString());
 
             RuleFor(x => x.Card)
-                .GreaterThanOrEqualTo(0)
+                .GreaterThanOrEqualTo(1)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_CARD.ToString());
 
             RuleFor(x => x.Bank)
-                .GreaterThanOrEqualTo(0)
+                .GreaterThanOrEqualTo(1)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_BANK.ToString());
 
             RuleFor(x => x.TransactionStatus)
-                .GreaterThan(0)
+                .GreaterThan(1)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_STATUS.ToString());
 
             RuleFor(x => x.Amount)
@@ -31,12 +31,16 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_AMOUNT.ToString());
 
             RuleFor(x => x.TransactionType)
-                .GreaterThan(0)
+                .GreaterThan(1)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_TYPE.ToString());
 
             RuleFor(x => x.Scheduler)
-                .GreaterThanOrEqualTo(0)
+                .GreaterThanOrEqualTo(1)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SCHEDULER.ToString());
+
+            RuleFor(x => x.TransactionSituation)
+                .GreaterThanOrEqualTo(1)
+                    .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SITUATION.ToString());
 
             RuleFor(x => x.Description)
                 .NotNull()

@@ -116,5 +116,69 @@ public class GetPaymentTransactionAsyncTest : AccountsServiceTestBase
         Output.WriteLine("Success test executed correctly.");
     }
 
+    [Fact(DisplayName = "GetPaymentTransaction With TransactionSituationId Filter Returns Filtered Ok")]
+    public async Task GetPaymentTransaction_WithTransactionSituationIdFilter_ReturnsFilteredOk()
+    {
+        // Arrange
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var existingUser = UserEntityFaker.Create().Generate();
+        authOrigin.Users.Add(existingUser);
+        await authOrigin.SaveChangesAsync();
+
+        var sitEntrada = TransactionSituationEntityFaker.Create().Generate();
+        sitEntrada.Id = 1;
+        sitEntrada.Name = "Entrada";
+        var sitSaida = TransactionSituationEntityFaker.Create().Generate();
+        sitSaida.Id = 2;
+        sitSaida.Name = "Saida";
+        origin.TransactionSituation.AddRange(sitEntrada, sitSaida);
+
+        var txStatus = TransactionStatusEntityFaker.Create().Generate();
+        txStatus.Id = 2;
+        txStatus.Name = "Completed";
+        origin.TransactionStatus.Add(txStatus);
+
+        var txType = TransactionTypeEntityFaker.Create().Generate();
+        txType.Id = 2;
+        txType.Name = "Income";
+        origin.TransactionType.Add(txType);
+
+        var tx1 = TransactionEntityFaker.Create().Generate();
+        tx1.UserId = existingUser.Id;
+        tx1.TransactionSituationId = sitEntrada.Id;
+        tx1.TransactionStatusId = txStatus.Id;
+        tx1.TransactionTypeId = txType.Id;
+
+        var tx2 = TransactionEntityFaker.Create().Generate();
+        tx2.UserId = existingUser.Id;
+        tx2.TransactionSituationId = sitSaida.Id;
+        tx2.TransactionStatusId = txStatus.Id;
+        tx2.TransactionTypeId = txType.Id;
+
+        origin.Transaction.AddRange(tx1, tx2);
+        await origin.SaveChangesAsync();
+        await SyncCoreToAttachedDatabasesAsync(origin);
+
+        var request = new GetPaymentTransactionRequestBuilder()
+            .WithEmail(existingUser.Email!)
+            .WithTransactionSituationId(sitEntrada.Id);
+
+        var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetPaymentTransaction(request);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        var response = (ResponseApiSucess)okResult.Value!;
+        var data = (ResponsePaginationBase<GetPaymentTransactionAsyncResponse>)response.Data!;
+        data.Items.Should().HaveCount(1);
+        data.Items.First().Situation.Should().Be("Entrada");
+        Output.WriteLine("Filtered situation test executed correctly.");
+    }
+
     #endregion
 }

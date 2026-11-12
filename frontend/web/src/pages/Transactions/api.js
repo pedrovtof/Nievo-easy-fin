@@ -31,6 +31,16 @@ export const getTransactionStatuses = (params = { page: 1, page_size: 20 }) => {
 };
 
 /**
+ * Fetches transaction situation metadata options (Entrada, Saida).
+ *
+ * @param {Object} params - Pagination parameters ({ page, page_size }).
+ * @returns {Promise<Object>} Axios response containing situations.
+ */
+export const getTransactionSituations = (params = { page: 1, page_size: 20 }) => {
+  return coreApi.get('/api/public/v1/Payment/situation', { params });
+};
+
+/**
  * Fetches transaction type metadata options (Expense, Income, Transfer).
  *
  * @param {Object} params - Pagination parameters ({ page, page_size }).

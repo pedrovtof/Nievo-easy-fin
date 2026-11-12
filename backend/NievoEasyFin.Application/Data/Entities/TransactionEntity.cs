@@ -108,4 +108,11 @@ public class TransactionEntity
     [JsonPropertyName("updated_at")]
     [Column("updated_at", TypeName = "TIMESTAMP")]
     public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Transaction Situation id
+    /// </summary>
+    [JsonPropertyName("transaction_situation_id")]
+    [Column("transaction_situation_id", TypeName = "INT")]
+    public int TransactionSituationId { get; set; }
 }

@@ -984,6 +984,11 @@ public enum EnumErrosApi
     POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SCHEDULER,
 
     /// <summary>
+    /// Invalid situation.
+    /// </summary>
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SITUATION,
+
+    /// <summary>
     /// Invalid description.
     /// </summary>
     POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_DESCRIPTION,
@@ -1071,6 +1076,12 @@ public enum EnumErrosApi
     POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_CATEGORY_NOT_FOUND,
 
     /// <summary>
+    /// Not found the situation informed.
+    /// </summary>
+    [Description("Not found the situation informed.")]
+    POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SITUATION_NOT_FOUND,
+
+    /// <summary>
     /// Created.
     /// </summary>
     [Description("Created")]
@@ -1139,4 +1150,19 @@ public enum EnumErrosApi
     GETPAYMENTTRANSACTION_CORESERVICE_404_USER_NOT_FOUND,
 
     #endregion
+
+    #region GetPaymenTransaction
+
+    /// <summary>
+    /// Page invalid
+    /// </summary>
+    GETPAYMENTTRANSACTIONSITUATION_CORESERVICE_400_INVALID_PAGE,
+
+    /// <summary>
+    /// PageSize invalid
+    /// </summary>
+    GETPAYMENTTRANSACTIONSITUATION_CORESERVICE_400_INVALID_PAGESIZE,
+
+    #endregion
+
 }

@@ -1,7 +1,5 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Extensions.Enum;
-using NievoEasyFin.Application.Interfaces.Enum;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Mocks.Database;
 using NievoEasyFin.Tests.Mocks.Fakers;

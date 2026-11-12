@@ -98,4 +98,17 @@ public class PaymentController : Controller
         );
         return await _paymentService.GetPaymentTransaction(request);
     }
+
+    /// <summary>
+    /// Search for transactions situation
+    /// </summary>
+    /// <param name="authorization">Token JWT</param>
+    /// <param name="request">GetPaymentTransactionSituationRequest</param>
+    /// <returns></returns>
+    [HttpGet("situation")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetPaymentTransactionSituation([FromHeader] string authorization, [FromQuery] GetPaymentTransactionSituationRequest request)
+        => await _paymentService.GetPaymentTransactionSituation(request);
 }

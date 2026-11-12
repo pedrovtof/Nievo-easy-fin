@@ -37,6 +37,7 @@ public abstract class EasyFinDbContext : DbContext
     public DbSet<TransactionStatusEntity> TransactionStatus { get; set; }
     public DbSet<SchedulerTypeEntity> SchedulerType { get; set; }
     public DbSet<TransactionTypeEntity> TransactionType { get; set; }
+    public DbSet<TransactionSituationEntity> TransactionSituation { get; set; }
 
     protected EasyFinDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
     {

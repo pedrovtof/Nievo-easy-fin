@@ -264,7 +264,103 @@ erDiagram
 
 ### 💳 Schema `payment` (Transações e Fluxo de Caixa)
 
-- **Schema `payment`:** Reservado para o registro detalhado de lançamentos financeiros, despesas, receitas, parcelamentos e fluxo de caixa.
+O schema `payment` armazena as transações financeiras dos usuários (`payment.transaction`) e as tabelas de domínio associadas: status (`payment.transaction_status`), tipo (`payment.transaction_type`), situação de fluxo de caixa (`payment.transaction_situation` — `Entrada` / `Saida`) e recorrência (`payment.scheduler_type`).
+
+```mermaid
+erDiagram
+    transaction_status ||--o{ transaction : "transaction_status_id"
+    transaction_type ||--o{ transaction : "transaction_type_id"
+    transaction_situation ||--o{ transaction : "transaction_situation_id"
+    scheduler_type ||--o{ transaction : "scheduler_id"
+
+    transaction_situation {
+        int id PK "SERIAL"
+        string name "VARCHAR(150) (Entrada, Saida)"
+        string description "VARCHAR(255)"
+        bool active "BOOLEAN DEFAULT true"
+        datetime created_at "TIMESTAMP DEFAULT now()"
+        datetime updated_at "TIMESTAMP"
+    }
+
+    transaction_status {
+        int id PK "SERIAL"
+        string name "VARCHAR(150)"
+        string description "VARCHAR(255)"
+        bool active "BOOLEAN DEFAULT true"
+        datetime created_at "TIMESTAMP DEFAULT now()"
+        datetime updated_at "TIMESTAMP"
+    }
+
+    transaction_type {
+        int id PK "SERIAL"
+        string name "VARCHAR(150)"
+        string description "VARCHAR(255)"
+        bool active "BOOLEAN DEFAULT true"
+        datetime created_at "TIMESTAMP DEFAULT now()"
+        datetime updated_at "TIMESTAMP"
+    }
+
+    scheduler_type {
+        int id PK "SERIAL"
+        string name "VARCHAR(150)"
+        string description "VARCHAR(255)"
+        string cron_tab "VARCHAR(100)"
+        bool active "BOOLEAN DEFAULT true"
+        datetime created_at "TIMESTAMP DEFAULT now()"
+        datetime updated_at "TIMESTAMP"
+    }
+
+    transaction {
+        uuid id PK "UUID"
+        string name "VARCHAR(150)"
+        string description "VARCHAR(255)"
+        int user_id "INT"
+        int transaction_status_id FK "INT"
+        int transaction_type_id FK "INT"
+        int transaction_situation_id FK "INT (fk_payment_transaction_situation)"
+        int categorie_id FK "INT"
+        datetime pay_date "TIMESTAMP"
+        bigint amount "BIGINT"
+        int card_id FK "INT"
+        int bank_id FK "INT"
+        int scheduler_id FK "INT"
+        datetime created_at "TIMESTAMP"
+        datetime updated_at "TIMESTAMP"
+    }
+```
+
+```dbml
+Table payment.transaction_situation {
+  id serial [pk, increment]
+  name varchar(150) [not null, note: 'Entrada ou Saida']
+  description varchar(255)
+  active boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+
+  Note: 'Transaction situation domain table (Entrada / Saida).'
+}
+
+Table payment.transaction {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(150) [not null]
+  description varchar(255)
+  user_id integer [not null]
+  transaction_status_id integer [not null]
+  transaction_type_id integer [not null]
+  transaction_situation_id integer [not null]
+  categorie_id integer
+  pay_date timestamp [not null]
+  amount bigint [not null]
+  card_id integer
+  bank_id integer
+  scheduler_id integer
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+}
+
+Ref fk_payment_transaction_situation: payment.transaction.transaction_situation_id > payment.transaction_situation.id
+```
 
 ---
 
@@ -377,6 +473,54 @@ FROM goals.category c
 WHERE c.user_id = @userId
     AND c.active = @active
 ORDER BY c.id
+LIMIT @limit OFFSET @offset;
+```
+
+### F. Consulta Paginada de Situações de Transação (`TransactionSituationModel.cs`)
+Consulta Dapper executada sobre a réplica de leitura (`CoreReplica`) na tabela de domínio `payment.transaction_situation` (`Entrada` / `Saida`):
+
+```sql
+SELECT
+    ts.id AS Id,
+    ts.name AS Name,
+    ts.description AS Description,
+    ts.active AS Active,
+    COUNT(*) OVER() AS Records
+FROM payment.transaction_situation ts
+WHERE ts.active = @active
+ORDER BY ts.id
+LIMIT @limit OFFSET @offset;
+```
+
+### G. Consulta Paginada de Transações Financeiras (`TransactionModel.cs`)
+Une `payment.transaction` com `payment.transaction_status`, `payment.transaction_type`, `payment.transaction_situation`, `goals.category`, `accounts.user_bank_card`, `accounts.user_bank` e `payment.scheduler_type`, permitindo filtros opcionais dinâmicos (incluindo `transaction_situation_id`):
+
+```sql
+SELECT
+    t.id AS Id,
+    t.name AS Name,
+    t.description AS Description,
+    ts.name AS Status,
+    tt.name AS Type,
+    tsi.name AS Situation,
+    gc.name AS Categorie,
+    t.pay_date AS PayDate,
+    t.amount AS Amount,
+    aubc.name AS Card,
+    aub.nick_name AS Bank,
+    pst.name AS Scheduler,
+    CAST(t.created_at AS DATE) AS CreatedAt,
+    COUNT(*) OVER() AS Records
+FROM payment."transaction" t
+    INNER JOIN payment.transaction_status ts ON ts.id = t.transaction_status_id
+    INNER JOIN payment.transaction_type tt ON tt.id = t.transaction_type_id
+    INNER JOIN payment.transaction_situation tsi ON tsi.id = t.transaction_situation_id
+    INNER JOIN goals.category gc ON gc.id = t.categorie_id AND gc.user_id = t.user_id
+    LEFT JOIN accounts.user_bank_card aubc ON aubc.id = t.card_id AND aubc.user_id = t.user_id
+    LEFT JOIN accounts.user_bank aub ON aub.id = t.bank_id AND aub.user_id = t.user_id
+    LEFT JOIN payment.scheduler_type pst ON pst.id = t.scheduler_id
+WHERE t.user_id = @userId
+ORDER BY t.created_at DESC
 LIMIT @limit OFFSET @offset;
 ```
 

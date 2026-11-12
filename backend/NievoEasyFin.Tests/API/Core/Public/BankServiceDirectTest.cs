@@ -2,7 +2,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using NievoEasyFin.Application.Interfaces.Response;
 using NievoEasyFin.Tests.Build.Request;
-using NievoEasyFin.Tests.Mocks.Database;
 using Xunit.Abstractions;
 
 namespace NievoEasyFin.Tests.API.Core.Public;
