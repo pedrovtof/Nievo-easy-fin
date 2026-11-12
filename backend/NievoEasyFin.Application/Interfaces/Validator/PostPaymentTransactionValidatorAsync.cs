@@ -4,8 +4,14 @@ using NievoEasyFin.Application.Interfaces.Request;
 
 namespace NievoEasyFin.Application.Interfaces.Validator
 {
+    /// <summary>
+    /// Validator for PostPaymentTransactionRequest payload rules.
+    /// </summary>
     public class PostPaymentTransactionValidatorAsync : AbstractValidator<PostPaymentTransactionRequest>
     {
+        /// <summary>
+        /// Initializes validation rules for creating a payment transaction.
+        /// </summary>
         public PostPaymentTransactionValidatorAsync()
         {
             RuleFor(x => x.GetEmail())
@@ -15,15 +21,15 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_EMAIL.ToString());
 
             RuleFor(x => x.Card)
-                .GreaterThanOrEqualTo(1)
+                .GreaterThanOrEqualTo(0)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_CARD.ToString());
 
             RuleFor(x => x.Bank)
-                .GreaterThanOrEqualTo(1)
+                .GreaterThanOrEqualTo(0)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_BANK.ToString());
 
             RuleFor(x => x.TransactionStatus)
-                .GreaterThan(1)
+                .GreaterThan(0)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_STATUS.ToString());
 
             RuleFor(x => x.Amount)
@@ -31,11 +37,11 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_AMOUNT.ToString());
 
             RuleFor(x => x.TransactionType)
-                .GreaterThan(1)
+                .GreaterThan(0)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_TYPE.ToString());
 
             RuleFor(x => x.Scheduler)
-                .GreaterThanOrEqualTo(1)
+                .GreaterThanOrEqualTo(0)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SCHEDULER.ToString());
 
             RuleFor(x => x.TransactionSituation)

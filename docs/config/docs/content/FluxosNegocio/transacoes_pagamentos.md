@@ -6,9 +6,9 @@ O gerenciamento de lançamentos financeiros e fluxo de caixa no **Nievo EasyFin*
 
 ## 💸 1. Situação da Transação (`payment.transaction_situation`)
 
-Toda transação financeira registrada na plataforma é classificada de acordo com sua situação de fluxo de caixa na tabela de domínio `payment.transaction_situation`:
-- **`Entrada` (`id = 1`)**: Receitas, créditos, salários, reembolsos ou aportes recebidos pelo usuário.
-- **`Saida` (`id = 2`)**: Despesas, débitos, pagamentos de faturas ou transferências enviadas pelo usuário.
+Toda transação financeira registrada na plataforma é classificada de acordo com sua situação de fluxo de caixa na tabela de domínio `payment.transaction_situation` e mapeada no backend pelo enumerador `EnumTransactionSituation`:
+- **`Entrada` (`EnumTransactionSituation.ENTRADA = 1`)**: Receitas, créditos, salários, reembolsos ou aportes recebidos pelo usuário (mantém `amount` positivo).
+- **`Saida` (`EnumTransactionSituation.SAIDA = 2`)**: Despesas, débitos, pagamentos de faturas ou transferências enviadas pelo usuário (converte automaticamente `request.Amount = request.Amount * -1` no `PaymentService` antes da gravação).
 
 ### 1.1 Fluxo de Decisão — Consulta de Situações (`GET /api/public/v1/Payment/situation`)
 
@@ -33,7 +33,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     start_tx(["([Início: Usuário registra nova transação])"]) --> input_tx[/Recebe POST /api/public/v1/Payment com Token JWT + PostPaymentTransactionRequest/]
-    input_tx --> val_dto{Payload válido no PostPaymentTransactionValidatorAsync?<br/>Name/Desc 3..150, Amount > 0, Categorie >= 1,<br/>Status > 1, Type > 1, Situation >= 1, Bank OU Card >= 1}
+    input_tx --> val_dto{"Payload válido no PostPaymentTransactionValidatorAsync?<br/>Name/Desc/Category não vazios, Amount > 0,<br/>Status > 0, Type > 0, Situation >= 1, Bank >= 0, Card >= 0, Scheduler >= 0"}
     val_dto -->|Não| err_400_tx(["([Fim: HTTP 400 Bad Request - Erro de Validação])"])
     val_dto -->|Sim| check_user{Usuário existe em user_details.user?}
 
@@ -49,13 +49,17 @@ flowchart TD
     check_type -->|Não| err_404_type(["([Fim: HTTP 404 Not Found - TRANSACTION_TYPE_NOT_FOUND])"])
     check_type -->|Sim| check_situation{Situação existe e está ativa em payment.transaction_situation?}
 
-    check_situation -->|Não| err_404_sit(["([Fim: HTTP 404 Not Found - TRANSACTION_SITUATION_NOT_FOUND])"])
-    check_situation -->|Sim| check_payment_source{Banco, Cartão e Scheduler opcionais existem quando informados?}
+    check_situation -->|Não| err_404_sit(["([Fim: HTTP 404 Not Found - SITUATION_NOT_FOUND])"])
+    check_situation -->|Sim| check_payment_source{Banco e Cartão/Scheduler opcionais existem quando > 0?}
 
     check_payment_source -->|Não| err_404_source(["([Fim: HTTP 404 Not Found - BANK / CARD / SCHEDULER_NOT_FOUND])"])
-    check_payment_source -->|Sim| insert_tx[(Persiste em payment.transaction via TransactionModel.CreatePaymentTransaction)]
+    check_payment_source -->|Sim| check_is_saida{"situation.Name == EnumTransactionSituation.SAIDA ('Saida')?"}
 
-    insert_tx --> end_200_tx(["([Fim: HTTP 200 OK - POSTPAYMENTTRANSACTION_CORESERVICE_200_SUCESS])"])
+    check_is_saida -->|Sim| negate_amount["Inverte sinal contábil: request.Amount = request.Amount * -1"]
+    check_is_saida -->|"Não (Entrada)"| insert_tx[(Persiste em payment.transaction via TransactionModel.CreatePaymentTransaction)]
+    negate_amount --> insert_tx
+
+    insert_tx --> end_201_tx(["([Fim: HTTP 201 Created - POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS])"])
 ```
 
 ---
@@ -73,9 +77,11 @@ flowchart LR
         uc_filter_situation(["Filtrar Transações por Situação (transaction_situation_id)"])
         uc_create_transaction(["Registrar Nova Transação Financeira"])
         uc_validate_situation(["Validar Situação da Transação (payment.transaction_situation)"])
+        uc_apply_sign(["Aplicar Sinal Contábil por Situação (+ Entrada / - Saída)"])
 
         uc_list_transactions -.->|"<<extend>>"| uc_filter_situation
         uc_create_transaction -.->|"<<include>>"| uc_validate_situation
+        uc_create_transaction -.->|"<<include>>"| uc_apply_sign
         uc_create_transaction -.->|"<<include>>"| uc_list_situations
         uc_create_transaction -.->|"<<include>>"| uc_list_metadata
     end
@@ -238,10 +244,17 @@ classDiagram
         +ValidateAsync(request: GetPaymentTransactionSituationRequest) Task~ValidationResult~
     }
 
+    class EnumTransactionSituation {
+        <<enumeration>>
+        +ENTRADA = 1
+        +SAIDA = 2
+    }
+
     PaymentController --> IPaymentService : delegates
     PaymentService ..|> IPaymentService : implements
     PaymentService --> TransactionModel : uses
     PaymentService --> TransactionSituationModel : uses
+    PaymentService ..> EnumTransactionSituation : evaluates
     TransactionEntity <|-- TransactionModel : inherits
     TransactionSituationEntity <|-- TransactionSituationModel : inherits
     TransactionModel ..> TransactionView : queries

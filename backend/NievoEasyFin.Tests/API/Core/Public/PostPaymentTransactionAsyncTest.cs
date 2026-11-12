@@ -73,7 +73,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Card' must be greater than or equal to '1'."));
+        response.Messages.Should().Contain(e => e.Contains("'Card' must be greater than or equal to '0'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -93,7 +93,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Bank' must be greater than or equal to '1'."));
+        response.Messages.Should().Contain(e => e.Contains("'Bank' must be greater than or equal to '0'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -113,7 +113,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Transaction Status' must be greater than '1'."));
+        response.Messages.Should().Contain(e => e.Contains("'Transaction Status' must be greater than '0'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -153,7 +153,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Transaction Type' must be greater than '1'."));
+        response.Messages.Should().Contain(e => e.Contains("'Transaction Type' must be greater than '0'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -173,7 +173,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Scheduler' must be greater than or equal to '1'."));
+        response.Messages.Should().Contain(e => e.Contains("'Scheduler' must be greater than or equal to '0'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -664,6 +664,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     {
         // Arrange
         var request = new PostPaymentTransactionRequestBuilder();
+        var expectedAmount = request.Amount;
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -702,6 +703,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
 
         var situation = TransactionSituationEntityFaker.Create().Generate();
         situation.Id = request.TransactionSituation;
+        situation.Name = EnumTransactionSituation.ENTRADA.GetDescription();
         origin.TransactionSituation.Add(situation);
 
         await origin.SaveChangesAsync();
@@ -722,7 +724,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
 
         var transactionInDb = await origin.Transaction.FirstOrDefaultAsync(t => t.Name == request.Name && t.UserId == existingUser.Id);
         transactionInDb.Should().NotBeNull();
-        transactionInDb!.Amount.Should().Be(request.Amount);
+        transactionInDb!.Amount.Should().Be(expectedAmount);
         transactionInDb.CardId.Should().Be(userBankCard.Id);
         transactionInDb.SchedulerId.Should().Be(schedulerType.Id);
         transactionInDb.TransactionSituationId.Should().Be(situation.Id);
@@ -730,13 +732,13 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         Output.WriteLine("Success test executed correctly.");
     }
 
-    [Fact(DisplayName = "PostPaymentTransaction With Minimum Valid Request Returns Created")]
-    public async Task PostPaymentTransaction_WithMinimumValidRequest_ReturnsCreated()
+    [Fact(DisplayName = "PostPaymentTransaction When Situation Is Saida Negates Amount And Returns Created")]
+    public async Task PostPaymentTransaction_WhenSituationIsSaida_NegatesAmountAndReturnsCreated()
     {
         // Arrange
+        var initialAmount = 25000L;
         var request = new PostPaymentTransactionRequestBuilder()
-            .WithCard(1)
-            .WithScheduler(1);
+            .WithAmount(initialAmount);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
 
@@ -775,6 +777,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
 
         var situation = TransactionSituationEntityFaker.Create().Generate();
         situation.Id = request.TransactionSituation;
+        situation.Name = EnumTransactionSituation.SAIDA.GetDescription();
         origin.TransactionSituation.Add(situation);
 
         await origin.SaveChangesAsync();
@@ -795,7 +798,73 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
 
         var transactionInDb = await origin.Transaction.FirstOrDefaultAsync(t => t.Name == request.Name && t.UserId == existingUser.Id);
         transactionInDb.Should().NotBeNull();
-        transactionInDb!.TransactionSituationId.Should().Be(situation.Id);
+        transactionInDb!.Amount.Should().Be(-initialAmount);
+        transactionInDb.TransactionSituationId.Should().Be(situation.Id);
+
+        Output.WriteLine("Saida amount negation test executed correctly.");
+    }
+
+    [Fact(DisplayName = "PostPaymentTransaction With Minimum Valid Request Returns Created")]
+    public async Task PostPaymentTransaction_WithMinimumValidRequest_ReturnsCreated()
+    {
+        // Arrange
+        var request = new PostPaymentTransactionRequestBuilder()
+            .WithCard(0)
+            .WithScheduler(0)
+            .WithTransactionStatus(1)
+            .WithTransactionType(1);
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var existingUser = UserEntityFaker.Create().Generate();
+        existingUser.Email = request.GetEmail()!;
+        authOrigin.Users.Add(existingUser);
+        await authOrigin.SaveChangesAsync();
+
+        var userBank = UserBankEntityFaker.Create().Generate();
+        userBank.UserId = existingUser.Id;
+        userBank.BankId = request.Bank;
+        origin.UserBank.Add(userBank);
+
+        var transactionType = TransactionTypeEntityFaker.Create().Generate();
+        transactionType.Id = request.TransactionType;
+        origin.TransactionType.Add(transactionType);
+
+        var transactionStatus = TransactionStatusEntityFaker.Create().Generate();
+        transactionStatus.Id = request.TransactionStatus;
+        origin.TransactionStatus.Add(transactionStatus);
+
+        var category = CategoryEntityFaker.Create().Generate();
+        category.UserId = existingUser.Id;
+        category.Name = request.CategoryName;
+        origin.Category.Add(category);
+
+        var situation = TransactionSituationEntityFaker.Create().Generate();
+        situation.Id = request.TransactionSituation;
+        situation.Name = EnumTransactionSituation.ENTRADA.GetDescription();
+        origin.TransactionSituation.Add(situation);
+
+        await origin.SaveChangesAsync();
+
+        var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.PostPaymentTransaction(request);
+
+        // Assert
+        result.Should().BeOfType<ObjectResult>();
+        var createdResult = (ObjectResult)result;
+        createdResult.StatusCode.Should().Be(201);
+        createdResult.Value.Should().BeOfType<ResponseApiSucess>();
+
+        var response = (ResponseApiSucess)createdResult.Value!;
+        response.Data.Should().Be(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS.GetDescription());
+
+        var transactionInDb = await origin.Transaction.FirstOrDefaultAsync(t => t.Name == request.Name && t.UserId == existingUser.Id);
+        transactionInDb.Should().NotBeNull();
+        transactionInDb!.CardId.Should().BeNull();
+        transactionInDb.SchedulerId.Should().BeNull();
+        transactionInDb.TransactionSituationId.Should().Be(situation.Id);
 
         Output.WriteLine("Success test executed correctly.");
     }

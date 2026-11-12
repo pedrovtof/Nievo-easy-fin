@@ -396,18 +396,18 @@ Registra uma nova transação financeira (`payment.transaction`) vinculada ao us
   }
   ```
 - **Regras de Validação (`PostPaymentTransactionValidatorAsync`):**
-  - `name` e `description`: Obrigatórios, entre 3 e 150 caracteres.
-  - `amount`: Obrigatório e maior que `0`.
-  - `categorie`: Obrigatório e `>= 1`.
-  - `transaction_status`: Obrigatório e `> 1`.
-  - `transaction_type`: Obrigatório e `> 1`.
-  - `transaction_situation`: Obrigatório e `>= 1` (ex: `1 = Entrada`, `2 = Saida`).
-  - `bank` OU `card`: Pelo menos um meio de pagamento deve ser informado (`bank >= 1` ou `card >= 1`).
-  - `scheduler`: Opcional (`>= 1` quando informado).
+  - `name`, `description` e `category_name`: Obrigatórios (não nulos e não vazios).
+  - `amount`: Obrigatório e maior que `0` (`> 0`). Caso a situação da transação seja `Saida` (`EnumTransactionSituation.SAIDA`), o `PaymentService` converte automaticamente o valor para negativo (`request.Amount = request.Amount * -1`) antes de persistir no banco.
+  - `transaction_status`: Obrigatório e `> 0`.
+  - `transaction_type`: Obrigatório e `> 0`.
+  - `transaction_situation`: Obrigatório e `>= 1` (`1 = Entrada`, `2 = Saida`, mapeados em `EnumTransactionSituation`).
+  - `bank`: Obrigatório e `>= 0`.
+  - `card`: Opcional (`>= 0`, consultado na base apenas quando `> 0`).
+  - `scheduler`: Opcional (`>= 0`, consultado na base apenas quando `> 0`).
 - **Respostas:**
-  - `200 OK`: Transação registrada com sucesso (`POSTPAYMENTTRANSACTION_CORESERVICE_200_SUCESS`).
+  - `201 Created`: Transação registrada com sucesso (`POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS`).
   - `400 Bad Request`: Violação de validação nos campos obrigatórios.
-  - `404 Not Found`: Usuário, Categoria, Status, Tipo, Situação (`POSTPAYMENTTRANSACTION_CORESERVICE_404_TRANSACTION_SITUATION_NOT_FOUND`), Banco, Cartão ou Agendador não encontrado.
+  - `404 Not Found`: Usuário, Categoria, Status, Tipo, Situação (`POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SITUATION_NOT_FOUND`), Banco, Cartão ou Agendador não encontrado.
 
 ```mermaid
 sequenceDiagram
@@ -442,36 +442,39 @@ sequenceDiagram
         DB -->>- UserModel: UserEntity / null
         UserModel -->>- Service: UserEntity / null
 
-        Service ->>+ CategoryModel: GetCategoryByUserIdAndId(userId, categorieId)
+        Service ->>+ CategoryModel: GetCategoryValidByNameAndUserId(categoryName, userId)
         CategoryModel ->>+ DB: SELECT FROM goals.category
         DB -->>- CategoryModel: CategoryEntity / null
         CategoryModel -->>- Service: CategoryEntity / null
 
-        Service ->>+ StatusModel: GetTransactionStatusById(transactionStatus)
+        Service ->>+ StatusModel: GetTransactionStatusByIdAsync(transactionStatus)
         StatusModel ->>+ DB: SELECT FROM payment.transaction_status
         DB -->>- StatusModel: TransactionStatusEntity / null
         StatusModel -->>- Service: TransactionStatusEntity / null
 
-        Service ->>+ TypeModel: GetTransactionTypeById(transactionType)
+        Service ->>+ TypeModel: GetTransactionTypeByIdAsync(transactionType)
         TypeModel ->>+ DB: SELECT FROM payment.transaction_type
         DB -->>- TypeModel: TransactionTypeEntity / null
         TypeModel -->>- Service: TransactionTypeEntity / null
 
-        Service ->>+ SituationModel: GetTransactionSituationById(transactionSituation)
+        Service ->>+ SituationModel: GetTransactionSituationByIdAsync(transactionSituation)
         SituationModel ->>+ DB: SELECT FROM payment.transaction_situation WHERE id = @id AND active = true
         DB -->>- SituationModel: TransactionSituationEntity / null
         SituationModel -->>- Service: TransactionSituationEntity / null
 
         alt Situação da Transação Não Encontrada
-            Service -->> Controller: 404 NotFound (TRANSACTION_SITUATION_NOT_FOUND)
+            Service -->> Controller: 404 NotFound (SITUATION_NOT_FOUND)
             Controller -->> Client: 404 NotFound
         else Domínios Validados (e Banco/Cartão/Scheduler verificados)
+            opt situation.Name == "Saida" (EnumTransactionSituation.SAIDA)
+                Service ->> Service: request.Amount = request.Amount * -1
+            end
             Service ->>+ TxModel: CreatePaymentTransaction(...)
             TxModel ->>+ DB: INSERT INTO payment.transaction
             DB -->>- TxModel: TransactionEntity
             TxModel -->>- Service: TransactionEntity
-            Service -->>- Controller: 200 OK (POSTPAYMENTTRANSACTION_CORESERVICE_200_SUCESS)
-            Controller -->>- Client: 200 OK (ResponseApiSucess)
+            Service -->>- Controller: 201 Created (POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS)
+            Controller -->>- Client: 201 Created (ResponseApiSucess)
         end
     end
 ```

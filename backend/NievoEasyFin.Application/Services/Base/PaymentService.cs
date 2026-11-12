@@ -117,6 +117,9 @@ public class PaymentService : Controller, IPaymentService
                     new List<string>() { EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SITUATION_NOT_FOUND.GetDescription() }
                 ));
 
+        if (situation.Name == EnumTransactionSituation.SAIDA.GetDescription())
+            request.Amount = request.Amount * -1;
+
         var paymentTransaction = await _transactionModel.CreatePaymentTransaction(
             request.Name,
             request.Description,
