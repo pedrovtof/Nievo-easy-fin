@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using NievoEasyFin.Application.Data.Entities;
-using NievoEasyFin.Application.Data.Views;
 using NievoEasyFin.Application.Extensions.Enum;
 using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Interfaces.Enum;

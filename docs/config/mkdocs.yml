@@ -14,6 +14,7 @@ nav:
     - Autenticação e Segurança: content/FluxosNegocio/autenticacao_seguranca.md
     - Gestão de Contas e Cartões: content/FluxosNegocio/gestao_contas_cartoes.md
     - Planejamento de Metas e Categorias: content/FluxosNegocio/metas_categorias.md
+    - Transações e Situação de Caixa: content/FluxosNegocio/transacoes_pagamentos.md
   - Frontend:
     - Arquitetura e Componentes: content/Frontend/intro.md
   - APIs e Integrações:

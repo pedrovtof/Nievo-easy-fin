@@ -29,7 +29,15 @@ timeline
 
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
 
-### 📅 Novembro / 2026 — Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+### 📅 Novembro / 2026 — Situação de Transações (#65), Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+* **Issue #65 — Branch `feature/card-65-transaction-situation`:**
+  - **Domínio de Situação de Transação (`payment.transaction_situation` — `Entrada` / `Saida`):**
+    - Criação das migrações Alembic `a3b8cb1f9b53_create_situation_table_for_transaction.py`, `ee02405d95e2_insert_situation_values.py` e `e30ce4be995a_create_situation_constrain.py` adicionando a tabela `payment.transaction_situation`, seed inicial (`Entrada`, `Saida`), coluna `transaction_situation_id` em `payment.transaction` e constraint `fk_payment_transaction_situation`.
+    - Implementação de `EnumTransactionSituation`, `TransactionSituationEntity`, `TransactionSituationView`, `TransactionSituationModel`, `GetPaymentTransactionSituationRequest`, `GetPaymentTransactionSituationAsyncResponse` e `GetPaymentTransactionSituationValidatorAsync`.
+    - Adição do endpoint `GET /api/public/v1/Payment/situation` no `PaymentController` e `PaymentService`, além da inclusão de `transaction_situation` no `POST /api/public/v1/Payment` (com conversão automática de sinal contábil `Amount * -1` quando `situation.Name == "Saida"` e ajustes de limites de validação em `PostPaymentTransactionValidatorAsync`) e filtro `transaction_situation_id` / campo `situation` no `GET /api/public/v1/Payment`.
+    - Atualização da página `Transactions` no Frontend (`frontend/web/src/pages/Transactions/`) seguindo o Design System *"The Silent Navigator"* com filtro de situação, seletor no modal de nova transação, badges tonais (`Entrada` / `Saida`) e suporte completo no `mockData.js`.
+    - Criação e atualização de testes unitários e de integração no Backend (`GetPaymentTransactionSituationAsyncTest`, `PostPaymentTransactionAsyncTest`, `GetPaymentTransactionAsyncTest`, `PaymentControllerPublicTest`) e Frontend (`Transactions.test.js`).
+
 * **Issue #55 — Branch `fix/card-55-user-bank-card`:**
   - **Validação de Unicidade de Cartão do Usuário (`idx_unic_user_bank_card`):**
     - Inclusão de verificação prévia em `CoreUserService.PostUserCard` utilizando `UserBankCardModel.GetUserBankCardByCardIdAndUserId(card.Id, user.Id)` para impedir exceção de banco na constraint `idx_unic_user_bank_card` (`card_id` + `user_id`).

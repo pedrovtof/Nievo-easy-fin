@@ -4,8 +4,14 @@ using NievoEasyFin.Application.Interfaces.Request;
 
 namespace NievoEasyFin.Application.Interfaces.Validator
 {
+    /// <summary>
+    /// Validator for PostPaymentTransactionRequest payload rules.
+    /// </summary>
     public class PostPaymentTransactionValidatorAsync : AbstractValidator<PostPaymentTransactionRequest>
     {
+        /// <summary>
+        /// Initializes validation rules for creating a payment transaction.
+        /// </summary>
         public PostPaymentTransactionValidatorAsync()
         {
             RuleFor(x => x.GetEmail())
@@ -37,6 +43,10 @@ namespace NievoEasyFin.Application.Interfaces.Validator
             RuleFor(x => x.Scheduler)
                 .GreaterThanOrEqualTo(0)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SCHEDULER.ToString());
+
+            RuleFor(x => x.TransactionSituation)
+                .GreaterThanOrEqualTo(1)
+                    .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_SITUATION.ToString());
 
             RuleFor(x => x.Description)
                 .NotNull()

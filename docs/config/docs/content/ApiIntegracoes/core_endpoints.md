@@ -1,9 +1,10 @@
-# Endpoints de Usuário, Bancos, Cartões, Metas e Categorias (Core Service)
+# Endpoints de Usuário, Bancos, Cartões, Metas, Categorias e Pagamentos (Core Service)
 
-O Monólito `NievoEasyFin.Core` (Porta interna `8082`, rota de entrada Kong `/api/core`) gerencia as entidades do domínio financeiro, incluindo instituições bancárias, contas do usuário, cartões de crédito/débito, planejamento de metas e hierarquia de categorias orçamentárias.
+O Monólito `NievoEasyFin.Core` (Porta interna `8082`, rota de entrada Kong `/api/core`) gerencia as entidades do domínio financeiro, incluindo instituições bancárias, contas do usuário, cartões de crédito/débito, planejamento de metas, hierarquia de categorias orçamentárias e transações de pagamento (`payment`).
 
 Seguindo os princípios **SOLID** (em especial o Princípio da Responsabilidade Única - *SRP* e o Princípio da Segregação de Interfaces - *ISP*) e as convenções de design de **APIs RESTful**, os serviços e controllers foram desacoplados em contratos granulares:
 - **`UserController`** (`/api/public/v1/User`): Consome `IUserService` para gerenciar recursos vinculados diretamente ao usuário logado (contas bancárias, cartões, metas e categorias).
+- **`PaymentController`** (`/api/public/v1/Payment`): Consome `IPaymentService` para gerenciar lançamentos financeiros (`payment.transaction`), status (`payment.transaction_status`), tipos (`payment.transaction_type`), agendadores (`payment.scheduler_type`) e situações de fluxo de caixa (`payment.transaction_situation` — `Entrada` / `Saida`).
 - **`BankController` (Público)** (`/api/public/v1/Bank`): Consome `IPublicBankService` para consulta do catálogo de instituições financeiras e produtos bancários.
 - **`CardController`** (`/api/public/v1/Card`): Consome `ICardService` para consulta de tipos e bandeiras de cartões.
 - **`BankController` (Privado)** (`/api/private/v1/Bank`): Consome `IPrivateBankService` para operações administrativas de cadastro de bancos e cartões no catálogo global.
@@ -367,3 +368,195 @@ Valida conectividade com o nó Réplica do PostgreSQL (`CoreReplica`).
 - **Respostas:**
   - `200 OK`: Retorna resultado da consulta `select 1 as test_replicaNode`.
   - `400 Bad Request`: Falha na comunicação com a réplica de leitura.
+
+---
+
+## 💸 6. Endpoints Públicos de Pagamentos e Transações (`/api/public/v1/Payment`)
+
+Controlador dedicado ao lançamento e consulta de transações financeiras do usuário (`payment.transaction`) e seus domínios auxiliares (`status`, `type`, `scheduler`, `situation`).
+
+### 18. `POST /api/public/v1/Payment`
+Registra uma nova transação financeira (`payment.transaction`) vinculada ao usuário autenticado, classificando sua situação (`Entrada` ou `Saida`).
+
+- **Headers:** `Authorization: Bearer <token_jwt>`
+- **Corpo da Requisição:**
+  ```json
+  {
+    "name": "Salário Mensal",
+    "description": "Crédito folha de pagamento",
+    "transaction_status": 2,
+    "transaction_type": 2,
+    "transaction_situation": 1,
+    "categorie": 1,
+    "pay_date": "2026-11-12T00:00:00Z",
+    "amount": 5500,
+    "card": null,
+    "bank": 1,
+    "scheduler": null
+  }
+  ```
+- **Regras de Validação (`PostPaymentTransactionValidatorAsync`):**
+  - `name`, `description` e `category_name`: Obrigatórios (não nulos e não vazios).
+  - `amount`: Obrigatório e maior que `0` (`> 0`). Caso a situação da transação seja `Saida` (`EnumTransactionSituation.SAIDA`), o `PaymentService` converte automaticamente o valor para negativo (`request.Amount = request.Amount * -1`) antes de persistir no banco.
+  - `transaction_status`: Obrigatório e `> 0`.
+  - `transaction_type`: Obrigatório e `> 0`.
+  - `transaction_situation`: Obrigatório e `>= 1` (`1 = Entrada`, `2 = Saida`, mapeados em `EnumTransactionSituation`).
+  - `bank`: Obrigatório e `>= 0`.
+  - `card`: Opcional (`>= 0`, consultado na base apenas quando `> 0`).
+  - `scheduler`: Opcional (`>= 0`, consultado na base apenas quando `> 0`).
+- **Respostas:**
+  - `201 Created`: Transação registrada com sucesso (`POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS`).
+  - `400 Bad Request`: Violação de validação nos campos obrigatórios.
+  - `404 Not Found`: Usuário, Categoria, Status, Tipo, Situação (`POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_404_SITUATION_NOT_FOUND`), Banco, Cartão ou Agendador não encontrado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Cliente (Frontend)
+    box Application Layer (Core)
+        participant Controller as PaymentController
+        participant Validator as PostPaymentTransactionValidatorAsync
+        participant Service as PaymentService
+    end
+    box Data Access Layer
+        participant UserModel as UserModel
+        participant CategoryModel as CategoryModel
+        participant StatusModel as TransactionStatusModel
+        participant TypeModel as TransactionTypeModel
+        participant SituationModel as TransactionSituationModel
+        participant TxModel as TransactionModel
+        participant DB as PostgreSQL (payment / goals / accounts)
+    end
+
+    Client ->>+ Controller: POST /api/public/v1/Payment (JWT + PostPaymentTransactionRequest)
+    Controller ->>+ Service: PostPaymentTransaction(request)
+    Service ->>+ Validator: ValidateAsync(request)
+    Validator -->>- Service: ValidationResult
+
+    alt Payload Inválido
+        Service -->> Controller: 400 BadRequest (ResponseApiError)
+        Controller -->> Client: 400 BadRequest
+    else Payload Válido
+        Service ->>+ UserModel: GetUserByEmailAsync(email)
+        UserModel ->>+ DB: SELECT FROM user_details.user WHERE email = @email
+        DB -->>- UserModel: UserEntity / null
+        UserModel -->>- Service: UserEntity / null
+
+        Service ->>+ CategoryModel: GetCategoryValidByNameAndUserId(categoryName, userId)
+        CategoryModel ->>+ DB: SELECT FROM goals.category
+        DB -->>- CategoryModel: CategoryEntity / null
+        CategoryModel -->>- Service: CategoryEntity / null
+
+        Service ->>+ StatusModel: GetTransactionStatusByIdAsync(transactionStatus)
+        StatusModel ->>+ DB: SELECT FROM payment.transaction_status
+        DB -->>- StatusModel: TransactionStatusEntity / null
+        StatusModel -->>- Service: TransactionStatusEntity / null
+
+        Service ->>+ TypeModel: GetTransactionTypeByIdAsync(transactionType)
+        TypeModel ->>+ DB: SELECT FROM payment.transaction_type
+        DB -->>- TypeModel: TransactionTypeEntity / null
+        TypeModel -->>- Service: TransactionTypeEntity / null
+
+        Service ->>+ SituationModel: GetTransactionSituationByIdAsync(transactionSituation)
+        SituationModel ->>+ DB: SELECT FROM payment.transaction_situation WHERE id = @id AND active = true
+        DB -->>- SituationModel: TransactionSituationEntity / null
+        SituationModel -->>- Service: TransactionSituationEntity / null
+
+        alt Situação da Transação Não Encontrada
+            Service -->> Controller: 404 NotFound (SITUATION_NOT_FOUND)
+            Controller -->> Client: 404 NotFound
+        else Domínios Validados (e Banco/Cartão/Scheduler verificados)
+            opt situation.Name == "Saida" (EnumTransactionSituation.SAIDA)
+                Service ->> Service: request.Amount = request.Amount * -1
+            end
+            Service ->>+ TxModel: CreatePaymentTransaction(...)
+            TxModel ->>+ DB: INSERT INTO payment.transaction
+            DB -->>- TxModel: TransactionEntity
+            TxModel -->>- Service: TransactionEntity
+            Service -->>- Controller: 201 Created (POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_201_SUCESS)
+            Controller -->>- Client: 201 Created (ResponseApiSucess)
+        end
+    end
+```
+
+---
+
+### 19. `GET /api/public/v1/Payment`
+Retorna a lista paginada de transações financeiras do usuário autenticado com suporte a múltiplos filtros combinados, incluindo filtro por situação (`transaction_situation_id`).
+
+- **Headers:** `Authorization: Bearer <token_jwt>`
+- **Parâmetros de Consulta (Query Params):**
+  - `page` (`int`, padrão: `1`): Número da página.
+  - `page_size` (`int`, padrão: `10`): Quantidade de itens por página.
+  - `transaction_status_id` (`int?`): Filtro por status da transação.
+  - `transaction_type_id` (`int?`): Filtro por tipo da transação.
+  - `transaction_situation_id` (`int?`): Filtro por situação da transação (`Entrada` / `Saida`).
+  - `categorie_id` (`int?`): Filtro por categoria.
+  - `pay_date` (`DateTime?`): Filtro por data de pagamento.
+  - `card_id` (`int?`): Filtro por cartão do usuário.
+  - `bank_id` (`int?`): Filtro por banco do usuário.
+  - `scheduler_id` (`int?`): Filtro por recorrência.
+  - `created_at` (`DateTime?`): Filtro por data de criação.
+- **Respostas:**
+  - `200 OK`: Retorna `ResponsePaginationBase<GetPaymentTransactionAsyncResponse>` contendo `id`, `name`, `description`, `status`, `type`, `situation`, `categorie`, `pay_date`, `amount`, `card`, `bank`, `scheduler`, `created_at`.
+
+---
+
+### 20. `GET /api/public/v1/Payment/situation`
+Retorna a lista paginada de situações de transação (`Entrada`, `Saida`) cadastradas na tabela `payment.transaction_situation`.
+
+- **Headers:** `Authorization: Bearer <token_jwt>`
+- **Parâmetros de Consulta (Query Params):**
+  - `page` (`int`, padrão: `1`): Número da página (`> 0`).
+  - `page_size` (`int`, padrão: `10`): Quantidade de itens por página (`1..100`).
+  - `active` (`bool`, padrão: `true`): Filtra situações ativas ou inativas.
+- **Respostas:**
+  - `200 OK`: Retorna `ResponsePaginationBase<GetPaymentTransactionSituationAsyncResponse>` (`GETPAYMENTTRANSACTIONSITUATION_CORESERVICE_200_SUCESS`).
+  - `400 Bad Request`: Parâmetros de paginação inválidos (`GETPAYMENTTRANSACTIONSITUATION_CORESERVICE_400_INVALID_REQUEST`).
+  - `404 Not Found`: Nenhuma situação encontrada (`GETPAYMENTTRANSACTIONSITUATION_CORESERVICE_404_SITUATIONS_NOT_FOUND`).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Cliente (Frontend)
+    box Application Layer (Core)
+        participant Controller as PaymentController
+        participant Validator as GetPaymentTransactionSituationValidatorAsync
+        participant Service as PaymentService
+    end
+    box Data Access Layer
+        participant SituationModel as TransactionSituationModel
+        participant DB as PostgreSQL (CoreReplica - payment)
+    end
+
+    Client ->>+ Controller: GET /api/public/v1/Payment/situation?page=1&page_size=10&active=true
+    Controller ->>+ Service: GetPaymentTransactionSituation(request)
+    Service ->>+ Validator: ValidateAsync(request)
+    Validator -->>- Service: ValidationResult
+
+    alt Paginação Inválida
+        Service -->> Controller: 400 BadRequest (INVALID_REQUEST)
+        Controller -->> Client: 400 BadRequest
+    else Paginação Válida
+        Service ->>+ SituationModel: GetTransactionSituationAsync(page, pageSize, active)
+        SituationModel ->>+ DB: SELECT id, name, description, active, count(*) over() FROM payment.transaction_situation
+        DB -->>- SituationModel: List<TransactionSituationView>
+        SituationModel -->>- Service: Tuple(items, totalRecords)
+
+        alt Nenhum Registro Encontrado (totalRecords == 0)
+            Service -->> Controller: 404 NotFound (SITUATIONS_NOT_FOUND)
+            Controller -->> Client: 404 NotFound
+        else Registros Encontrados
+            Service -->>- Controller: 200 OK (ResponsePaginationBase)
+            Controller -->>- Client: 200 OK (ResponseApiSucess)
+        end
+    end
+```
+
+---
+
+### 21. `GET /api/public/v1/Payment/status`, `/type` e `/scheduler`
+Endpoints auxiliares de metadados de transações:
+- **`GET /api/public/v1/Payment/status`**: Lista paginada de status (`payment.transaction_status`).
+- **`GET /api/public/v1/Payment/type`**: Lista paginada de tipos (`payment.transaction_type`).
+- **`GET /api/public/v1/Payment/scheduler`**: Lista paginada de agendadores (`payment.scheduler_type`).

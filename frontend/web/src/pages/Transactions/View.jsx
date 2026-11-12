@@ -36,6 +36,7 @@ import {
 const TransactionsView = ({
   transactions,
   statuses,
+  situations = [],
   types,
   schedulers,
   categories,
@@ -108,6 +109,22 @@ const TransactionsView = ({
         <TextField
           select
           size="small"
+          label="Situation"
+          value={filters.transaction_situation_id || ''}
+          onChange={(e) => onFilterChange('transaction_situation_id', e.target.value)}
+          sx={{ minWidth: 150 }}
+        >
+          <MenuItem value="">All Situations</MenuItem>
+          {situations.map((sit) => (
+            <MenuItem key={sit.id} value={sit.id}>
+              {sit.name}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <TextField
+          select
+          size="small"
           label="Type"
           value={filters.transaction_type_id}
           onChange={(e) => onFilterChange('transaction_type_id', e.target.value)}
@@ -173,8 +190,12 @@ const TransactionsView = ({
       ) : (
         <TransactionsListContainer>
           {transactions.map((tx, idx) => {
+            const sitLower = tx.situation?.toLowerCase();
             const isIncome =
-              tx.type?.toLowerCase() === 'income' || tx.type?.toLowerCase() === 'receita';
+              sitLower === 'entrada' ||
+              sitLower === 'income' ||
+              (!sitLower &&
+                (tx.type?.toLowerCase() === 'income' || tx.type?.toLowerCase() === 'receita'));
             const formattedDate = tx.pay_date
               ? new Date(tx.pay_date).toLocaleDateString('en-US', {
                   month: 'short',
@@ -211,6 +232,17 @@ const TransactionsView = ({
                 </Box>
 
                 <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
+                  {tx.situation && (
+                    <Chip
+                      label={tx.situation}
+                      size="small"
+                      sx={{
+                        bgcolor: isIncome ? 'success.container' : 'error.container',
+                        color: isIncome ? 'success.main' : 'error.main',
+                        fontWeight: 600,
+                      }}
+                    />
+                  )}
                   <Chip
                     label={tx.category || 'Uncategorized'}
                     size="small"
@@ -306,7 +338,23 @@ const TransactionsView = ({
             </Grid>
 
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  label="Situation"
+                  value={formData.transaction_situation || ''}
+                  onChange={(e) => onFormChange('transaction_situation', e.target.value)}
+                  fullWidth
+                  required
+                >
+                  {situations.map((sit) => (
+                    <MenuItem key={sit.id} value={sit.id}>
+                      {sit.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   select
                   label="Transaction Type"
@@ -322,7 +370,7 @@ const TransactionsView = ({
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   select
                   label="Status"

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using NievoEasyFin.Application.Data.Entities;
 using NievoEasyFin.Application.Data.Views;
 
 
@@ -22,6 +21,7 @@ namespace NievoEasyFin.Application.Interfaces.Response
             UserCardName = view.UserCardName;
             UserBankNickName = view.UserBankNickName;
             BankName = view.BankName;
+            Situation = view.Situation;
         }
 
         /// <summary>
@@ -101,5 +101,11 @@ namespace NievoEasyFin.Application.Interfaces.Response
         /// </summary>
         [JsonPropertyName("created_at")]
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Situation
+        /// </summary>
+        [JsonPropertyName("situation")]
+        public string Situation { get; set; }
     }
 }

@@ -4,6 +4,7 @@ import {
   getPaymentTransactions,
   createPaymentTransaction,
   getTransactionStatuses,
+  getTransactionSituations,
   getTransactionTypes,
   getPaymentSchedulers,
   getUserCategories,
@@ -34,6 +35,7 @@ const extractList = (response) => {
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [situations, setSituations] = useState([]);
   const [types, setTypes] = useState([]);
   const [schedulers, setSchedulers] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -45,6 +47,7 @@ const Transactions = () => {
 
   const [filters, setFilters] = useState({
     transaction_status_id: '',
+    transaction_situation_id: '',
     transaction_type_id: '',
     category: '',
     user_bank_card: '',
@@ -60,6 +63,7 @@ const Transactions = () => {
     pay_date: new Date().toISOString().slice(0, 10),
     category_name: '',
     transaction_status: '',
+    transaction_situation: '',
     transaction_type: '',
     bank: '',
     card: 0,
@@ -68,9 +72,10 @@ const Transactions = () => {
 
   const fetchMetadata = useCallback(async () => {
     try {
-      const [statusRes, typeRes, schedRes, catRes, userBankRes, catalogBankRes, cardRes] =
+      const [statusRes, situationRes, typeRes, schedRes, catRes, userBankRes, catalogBankRes, cardRes] =
         await Promise.all([
           getTransactionStatuses({ page: 1, page_size: 20 }),
+          getTransactionSituations({ page: 1, page_size: 20 }),
           getTransactionTypes({ page: 1, page_size: 20 }),
           getPaymentSchedulers({ page: 1, page_size: 20 }),
           getUserCategories({ page: 1, page_size: 30, active: true }),
@@ -80,6 +85,7 @@ const Transactions = () => {
         ]);
 
       const statusList = extractList(statusRes);
+      const situationList = extractList(situationRes);
       const typeList = extractList(typeRes);
       const schedList = extractList(schedRes);
       const catList = extractList(catRes);
@@ -108,6 +114,7 @@ const Transactions = () => {
             }));
 
       setStatuses(statusList);
+      setSituations(situationList);
       setTypes(typeList);
       setSchedulers(schedList);
       setCategories(catList);
@@ -118,6 +125,7 @@ const Transactions = () => {
         ...prev,
         category_name: prev.category_name || catList[0]?.name || '',
         transaction_status: prev.transaction_status || statusList[0]?.id || 1,
+        transaction_situation: prev.transaction_situation || situationList[0]?.id || 1,
         transaction_type: prev.transaction_type || typeList[0]?.id || 1,
         bank: prev.bank || availableBanks[0]?.resolvedBankId || 1,
       }));
@@ -132,6 +140,7 @@ const Transactions = () => {
       setError(null);
       const query = { page: 1, page_size: 20 };
       if (filters.transaction_status_id) query.transaction_status_id = Number(filters.transaction_status_id);
+      if (filters.transaction_situation_id) query.transaction_situation_id = Number(filters.transaction_situation_id);
       if (filters.transaction_type_id) query.transaction_type_id = Number(filters.transaction_type_id);
       if (filters.category) query.category = Number(filters.category);
       if (filters.user_bank_card) query.user_bank_card = Number(filters.user_bank_card);
@@ -161,6 +170,7 @@ const Transactions = () => {
   const handleResetFilters = () => {
     setFilters({
       transaction_status_id: '',
+      transaction_situation_id: '',
       transaction_type_id: '',
       category: '',
       user_bank_card: '',
@@ -176,6 +186,7 @@ const Transactions = () => {
       pay_date: new Date().toISOString().slice(0, 10),
       category_name: categories[0]?.name || '',
       transaction_status: statuses[0]?.id || 1,
+      transaction_situation: situations[0]?.id || 1,
       transaction_type: types[0]?.id || 1,
       bank: banks[0]?.resolvedBankId || 1,
       card: 0,
@@ -203,6 +214,7 @@ const Transactions = () => {
         pay_date: isoDate,
         category_name: formData.category_name,
         transaction_status: Number(formData.transaction_status),
+        transaction_situation: Number(formData.transaction_situation),
         transaction_type: Number(formData.transaction_type),
         bank: Number(formData.bank),
         card: Number(formData.card) || 0,
@@ -222,6 +234,7 @@ const Transactions = () => {
     <TransactionsView
       transactions={transactions}
       statuses={statuses}
+      situations={situations}
       types={types}
       schedulers={schedulers}
       categories={categories}

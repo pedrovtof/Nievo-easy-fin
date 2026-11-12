@@ -73,6 +73,7 @@
     "amount": "Amount",
     "category": "Category",
     "status": "Status",
+    "situation": "Situation",
     "account": "Account & Card"
   },
   "Settings": {

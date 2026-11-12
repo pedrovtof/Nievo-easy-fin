@@ -35,6 +35,12 @@ namespace NievoEasyFin.Application.Interfaces.Request
         public int? Category { get; set; }
 
         /// <summary>
+        /// TransactionSituationId
+        /// </summary>
+        [FromQuery(Name = "transaction_situation_id")]
+        public int? TransactionSituationId { get; set; }
+
+        /// <summary>
         /// PayDateStart
         /// </summary>
         [FromQuery(Name = "pay_date_start")]

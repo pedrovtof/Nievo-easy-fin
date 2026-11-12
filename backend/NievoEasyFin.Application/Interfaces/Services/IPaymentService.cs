@@ -37,4 +37,10 @@ public interface IPaymentService
     /// </summary>
     /// <param name="request">GetPaymentSchedulerRequest</param>
     Task<IActionResult> GetPaymentScheduler(GetPaymentSchedulerRequest request);
+
+    /// <summary>
+    /// Search for transactions situation
+    /// </summary>
+    /// <param name="request">GetPaymentTransactionSituationRequest</param>
+    Task<IActionResult> GetPaymentTransactionSituation(GetPaymentTransactionSituationRequest request);
 }

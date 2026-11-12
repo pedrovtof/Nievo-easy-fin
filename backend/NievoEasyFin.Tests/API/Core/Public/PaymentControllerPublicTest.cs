@@ -115,4 +115,22 @@ public class PaymentControllerPublicTest
         result.Should().BeSameAs(expected);
         await _mockPaymentService.Received(1).GetPaymentTransaction(request);
     }
+
+    [Fact(DisplayName = "GetPaymentTransactionSituation calls IPaymentService and returns Ok")]
+    public async Task GetPaymentTransactionSituation_ValidRequest_CallsServiceAndReturnsResult()
+    {
+        // Arrange
+        var expected = new OkObjectResult(new ResponseApiSucess("ok"));
+        _mockPaymentService.GetPaymentTransactionSituation(Arg.Any<GetPaymentTransactionSituationRequest>())
+            .Returns(Task.FromResult<IActionResult>(expected));
+
+        var request = new GetPaymentTransactionSituationRequestBuilder();
+
+        // Act
+        var result = await _controller.GetPaymentTransactionSituation("fake-token", request);
+
+        // Assert
+        result.Should().BeSameAs(expected);
+        await _mockPaymentService.Received(1).GetPaymentTransactionSituation(request);
+    }
 }

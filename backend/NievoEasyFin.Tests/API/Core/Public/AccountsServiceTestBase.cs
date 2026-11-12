@@ -4,12 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using NievoEasyFin.Application.Data.Context.Database;
 using NievoEasyFin.Application.Data.Entities;
-using NievoEasyFin.Application.Infrastructure.Auth;
 using NievoEasyFin.Application.Models;
 using NievoEasyFin.Application.Services.Base;
-using NievoEasyFin.Application.Services.Security;
 using NievoEasyFin.Tests.Mocks.Helpers;
-using NievoEasyFin.Tests.Mocks.Infrastructure;
 using StackExchange.Redis;
 using NSubstitute;
 using Xunit.Abstractions;
@@ -54,6 +51,34 @@ public class CoreReplicaTest : CoreReplica
 
 public abstract class AccountsServiceTestBase : IDisposable
 {
+    private class SqliteGuidTypeHandler : Dapper.SqlMapper.TypeHandler<Guid>
+    {
+        public override void SetValue(System.Data.IDbDataParameter parameter, Guid value)
+            => parameter.Value = value.ToString();
+
+        public override Guid Parse(object value)
+            => Guid.Parse(value.ToString()!);
+    }
+
+    private class SqliteDateTimeTypeHandler : Dapper.SqlMapper.TypeHandler<DateTime>
+    {
+        public override void SetValue(System.Data.IDbDataParameter parameter, DateTime value)
+            => parameter.Value = value.ToString("O");
+
+        public override DateTime Parse(object value)
+        {
+            if (value is DateTime dt) return dt;
+            if (value is long yr && yr >= 1900 && yr <= 3000) return new DateTime((int)yr, 1, 1);
+            return DateTime.Parse(value.ToString()!);
+        }
+    }
+
+    static AccountsServiceTestBase()
+    {
+        Dapper.SqlMapper.AddTypeHandler(new SqliteGuidTypeHandler());
+        Dapper.SqlMapper.AddTypeHandler(new SqliteDateTimeTypeHandler());
+    }
+
     private SqliteConnection _connection;
     protected readonly ITestOutputHelper Output;
 
@@ -191,6 +216,14 @@ public abstract class AccountsServiceTestBase : IDisposable
                     created_at TEXT,
                     updated_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS payment.transaction_situation (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    description TEXT,
+                    active INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                );
                 CREATE TABLE IF NOT EXISTS payment.""transaction"" (
                     id TEXT PRIMARY KEY,
                     name TEXT,
@@ -205,7 +238,8 @@ public abstract class AccountsServiceTestBase : IDisposable
                     transaction_type_id INTEGER,
                     scheduler_id INTEGER,
                     created_at TEXT,
-                    updated_at TEXT
+                    updated_at TEXT,
+                    transaction_situation_id INTEGER
                 );
                 CREATE TABLE IF NOT EXISTS accounts.user_bank_card (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -262,6 +296,7 @@ public abstract class AccountsServiceTestBase : IDisposable
         var userBankCardModel = new UserBankCardModel(origin, replica);
         var categoryModel = new CategoryModel(origin, replica);
         var userBankModel = new UserBankModel(origin, replica);
+        var transactionSituationModel = new TransactionSituationModel(origin, replica);
 
         return new PaymentService(
             schedulerTypeModel,
@@ -271,7 +306,8 @@ public abstract class AccountsServiceTestBase : IDisposable
             userModel,
             userBankCardModel,
             categoryModel,
-            userBankModel
+            userBankModel,
+            transactionSituationModel
         );
     }
 
@@ -326,6 +362,7 @@ public abstract class AccountsServiceTestBase : IDisposable
                 INSERT OR REPLACE INTO payment.transaction_status SELECT * FROM main.transaction_status;
                 INSERT OR REPLACE INTO payment.transaction_type SELECT * FROM main.transaction_type;
                 INSERT OR REPLACE INTO payment.scheduler_type SELECT * FROM main.scheduler_type;
+                INSERT OR REPLACE INTO payment.transaction_situation SELECT * FROM main.transaction_situation;
                 INSERT OR REPLACE INTO payment.""transaction"" SELECT * FROM main.""transaction"";
             ";
             await cmd.ExecuteNonQueryAsync();
