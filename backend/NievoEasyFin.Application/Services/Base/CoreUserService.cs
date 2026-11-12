@@ -26,6 +26,9 @@ public class CoreUserService : Controller, ICoreUserService
     private readonly AuthDbCacheService _authDbCacheService;
     private readonly BankCardModel _bankCardModel;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="CoreUserService"/> with required models and cache services.
+    /// </summary>
     public CoreUserService(
         UserModel userModel,
         UserBankModel userBankModel,
@@ -176,9 +179,10 @@ public class CoreUserService : Controller, ICoreUserService
     }
 
     /// <summary>
-    /// Post user card banks
+    /// Creates and links a bank card to the authenticated user's wallet, validating uniqueness for the card and user pair.
     /// </summary>
-    ///  <param name="request">PostUserCardRequest</param>
+    /// <param name="request">PostUserCardRequest</param>
+    /// <returns>IActionResult</returns>
     public async Task<IActionResult> PostUserCard(PostUserCardRequest request)
     {
         var validatorResult = await new PostUserCardValidatorAsync().ValidateAsync(request);
@@ -205,7 +209,13 @@ public class CoreUserService : Controller, ICoreUserService
                 new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
             ));
 
-        var userCard = await _userBankCardModel.CreateUserBankCard(bank.Id, card.Id, user.Id, request.CardUserName, request.ExpireAt);
+        UserBankCardEntity? userCard = await _userBankCardModel.GetUserBankCardByCardIdAndUserId(card.Id, user.Id);
+        if (userCard != null)
+            return BadRequest(new ResponseApiError(
+                new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_400_USER_CARD_ALREADY_EXISTS.GetDescription() }
+            ));
+
+        userCard = await _userBankCardModel.CreateUserBankCard(bank.Id, card.Id, user.Id, request.CardUserName, request.ExpireAt);
         if (userCard == null)
             return NotFound(new ResponseApiError(
                 new List<string>() { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_400_CARD_NOT_CREATED.GetDescription() }
@@ -252,6 +262,11 @@ public class CoreUserService : Controller, ICoreUserService
         return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERGOALASYNC_CORESERVICE_200_GOAL_CREATED.GetDescription()));
     }
 
+    /// <summary>
+    /// Retrieves paginated financial goals for the authenticated user.
+    /// </summary>
+    /// <param name="request">GetUserGoalRequest</param>
+    /// <returns>IActionResult</returns>
     public async Task<IActionResult> GetUserGoal(GetUserGoalRequest request)
     {
         var validatorResult = await new GetUserGoalValidatorAsync().ValidateAsync(request);
@@ -344,6 +359,11 @@ public class CoreUserService : Controller, ICoreUserService
         return Ok(new ResponseApiSucess(EnumErrosApi.POSTUSERCATEGORYASYNC_CORESERVICE_200_CREATED.GetDescription()));
     }
 
+    /// <summary>
+    /// Retrieves paginated financial categories for the authenticated user.
+    /// </summary>
+    /// <param name="request">GetUserCategoryRequest</param>
+    /// <returns>IActionResult</returns>
     public async Task<IActionResult> GetUserCategory(GetUserCategoryRequest request)
     {
         var validatorResult = await new GetUserCategoryValidatorAsync().ValidateAsync(request);

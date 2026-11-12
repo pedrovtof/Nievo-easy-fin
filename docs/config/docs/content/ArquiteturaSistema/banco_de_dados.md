@@ -172,13 +172,40 @@ erDiagram
         int id PK "SERIAL"
         int bank_id FK
         string name "VARCHAR(150)"
-        int card_id FK
+        int card_id FK "UNIQUE (idx_unic_user_bank_card)"
         bool active "BOOLEAN DEFAULT true"
-        int user_id FK
+        int user_id FK "UNIQUE (idx_unic_user_bank_card)"
         datetime expired_at "TIMESTAMP"
         datetime created_at "TIMESTAMP"
         datetime updated_at "TIMESTAMP"
     }
+```
+
+#### 📌 Índices de Integridade do Schema `accounts`:
+- **`accounts.user_bank_card`:**
+  - `idx_unic_user_bank_card`: Índice único composto sobre `(card_id, user_id)` para garantir que um usuário não vincule o mesmo cartão bancário em duplicidade. Validado na aplicação via `UserBankCardModel.GetUserBankCardByCardIdAndUserId` antes da persistência em `CoreUserService.PostUserCard`.
+
+```dbml
+Table accounts.user_bank_card {
+  id serial [pk, increment]
+  bank_id integer [not null]
+  name varchar(150) [not null]
+  card_id integer [not null]
+  active boolean [not null, default: true]
+  user_id integer [not null]
+  expired_at timestamp [not null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (card_id, user_id) [unique, name: 'idx_unic_user_bank_card']
+  }
+
+  Note: 'User linked bank cards with composite uniqueness on (card_id, user_id).'
+}
+
+Ref fk_user_bank_card_bank: accounts.user_bank_card.bank_id > accounts.bank.id
+Ref fk_user_bank_card_card: accounts.user_bank_card.card_id > accounts.bank_card.id
 ```
 
 ---

@@ -55,6 +55,7 @@ public class PostUserCardAsyncTest : AccountsTestBase
         new object[] { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND, "Banco não encontrado" },
         new object[] { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_BANKCARD_NOT_FOUND, "Cartão do banco não encontrado" },
         new object[] { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND, "Usuário não encontrado" },
+        new object[] { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_400_USER_CARD_ALREADY_EXISTS, "Cartão do usuário já existe" },
         new object[] { EnumErrosApi.POSTUSERCARDASYNC_CORESERVICE_400_CARD_NOT_CREATED, "Cartão não pôde ser criado" },
     };
 

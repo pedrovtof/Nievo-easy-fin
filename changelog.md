@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changelog
 
+2026-11-12 - [FIX] - Validate duplicate user bank card (card_id + user_id) in PostUserCard (#55)
+
+Detalhes:
+
+- Add pre-creation uniqueness check via GetUserBankCardByCardIdAndUserId in CoreUserService.PostUserCard to prevent idx_unic_user_bank_card constraint exception, add POSTUSERCARDASYNC_CORESERVICE_400_USER_CARD_ALREADY_EXISTS in EnumErrosApi, expand unit and integration tests in PostUserCardAsyncTest and UserServiceDirectTest, and update MkDocs documentation and diagrams - pedrovotf - 2026-11-12 - #55 - PENDING
+
 2026-11-11 - [CHG] - Split frontend API clients into VITE_BASE_AUTH_URL and VITE_BASE_CORE_URL
 
 Detalhes:

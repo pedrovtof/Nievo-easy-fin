@@ -771,6 +771,12 @@ public enum EnumErrosApi
     POSTUSERCARDASYNC_CORESERVICE_400_CARD_NOT_CREATED,
 
     /// <summary>
+    /// There is already a user with this card.
+    /// </summary>
+    [Description("There is already a user with this card.")]
+    POSTUSERCARDASYNC_CORESERVICE_400_USER_CARD_ALREADY_EXISTS,
+
+    /// <summary>
     /// Created user card with sucess.
     /// </summary>
     [Description("Created user card with sucess.")]

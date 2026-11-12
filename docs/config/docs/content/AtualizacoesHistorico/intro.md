@@ -29,6 +29,13 @@ timeline
 
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
 
+### 📅 Novembro / 2026 — Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+* **Issue #55 — Branch `fix/card-55-user-bank-card`:**
+  - **Validação de Unicidade de Cartão do Usuário (`idx_unic_user_bank_card`):**
+    - Inclusão de verificação prévia em `CoreUserService.PostUserCard` utilizando `UserBankCardModel.GetUserBankCardByCardIdAndUserId(card.Id, user.Id)` para impedir exceção de banco na constraint `idx_unic_user_bank_card` (`card_id` + `user_id`).
+    - Adição do código de erro `POSTUSERCARDASYNC_CORESERVICE_400_USER_CARD_ALREADY_EXISTS` em `EnumErrosApi` retornando `400 Bad Request` quando o usuário já possui o cartão ativo cadastrado.
+    - Expansão da cobertura de testes unitários e de integração em `PostUserCardAsyncTest` e `UserServiceDirectTest`.
+
 ### 📅 Outubro / 2026 — Refatoração SOLID de Interfaces, Endpoints RESTful e Versionamento v1
 * **Branch `fix/endpoint-services-filepath` (`390e5f4`, `bf34034`, `c27d6d0`):**
   - **Adequação aos Princípios SOLID:**
