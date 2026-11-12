@@ -55,13 +55,94 @@ Cadastra e vincula um cartão de banco à carteira do usuário logado (`accounts
   {
     "bank_id": 2,
     "card_id": 5,
-    "card_user_name": "Cartão Black Itaú",
+    "nickname": "Cartão Black Itaú",
     "expire_at": "2029-12-31T23:59:59Z"
   }
   ```
+- **Regras de Validação e Unicidade (`idx_unic_user_bank_card`):**
+  - `bank_id` e `card_id`: Obrigatórios e maiores que zero (`> 0`).
+  - `nickname` (`CardUserName`): Obrigatório.
+  - `expire_at`: Data futura (`expire_at > DateTime.Today`).
+  - **Unicidade (`card_id` + `user_id`):** Verifica previamente via `GetUserBankCardByCardIdAndUserId` se o usuário já possui o cartão ativo vinculado na carteira, prevenindo violação do índice único `idx_unic_user_bank_card`.
 - **Respostas:**
-  - `200 OK`: Cartão do usuário cadastrado (`accounts.user_bank_card`).
-  - `404 Not Found`: Banco, Cartão ou Usuário não encontrado.
+  - `200 OK`: Cartão do usuário cadastrado (`POSTUSERCARDASYNC_CORESERVICE_200_CARD_CREATED`).
+  - `400 Bad Request`: Dados inválidos ou cartão já existente para este usuário (`POSTUSERCARDASYNC_CORESERVICE_400_USER_CARD_ALREADY_EXISTS`).
+  - `404 Not Found`: Banco, Cartão do Banco ou Usuário não encontrado (`POSTUSERCARDASYNC_CORESERVICE_404_BANK_NOT_FOUND`, `POSTUSERCARDASYNC_CORESERVICE_404_BANKCARD_NOT_FOUND`, `POSTUSERCARDASYNC_CORESERVICE_404_USER_NOT_FOUND`).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Cliente (Frontend)
+    box Application Layer (Core)
+        participant Controller as UserController
+        participant Validator as PostUserCardValidatorAsync
+        participant Service as CoreUserService
+    end
+    box Data Access Layer
+        participant BankModel as BankModel
+        participant BankCardModel as BankCardModel
+        participant UserModel as UserModel
+        participant UserCardModel as UserBankCardModel
+        participant DB as PostgreSQL (accounts / user_details)
+    end
+
+    Client ->>+ Controller: POST /api/public/v1/User/bank-card (JWT + Payload)
+    Controller ->>+ Service: PostUserCard(request)
+    Service ->>+ Validator: ValidateAsync(request)
+    Validator -->>- Service: ValidationResult
+
+    alt Payload Inválido
+        Service -->> Controller: 400 BadRequest (ResponseApiError)
+        Controller -->> Client: 400 BadRequest
+    else Payload Válido
+        Service ->>+ BankModel: GetBankByIdAsync(bankId)
+        BankModel ->>+ DB: SELECT FROM accounts.bank WHERE id = @bankId AND active = true
+        DB -->>- BankModel: BankEntity / null
+        BankModel -->>- Service: BankEntity / null
+
+        alt Banco Não Encontrado
+            Service -->> Controller: 404 NotFound (BANK_NOT_FOUND)
+            Controller -->> Client: 404 NotFound
+        else Banco Encontrado
+            Service ->>+ BankCardModel: GetBankCardByBankIdAndCardId(bankId, cardId)
+            BankCardModel ->>+ DB: SELECT FROM accounts.bank_card WHERE bank_id = @bankId AND id = @cardId
+            DB -->>- BankCardModel: BankCardEntity / null
+            BankCardModel -->>- Service: BankCardEntity / null
+
+            alt Cartão do Banco Não Encontrado
+                Service -->> Controller: 404 NotFound (BANKCARD_NOT_FOUND)
+                Controller -->> Client: 404 NotFound
+            else Cartão do Banco Encontrado
+                Service ->>+ UserModel: GetUserByEmailAsync(email)
+                UserModel ->>+ DB: SELECT FROM user_details.user WHERE email = @email
+                DB -->>- UserModel: UserEntity / null
+                UserModel -->>- Service: UserEntity / null
+
+                alt Usuário Não Encontrado
+                    Service -->> Controller: 404 NotFound (USER_NOT_FOUND)
+                    Controller -->> Client: 404 NotFound
+                else Usuário Encontrado
+                    Service ->>+ UserCardModel: GetUserBankCardByCardIdAndUserId(cardId, userId)
+                    UserCardModel ->>+ DB: SELECT FROM accounts.user_bank_card WHERE card_id = @cardId AND user_id = @userId AND active = true
+                    DB -->>- UserCardModel: UserBankCardEntity / null
+                    UserCardModel -->>- Service: UserBankCardEntity / null
+
+                    alt Cartão Já Vinculado ao Usuário (idx_unic_user_bank_card)
+                        Service -->> Controller: 400 BadRequest (USER_CARD_ALREADY_EXISTS)
+                        Controller -->> Client: 400 BadRequest
+                    else Cartão Disponível para Vínculo
+                        Service ->>+ UserCardModel: CreateUserBankCard(bankId, cardId, userId, cardUserName, expireAt)
+                        UserCardModel ->>+ DB: INSERT INTO accounts.user_bank_card
+                        DB -->>- UserCardModel: UserBankCardEntity
+                        UserCardModel -->>- Service: UserBankCardEntity
+                        Service -->>- Controller: 200 OK (CARD_CREATED)
+                        Controller -->>- Client: 200 OK (ResponseApiSucess)
+                    end
+                end
+            end
+        end
+    end
+```
 
 ---
 

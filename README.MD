@@ -93,7 +93,7 @@ Desenvolvido em **React com Vite**, utilizando **MUI (Material UI)** como biblio
 
 Estrutura composta por
 
-* Monólito em C# (core)
+* Monólito em C# (core): gerencia contas bancárias, cartões de usuário (com validação de unicidade `card_id + user_id`), metas financeiras, categorias e transações de pagamento.
 * Dois microserviços
     Python, como serviço de dados
     C#, como serviço de login
@@ -239,7 +239,7 @@ Developed in **React with Vite**, using **MUI (Material UI)** as the component a
 
 Structure composed of:
 
-* C# Monolith (core)
+* C# Monolith (core): manages bank accounts, user bank cards (with `card_id + user_id` uniqueness validation), financial goals, categories, and payment transactions.
 * Two microservices:
     Python, as a data service
     C#, as a login service
