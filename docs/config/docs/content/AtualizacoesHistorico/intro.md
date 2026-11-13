@@ -29,7 +29,12 @@ timeline
 
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
 
-### 📅 Novembro / 2026 — Situação de Transações (#65), Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+### 📅 Novembro / 2026 — Valores Decimais em Transações (#66), Situação de Transações (#65), Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+* **Issue #66 — Branch `feature/card-66-transaction-decimal`:**
+  - **Suporte a Valores Monetários Decimais (`Decimal` / `DECIMAL`) em Transações (`payment.transaction`):**
+    - Alteração do tipo da propriedade `Amount` de `long`/`BIGINT` para `Decimal`/`DECIMAL` em `TransactionEntity`, `TransactionView`, `PostPaymentTransactionRequest`, `GetPaymentTransactionAsyncResponse`, `TransactionModel`, `PostPaymentTransactionValidatorAsync` (`GreaterThan(0.00m)`) e migração Alembic `05dfe2dffece_create_payment_tables.py`.
+    - Adaptação da página `Transactions` no Frontend (`frontend/web/src/pages/Transactions/`) e `mockData.js` para validar no máximo 2 casas decimais na criação (`step="0.01"`, `min="0.01"`) preservando múltiplas casas decimais na exibição, com cobertura de testes unitários e de integração.
+
 * **Issue #65 — Branch `feature/card-65-transaction-situation`:**
   - **Domínio de Situação de Transação (`payment.transaction_situation` — `Entrada` / `Saida`):**
     - Criação das migrações Alembic `a3b8cb1f9b53_create_situation_table_for_transaction.py`, `ee02405d95e2_insert_situation_values.py` e `e30ce4be995a_create_situation_constrain.py` adicionando a tabela `payment.transaction_situation`, seed inicial (`Entrada`, `Saida`), coluna `transaction_situation_id` em `payment.transaction` e constraint `fk_payment_transaction_situation`.

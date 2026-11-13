@@ -64,8 +64,8 @@ public class TransactionEntity
     /// Amount
     /// </summary>
     [JsonPropertyName("amount")]
-    [Column("amount", TypeName = "BIGINT")]
-    public long Amount { get; set; }
+    [Column("amount", TypeName = "DECIMAL")]
+    public Decimal Amount { get; set; }
 
     /// <summary>
     /// Card id

@@ -46,7 +46,7 @@ namespace NievoEasyFin.Application.Interfaces.Response
         /// Amount
         /// </summary>
         [JsonPropertyName("amount")]
-        public long Amount { get; set; }
+        public Decimal Amount { get; set; }
 
         /// <summary>
         /// Cron Tab

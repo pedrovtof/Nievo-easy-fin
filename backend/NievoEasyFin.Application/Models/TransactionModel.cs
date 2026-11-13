@@ -202,7 +202,7 @@ namespace NievoEasyFin.Application.Models
             int transaction_type,
             int category,
             DateTime pay_date,
-            long amount,
+            Decimal amount,
             int? card,
             int bank,
             int? scheduler,

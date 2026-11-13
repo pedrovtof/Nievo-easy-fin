@@ -15,7 +15,7 @@ public static class TransactionEntityFaker
             .RuleFor(t => t.TransactionStatusId, f => f.Random.Int(1, 10))
             .RuleFor(t => t.CategorieId, f => f.Random.Int(1, 10))
             .RuleFor(t => t.PayDate, f => f.Date.Recent())
-            .RuleFor(t => t.Amount, f => f.Random.Long(100, 100000))
+            .RuleFor(t => t.Amount, f => Math.Round(f.Random.Decimal(10m, 100000m), 2))
             .RuleFor(t => t.CardId, f => f.Random.Int(1, 10))
             .RuleFor(t => t.BankId, f => f.Random.Int(1, 10))
             .RuleFor(t => t.TransactionTypeId, f => f.Random.Int(1, 10))

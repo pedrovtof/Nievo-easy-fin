@@ -103,7 +103,7 @@ Table payment.transaction {
   transaction_situation_id integer [not null, note: 'FK fk_payment_transaction_situation']
   categorie_id integer
   pay_date timestamp [not null]
-  amount bigint [not null]
+  amount decimal [not null]
   card_id integer
   bank_id integer
   scheduler_id integer

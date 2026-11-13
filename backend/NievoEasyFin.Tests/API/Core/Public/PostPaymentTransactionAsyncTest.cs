@@ -121,7 +121,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     public async Task PostPaymentTransaction_WhenAmountIsInvalid_ReturnsBadRequest()
     {
         // Arrange
-        var request = new PostPaymentTransactionRequestBuilder().WithAmount(0);
+        var request = new PostPaymentTransactionRequestBuilder().WithAmount(0m);
         var (origin, replica) = CreateSharedCoreContexts();
         var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
         var service = CreatePaymentService(origin, replica, authOrigin, authReplica);
@@ -133,7 +133,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequest = (BadRequestObjectResult)result;
         var response = (ResponseApiError)badRequest.Value!;
-        response.Messages.Should().Contain(e => e.Contains("'Amount' must be greater than '0'."));
+        response.Messages.Should().Contain(e => e.Contains("'Amount' must be greater than '0.00'."));
         Output.WriteLine("Validation executed successfully.");
     }
 
@@ -736,7 +736,7 @@ public class PostPaymentTransactionAsyncTest : AccountsServiceTestBase
     public async Task PostPaymentTransaction_WhenSituationIsSaida_NegatesAmountAndReturnsCreated()
     {
         // Arrange
-        var initialAmount = 25000L;
+        var initialAmount = 250.75m;
         var request = new PostPaymentTransactionRequestBuilder()
             .WithAmount(initialAmount);
         var (origin, replica) = CreateSharedCoreContexts();

@@ -27,6 +27,20 @@ import {
 } from './styles';
 
 /**
+ * Formats a financial transaction amount safely, displaying at least 2 decimal places
+ * while preserving additional decimal precision when returned by the backend.
+ *
+ * @param {number|string} amount - Raw transaction amount from the API.
+ * @returns {string} Formatted unsigned currency string.
+ */
+export const formatTransactionAmount = (amount) => {
+  const numeric = Math.abs(Number(amount) || 0);
+  const parts = String(amount ?? '').replace('-', '').split('.');
+  const decimalPlaces = parts[1] ? Math.min(Math.max(parts[1].length, 2), 6) : 2;
+  return numeric.toFixed(decimalPlaces);
+};
+
+/**
  * Transactions View Template
  * Pure presentation component to display a filterable list of transactions and the creation dialog.
  *
@@ -273,7 +287,7 @@ const TransactionsView = ({
                     sx={{ fontSize: '1.25rem' }}
                     color={isIncome ? 'success.main' : 'primary.main'}
                   >
-                    {isIncome ? '+' : '-'}${Math.abs(Number(tx.amount)).toFixed(2)}
+                    {isIncome ? '+' : '-'}${formatTransactionAmount(tx.amount)}
                   </Typography>
                   <Typography variant="caption" color="secondary" display="block">
                     {tx.user_bank_nickname || tx.bank_name}
@@ -317,7 +331,8 @@ const TransactionsView = ({
                 <TextField
                   label="Amount ($)"
                   type="number"
-                  inputProps={{ min: 1 }}
+                  placeholder="0.00"
+                  inputProps={{ min: 0.01, step: '0.01' }}
                   value={formData.amount}
                   onChange={(e) => onFormChange('amount', e.target.value)}
                   fullWidth
