@@ -41,3 +41,30 @@ test('Mock interceptor (mockData.js) supports /Payment/situation and filters/cre
   assert.match(mockSource, /params\.transaction_situation_id/);
   assert.match(mockSource, /body\.transaction_situation/);
 });
+
+test('Transactions Controller (index.jsx) validates max 2 decimal places on creation and preserves financial decimal amount without integer rounding', () => {
+  const controllerSource = fs.readFileSync(path.join(__dirname, 'index.jsx'), 'utf-8');
+  assert.doesNotMatch(controllerSource, /Math\.round\(Number\(formData\.amount\)\)/);
+  assert.match(controllerSource, /export const isValidTransactionAmountInput\s*=/);
+  assert.match(controllerSource, /export const parseTransactionAmount\s*=/);
+  assert.match(controllerSource, /amount:\s*parseTransactionAmount\(formData\.amount\)/);
+  assert.match(controllerSource, /toFixed\(2\)/);
+});
+
+test('Transactions View (View.jsx) configures Amount input with step 0.01 and min 0.01 and formats multi-precision amounts safely', () => {
+  const viewSource = fs.readFileSync(path.join(__dirname, 'View.jsx'), 'utf-8');
+  assert.match(viewSource, /export const formatTransactionAmount\s*=/);
+  assert.match(viewSource, /min:\s*0\.01,\s*step:\s*'0\.01'/);
+  assert.match(viewSource, /formatTransactionAmount\(tx\.amount\)/);
+});
+
+test('Mock interceptor (mockData.js) stores float transaction amounts and enforces 2-decimal validation on POST /Payment', () => {
+  const mockSource = fs.readFileSync(
+    path.join(__dirname, '../../services/mockData.js'),
+    'utf-8'
+  );
+  assert.match(mockSource, /-285\.50/);
+  assert.match(mockSource, /-195\.75/);
+  assert.match(mockSource, /parsedAmount\.toFixed\(2\)/);
+});
+

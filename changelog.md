@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changelog
 
+2026-11-13 - [NEW] - Support decimal transaction amounts across Payment backend, database, and frontend Transactions page (#66)
+
+Detalhes:
+
+- Update transaction amount type from long/BIGINT to Decimal/DECIMAL in backend entities, views, models, DTOs, validator, and Alembic migration, adapt frontend Transactions page and mockData to enforce 2 decimal places on creation while preserving multi-decimal precision on display, update unit/integration tests, and update MkDocs documentation and diagrams - pedrovotf - 2026-11-13 - #66 - PENDING
+
 2026-11-12 - [REFACTOR] - Remove obsolete TransactionIngress property from PostPaymentTransactionRequest (#65)
 
 Detalhes:

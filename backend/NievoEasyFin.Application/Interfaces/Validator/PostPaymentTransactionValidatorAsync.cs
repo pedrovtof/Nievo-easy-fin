@@ -33,7 +33,7 @@ namespace NievoEasyFin.Application.Interfaces.Validator
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_TRANSACTION_STATUS.ToString());
 
             RuleFor(x => x.Amount)
-                .GreaterThan(0)
+                .GreaterThan(0.00m)
                     .WithErrorCode(EnumErrosApi.POSTPAYMENTTRANSACTIONASYNC_CORESERVICE_400_INVALID_AMOUNT.ToString());
 
             RuleFor(x => x.TransactionType)

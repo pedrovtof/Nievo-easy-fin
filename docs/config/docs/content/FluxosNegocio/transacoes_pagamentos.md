@@ -33,7 +33,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     start_tx(["([Início: Usuário registra nova transação])"]) --> input_tx[/Recebe POST /api/public/v1/Payment com Token JWT + PostPaymentTransactionRequest/]
-    input_tx --> val_dto{"Payload válido no PostPaymentTransactionValidatorAsync?<br/>Name/Desc/Category não vazios, Amount > 0,<br/>Status > 0, Type > 0, Situation >= 1, Bank >= 0, Card >= 0, Scheduler >= 0"}
+    input_tx --> val_dto{"Payload válido no PostPaymentTransactionValidatorAsync?<br/>Name/Desc/Category não vazios, Amount > 0.00m (Decimal),<br/>Status > 0, Type > 0, Situation >= 1, Bank >= 0, Card >= 0, Scheduler >= 0"}
     val_dto -->|Não| err_400_tx(["([Fim: HTTP 400 Bad Request - Erro de Validação])"])
     val_dto -->|Sim| check_user{Usuário existe em user_details.user?}
 
@@ -142,7 +142,7 @@ classDiagram
         <<repository>>
         -CoreOrigin _coreOrigin
         -CoreReplica _coreReplica
-        +CreatePaymentTransaction(name: string, description: string, userId: int, transactionStatusId: int, transactionTypeId: int, transactionSituationId: int, categorieId: int, payDate: DateTime, amount: long, cardId: int?, bankId: int?, schedulerId: int?) Task~TransactionEntity?~
+        +CreatePaymentTransaction(name: string, description: string, userId: int, transactionStatusId: int, transactionTypeId: int, transactionSituationId: int, categorieId: int, payDate: DateTime, amount: decimal, cardId: int?, bankId: int?, schedulerId: int?) Task~TransactionEntity?~
         +GetPaymentTransactionAsync(userId: int, page: int, pageSize: int, transactionStatusId: int?, transactionTypeId: int?, transactionSituationId: int?, categorieId: int?, payDate: DateTime?, cardId: int?, bankId: int?, schedulerId: int?, createdAt: DateTime?) Task~Tuple~
     }
 
@@ -157,7 +157,7 @@ classDiagram
         +int TransactionSituationId
         +int? CategorieId
         +DateTime PayDate
-        +long Amount
+        +decimal Amount
         +int? CardId
         +int? BankId
         +int? SchedulerId
@@ -175,7 +175,7 @@ classDiagram
         +string Situation
         +string? Categorie
         +DateTime PayDate
-        +long Amount
+        +decimal Amount
         +string? Card
         +string? Bank
         +string? Scheduler
@@ -217,7 +217,7 @@ classDiagram
         +int TransactionSituation
         +int Categorie
         +DateTime PayDate
-        +long Amount
+        +decimal Amount
         +int? Card
         +int? Bank
         +int? Scheduler

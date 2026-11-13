@@ -320,7 +320,7 @@ erDiagram
         int transaction_situation_id FK "INT (fk_payment_transaction_situation)"
         int categorie_id FK "INT"
         datetime pay_date "TIMESTAMP"
-        bigint amount "BIGINT"
+        decimal amount "DECIMAL"
         int card_id FK "INT"
         int bank_id FK "INT"
         int scheduler_id FK "INT"
@@ -351,7 +351,7 @@ Table payment.transaction {
   transaction_situation_id integer [not null]
   categorie_id integer
   pay_date timestamp [not null]
-  amount bigint [not null]
+  amount decimal [not null]
   card_id integer
   bank_id integer
   scheduler_id integer

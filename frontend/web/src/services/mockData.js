@@ -172,7 +172,7 @@ let mockPaymentTransactions = [
     id: 'a1b2c3d4-0001-4000-8000-000000000001',
     name: 'Whole Foods Market',
     description: 'Weekly family grocery shopping',
-    amount: 285,
+    amount: -285.50,
     cron_tab: '',
     status: 'Completed',
     situation: 'Saida',
@@ -188,7 +188,7 @@ let mockPaymentTransactions = [
     id: 'a1b2c3d4-0002-4000-8000-000000000002',
     name: 'Monthly Salary Deposit',
     description: 'Primary software engineering compensation',
-    amount: 5400,
+    amount: 5400.00,
     cron_tab: '0 0 1 * *',
     status: 'Completed',
     situation: 'Entrada',
@@ -204,7 +204,7 @@ let mockPaymentTransactions = [
     id: 'a1b2c3d4-0003-4000-8000-000000000003',
     name: 'City Power & Fiber Internet',
     description: 'Monthly electricity and gigabit internet bill',
-    amount: 195,
+    amount: -195.75,
     cron_tab: '0 0 1 * *',
     status: 'Pending',
     situation: 'Saida',
@@ -557,33 +557,53 @@ export const setupMockAdapter = (apiClient) => {
         error.mockData = { status: 200, data: wrapPaginated(filtered, params.page, params.page_size) };
       } else if (method === 'post') {
         const body = parseBody(config.data);
-        const st = mockTransactionStatuses.find(s => Number(s.id) === Number(body.transaction_status)) || mockTransactionStatuses[0];
-        const sit = mockTransactionSituations.find(s => Number(s.id) === Number(body.transaction_situation)) || mockTransactionSituations[0];
-        const tp = mockTransactionTypes.find(t => Number(t.id) === Number(body.transaction_type)) || mockTransactionTypes[0];
-        const sched = Number(body.scheduler) > 0 ? mockSchedulers.find(s => Number(s.id) === Number(body.scheduler)) : null;
-        const userBank = mockUserBanks.find(b => Number(b.bank_id) === Number(body.bank) || Number(b.id) === Number(body.bank)) || mockUserBanks[0];
-        const userCard = Number(body.card) > 0
-          ? mockUserBankCards.find(c => Number(c.user_bank_card_id) === Number(body.card))
-          : null;
+        const normalizedAmountStr = String(body.amount ?? '').trim().replace(',', '.');
+        const parsedAmount = Number.parseFloat(normalizedAmountStr);
 
-        const newTx = {
-          id: `mock-tx-${Date.now()}`,
-          name: body.name,
-          description: body.description,
-          amount: Number(body.amount),
-          cron_tab: sched?.cron_tab || '',
-          status: st.name,
-          situation: sit.name,
-          type: tp.name,
-          category: body.category_name,
-          pay_date: body.pay_date || new Date().toISOString(),
-          user_card_name: userCard ? userCard.user_bank_card_nickname : '',
-          user_bank_nickname: userBank ? userBank.nick_name : 'Main Account',
-          bank_name: userBank ? userBank.name : 'Itaú Unibanco',
-          created_at: new Date().toISOString(),
-        };
-        mockPaymentTransactions = [newTx, ...mockPaymentTransactions];
-        error.mockData = { status: 201, data: { success: true, data: 'Payment transaction created successfully.' } };
+        if (
+          Number.isNaN(parsedAmount) ||
+          parsedAmount <= 0 ||
+          !/^\d+(\.\d{1,2})?$/.test(normalizedAmountStr)
+        ) {
+          error.mockData = {
+            status: 400,
+            data: {
+              success: false,
+              messages: ["'Amount' must be greater than '0.00' and contain at most 2 decimal places."],
+            },
+          };
+        } else {
+          const st = mockTransactionStatuses.find(s => Number(s.id) === Number(body.transaction_status)) || mockTransactionStatuses[0];
+          const sit = mockTransactionSituations.find(s => Number(s.id) === Number(body.transaction_situation)) || mockTransactionSituations[0];
+          const tp = mockTransactionTypes.find(t => Number(t.id) === Number(body.transaction_type)) || mockTransactionTypes[0];
+          const sched = Number(body.scheduler) > 0 ? mockSchedulers.find(s => Number(s.id) === Number(body.scheduler)) : null;
+          const userBank = mockUserBanks.find(b => Number(b.bank_id) === Number(body.bank) || Number(b.id) === Number(body.bank)) || mockUserBanks[0];
+          const userCard = Number(body.card) > 0
+            ? mockUserBankCards.find(c => Number(c.user_bank_card_id) === Number(body.card))
+            : null;
+
+          const financialAmount = Number(parsedAmount.toFixed(2));
+          const signedAmount = sit.name === 'Saida' ? -Math.abs(financialAmount) : Math.abs(financialAmount);
+
+          const newTx = {
+            id: `mock-tx-${Date.now()}`,
+            name: body.name,
+            description: body.description,
+            amount: signedAmount,
+            cron_tab: sched?.cron_tab || '',
+            status: st.name,
+            situation: sit.name,
+            type: tp.name,
+            category: body.category_name,
+            pay_date: body.pay_date || new Date().toISOString(),
+            user_card_name: userCard ? userCard.user_bank_card_nickname : '',
+            user_bank_nickname: userBank ? userBank.nick_name : 'Main Account',
+            bank_name: userBank ? userBank.name : 'Itaú Unibanco',
+            created_at: new Date().toISOString(),
+          };
+          mockPaymentTransactions = [newTx, ...mockPaymentTransactions];
+          error.mockData = { status: 201, data: { success: true, data: 'Payment transaction created successfully.' } };
+        }
       }
     } else {
       error.mockData = { status: 200, data: { success: true } };

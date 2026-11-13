@@ -35,7 +35,7 @@ namespace NievoEasyFin.Application.Interfaces.Request
         /// Amount
         /// </summary>
         [JsonPropertyName("amount")]
-        public long Amount { get; set; }
+        public Decimal Amount { get; set; }
 
         /// <summary>
         /// Bank

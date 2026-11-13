@@ -27,6 +27,31 @@ const extractList = (response) => {
 };
 
 /**
+ * Validates whether a raw financial amount input is positive and has at most 2 decimal places.
+ *
+ * @param {string|number} rawValue - Raw user input value for transaction amount.
+ * @returns {boolean} True when the value is a positive number with up to 2 decimal places.
+ */
+export const isValidTransactionAmountInput = (rawValue) => {
+  const normalized = String(rawValue ?? '').trim().replace(',', '.');
+  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) return false;
+  return Number(normalized) >= 0.01;
+};
+
+/**
+ * Parses a raw financial input into a 2-decimal number while avoiding IEEE-754 floating-point drift.
+ *
+ * @param {string|number} rawValue - Raw amount value from form state.
+ * @returns {number} Normalized financial amount with up to 2 decimal places.
+ */
+export const parseTransactionAmount = (rawValue) => {
+  const normalized = String(rawValue ?? '').trim().replace(',', '.');
+  const parsed = Number.parseFloat(normalized);
+  if (Number.isNaN(parsed)) return 0;
+  return Number(parsed.toFixed(2));
+};
+
+/**
  * Transactions Page Controller
  * Fetches and manages the state for the user's payment transaction history and creation modal.
  *
@@ -203,6 +228,14 @@ const Transactions = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isValidTransactionAmountInput(formData.amount)) {
+      setFeedback({
+        type: 'error',
+        message: 'Please enter a valid positive amount with up to 2 decimal places.',
+      });
+      return;
+    }
+
     try {
       setSubmitting(true);
       setFeedback(null);
@@ -210,7 +243,7 @@ const Transactions = () => {
       await createPaymentTransaction({
         name: formData.name.trim(),
         description: formData.description.trim(),
-        amount: Math.round(Number(formData.amount)),
+        amount: parseTransactionAmount(formData.amount),
         pay_date: isoDate,
         category_name: formData.category_name,
         transaction_status: Number(formData.transaction_status),

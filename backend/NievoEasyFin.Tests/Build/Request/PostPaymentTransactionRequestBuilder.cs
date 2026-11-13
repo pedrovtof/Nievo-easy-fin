@@ -17,7 +17,7 @@ public class PostPaymentTransactionRequestBuilder : PostPaymentTransactionReques
         TransactionSituation = _faker.Random.Int(1, 10);
         CategoryName = _faker.Commerce.Categories(1)[0];
         PayDate = _faker.Date.Recent();
-        Amount = _faker.Random.Long(100, 100000);
+        Amount = Math.Round(_faker.Random.Decimal(10m, 100000m), 2);
         Card = _faker.Random.Int(1, 10);
         Bank = _faker.Random.Int(1, 10);
         TransactionType = _faker.Random.Int(2, 10);
@@ -50,7 +50,7 @@ public class PostPaymentTransactionRequestBuilder : PostPaymentTransactionReques
         return this;
     }
 
-    public PostPaymentTransactionRequestBuilder WithAmount(long amount)
+    public PostPaymentTransactionRequestBuilder WithAmount(decimal amount)
     {
         Amount = amount;
         return this;
