@@ -1151,7 +1151,7 @@ public enum EnumErrosApi
 
     #endregion
 
-    #region GetPaymenTransaction
+    #region GetPaymentTransactionSituation
 
     /// <summary>
     /// Page invalid
@@ -1165,4 +1165,23 @@ public enum EnumErrosApi
 
     #endregion
 
+    #region GetUserDetails
+
+    /// <summary>
+    /// Empty email
+    /// </summary>
+    GETUSERDETAILSYASYNC_CORESERVICE_400_EMPTY_EMAIL,
+
+    /// <summary>
+    /// Invalid email
+    /// </summary>
+    GETUSERDETAILSYASYNC_CORESERVICE_400_INVALID_EMAIL,
+
+    /// <summary>
+    /// Please validate the user.
+    /// </summary>
+    [Description("Please validate the user.")]
+    GETUSERDETAILSYASYNC_CORESERVICE_404_USER_NOT_FOUND,
+
+    #endregion
 }

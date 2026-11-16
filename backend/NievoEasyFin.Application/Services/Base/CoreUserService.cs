@@ -400,4 +400,28 @@ public class CoreUserService : Controller, ICoreUserService
 
         return Ok(new ResponseApiSucess(response));
     }
+
+    /// <summary>
+    /// Retrieves profile details for the authenticated user by email.
+    /// </summary>
+    /// <param name="request">GetUserDetailsRequest</param>
+    /// <returns>IActionResult</returns>
+    public async Task<IActionResult> GetUserDetails(GetUserDetailsRequest request)
+    {
+        var validatorResult = await new GetUserDetailsValidatorAsync().ValidateAsync(request);
+        if (!validatorResult.IsValid)
+            return BadRequest(
+                new ResponseApiError(validatorResult.Errors.Select(x => x.ErrorMessage).ToList())
+            );
+
+        var user = await _userModel.GetUserDetailsByEmail(request.GetEmail());
+        if (user == null)
+            return NotFound(new ResponseApiError(
+                new List<string>() { EnumErrosApi.GETUSERDETAILSYASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription() }
+            ));
+
+        GetUserDetailsResponse response = new(user);
+
+        return Ok(new ResponseApiSucess(response));
+    }
 }

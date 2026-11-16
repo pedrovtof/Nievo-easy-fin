@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changelog
 
+2026-11-16 - [NEW] - Add GET /api/public/v1/User/details endpoint and integrate user details in frontend Header and Settings (#69)
+
+Detalhes:
+
+- Implement GET /api/public/v1/User/details in UserController, CoreUserService, and UserModel with GetUserDetailsRequest, GetUserDetailsResponse, GetUserDetailsValidatorAsync, and UserDetailsViews, integrate user profile details (name, email, phone, status) into frontend Header, Settings page, and mockData under The Silent Navigator design system, add backend and frontend unit/integration tests, and update MkDocs documentation and Mermaid diagrams - pedrovotf - 2026-11-16 - #69 - PENDING
+
 2026-11-13 - [NEW] - Support decimal transaction amounts across Payment backend, database, and frontend Transactions page (#66)
 
 Detalhes:

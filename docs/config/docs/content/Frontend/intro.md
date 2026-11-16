@@ -58,15 +58,15 @@ flowchart TD
 | `/cards` | `Cards` | Protegida| `ProtectedRoute` | `GET / POST /api/public/v1/User/bank-card`<br>`GET /api/public/v1/Bank/card`<br>`GET /api/public/v1/Card/type`<br>`GET /api/public/v1/Card/flag` | Carteira de cartões do usuário, filtros por bandeira/banco e catálogo de cartões. |
 | `/budget` | `Budget` | Protegida| `ProtectedRoute` | `GET / POST /api/public/v1/User/goal` | Planejamento e criação de metas financeiras (valor fixo ou percentual). |
 | `/categories` | `Categories` | Protegida| `ProtectedRoute` | `GET / POST /api/public/v1/User/category`<br>`GET /api/public/v1/User/goal` | Hierarquia de categorias com vínculo exclusivo a Metas ou Categoria Pai. |
-| `/settings` | `Settings` | Protegida| `ProtectedRoute` | Preferências locais & segurança | Configurações da conta do usuário, tema visual e preferências. |
+| `/settings` | `Settings` | Protegida| `ProtectedRoute` | `GET /api/public/v1/User/details`<br>`POST /auth/change-password` | Exibição dos detalhes do usuário autenticado (`name`, `email`, `phone`, `status`), preferências locais, tema visual e segurança. |
 
 ---
 
 ## 🔄 4. Fluxo de Integração Frontend ↔ Auth API (`5090`) & Core API (`5203`)
 
 O módulo [`src/services/api.js`](../../../../../frontend/web/src/services/api.js) expõe duas instâncias Axios pré-configuradas com interceptors de JWT e suporte a Mock:
-- **`authApi` (`VITE_BASE_AUTH_URL`, padrão `http://localhost:5090`):** Utilizada pelas páginas `Login`, `Register`, `ForgotPassword`, `ConfirmEmail`, `Terms` e `Settings` para comunicação com o serviço `NievoEasyFin.Auth`.
-- **`coreApi` (`VITE_BASE_CORE_URL`, padrão `http://localhost:5203`):** Utilizada pelas páginas `Transactions`, `Banks`, `Cards`, `Budget`, `Categories` e `Dashboard` para comunicação com o serviço `NievoEasyFin.Core`.
+- **`authApi` (`VITE_BASE_AUTH_URL`, padrão `http://localhost:5090`):** Utilizada pelas páginas `Login`, `Register`, `ForgotPassword`, `ConfirmEmail`, `Terms` e `Settings` (troca de senha) para comunicação com o serviço `NievoEasyFin.Auth`.
+- **`coreApi` (`VITE_BASE_CORE_URL`, padrão `http://localhost:5203`):** Utilizada pelo `Header` e pelas páginas `Settings` (`GET /api/public/v1/User/details`), `Transactions`, `Banks`, `Cards`, `Budget`, `Categories` e `Dashboard` para comunicação com o serviço `NievoEasyFin.Core`.
 
 ```mermaid
 sequenceDiagram

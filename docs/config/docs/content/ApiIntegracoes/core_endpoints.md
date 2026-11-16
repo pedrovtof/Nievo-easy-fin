@@ -243,6 +243,75 @@ Retorna a lista paginada de categorias do usuário logado, incluindo o nome e de
 
 ---
 
+### 8.1. `GET /api/public/v1/User/details`
+Retorna os dados cadastrais e o status atual do usuário autenticado (`user_details.user` com `INNER JOIN` em `user_details.user_status`) para exibição no cabeçalho (`Header`) e na página de configurações/perfil (`Settings`).
+
+- **Headers:** `Authorization: Bearer <token_jwt>` (o `UserController` extrai a claim `email` do token via `JsonWebTokenService`).
+- **Regras de Validação (`GetUserDetailsValidatorAsync`):**
+  - `email` (da claim JWT): Obrigatório (`GETUSERDETAILSYASYNC_CORESERVICE_400_EMPTY_EMAIL`) e com formato válido de e-mail (`GETUSERDETAILSYASYNC_CORESERVICE_400_INVALID_EMAIL`).
+  - O usuário deve existir com `status_id = ACTIVE` (`EnumUserStatus.ACTIVE`).
+- **Exemplo de Resposta (`200 OK` - `GetUserDetailsResponse`):**
+  ```json
+  {
+    "sucess": true,
+    "data": {
+      "email": "demo@nievo.com",
+      "name": "Mock User",
+      "phone": 119876543,
+      "status": "ACTIVE"
+    }
+  }
+  ```
+- **Respostas:**
+  - `200 OK`: Retorna `ResponseApiSucess` contendo `GetUserDetailsResponse` (`email`, `name`, `phone`, `status`).
+  - `400 Bad Request`: E-mail ausente ou inválido na claim (`GETUSERDETAILSYASYNC_CORESERVICE_400_EMPTY_EMAIL`, `GETUSERDETAILSYASYNC_CORESERVICE_400_INVALID_EMAIL`).
+  - `404 Not Found`: Usuário não encontrado ou inativo (`GETUSERDETAILSYASYNC_CORESERVICE_404_USER_NOT_FOUND` — `"Please validate the user."`).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Cliente (Frontend)
+    box Application Layer (Core)
+        participant Controller as UserController
+        participant JwtService as JsonWebTokenService
+        participant Service as CoreUserService
+        participant Validator as GetUserDetailsValidatorAsync
+    end
+    box Data Access Layer
+        participant UserModel as UserModel
+        participant DB as PostgreSQL (AuthReplica - user_details)
+    end
+
+    Client ->>+ Controller: GET /api/public/v1/User/details (Authorization: Bearer <JWT>)
+    Controller ->>+ JwtService: GetClaimValue(authorization, "email")
+    JwtService -->>- Controller: email
+    Controller ->> Controller: request.SetEmail(email)
+    Controller ->>+ Service: GetUserDetails(request)
+    Service ->>+ Validator: ValidateAsync(request)
+    Validator -->>- Service: ValidationResult
+
+    alt Claim de E-mail Vazia ou Inválida
+        Service -->> Controller: 400 BadRequest (EMPTY_EMAIL / INVALID_EMAIL)
+        Controller -->> Client: 400 BadRequest (ResponseApiError)
+    else Claim de E-mail Válida
+        Service ->>+ UserModel: GetUserDetailsByEmail(email, EnumUserStatus.ACTIVE)
+        UserModel ->>+ DB: SELECT u.name, u.email, u.phone, us.name FROM user_details."user" u INNER JOIN user_details.user_status us
+        DB -->>- UserModel: UserDetailsViews / null
+        UserModel -->>- Service: UserDetailsViews / null
+
+        alt Usuário Não Encontrado ou Inativo
+            Service -->> Controller: 404 NotFound (GETUSERDETAILSYASYNC_CORESERVICE_404_USER_NOT_FOUND)
+            Controller -->> Client: 404 NotFound (ResponseApiError)
+        else Usuário Ativo Encontrado
+            Service ->> Service: new GetUserDetailsResponse(user)
+            Service -->>- Controller: 200 OK (GetUserDetailsResponse)
+            Controller -->>- Client: 200 OK (ResponseApiSucess)
+        end
+    end
+```
+
+---
+
 ## 🏦 2. Endpoints Públicos de Bancos (`/api/public/v1/Bank`)
 
 Controlador dedicado a consultas do catálogo público de instituições financeiras e seus cartões disponíveis.
