@@ -1,11 +1,26 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import SettingsView from './View';
-import { getSettingsData, updateSettings } from './api';
+import { getUserDetails, getSettingsData, updateSettings, changePassword } from './api';
 import { ThemeContext } from '../../context/ThemeContext';
 
 /**
+ * Normalizes raw user details returned by GET /api/public/v1/User/details into the Settings profile shape.
+ *
+ * @param {Object} raw - Raw user details object ({ email, name, phone, status }).
+ * @returns {Object} Normalized profile object for Settings state.
+ */
+export const normalizeUserDetailsProfile = (raw = {}) => ({
+  fullName: raw.name || raw.fullName || '',
+  email: raw.email || '',
+  phone: raw.phone !== null && raw.phone !== undefined ? String(raw.phone) : '',
+  status: raw.status || 'ACTIVE',
+  currency: raw.currency || 'USD',
+});
+
+/**
  * Settings Page Controller
- * Manages state and logic for user profile updates.
+ * Manages state and logic for displaying authenticated user details (GET /api/public/v1/User/details)
+ * and updating user preferences.
  *
  * @returns {JSX.Element} The rendered Settings page controller.
  */
@@ -16,35 +31,50 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await getSettingsData();
-        const responseData = response.data || response;
-        if (responseData.profile && responseData.toggles) {
-          setProfile(responseData.profile);
-          setToggles(responseData.toggles);
-        } else if (responseData.data) {
-          setProfile(responseData.data.profile);
-          setToggles(responseData.data.toggles);
-        }
-      } catch {
-        setError('Failed to load settings data');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [detailsResponse, settingsResponse] = await Promise.all([
+        getUserDetails(),
+        getSettingsData(),
+      ]);
 
-    fetchData();
+      const detailsPayload = detailsResponse?.data?.data ?? detailsResponse?.data ?? {};
+      const settingsPayload = settingsResponse?.data ?? settingsResponse ?? {};
+
+      setProfile(
+        normalizeUserDetailsProfile({
+          ...settingsPayload.profile,
+          ...detailsPayload,
+        })
+      );
+      setToggles(
+        settingsPayload.toggles || {
+          twoFactor: false,
+          darkMode: false,
+          weeklyDigest: true,
+          unusualActivity: true,
+          budgetWarnings: false,
+        }
+      );
+    } catch {
+      setError('Failed to load user details and settings data');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleProfileChange = (key, value) => {
-    setProfile(prev => ({ ...prev, [key]: value }));
+    setProfile((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleToggleChange = (key) => {
-    setToggles(prev => ({ ...prev, [key]: !prev[key] }));
+    setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSave = async () => {
@@ -62,7 +92,7 @@ const Settings = () => {
     const newPassword = prompt('Enter your new password:');
     if (!newPassword) return;
     try {
-      await import('./api').then(m => m.changePassword(profile.email, oldPassword, newPassword));
+      await changePassword(profile.email, oldPassword, newPassword);
       alert('Password updated successfully!');
     } catch (err) {
       alert(err.response?.data?.messages?.[0] || 'Failed to update password. Check your current password.');

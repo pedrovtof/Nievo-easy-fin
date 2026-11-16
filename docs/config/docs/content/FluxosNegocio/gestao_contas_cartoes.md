@@ -56,14 +56,15 @@ flowchart TD
     check_created -->|Sim| end_ok(["([Fim: HTTP 200 OK - CARD_CREATED])"])
 ```
 
-### 2.2 Casos de Uso (Use Case Diagram - Gestão de Contas e Cartões)
+### 2.2 Casos de Uso (Use Case Diagram - Gestão de Contas, Cartões e Perfil do Usuário)
 
 ```mermaid
 flowchart LR
     actor_user["👤 Usuário Autenticado"]
     actor_admin["👤 Administrador"]
 
-    subgraph CoreAccountsSystem ["Sistema: Nievo EasyFin Core (Módulo Accounts)"]
+    subgraph CoreAccountsSystem ["Sistema: Nievo EasyFin Core (Módulos User & Accounts)"]
+        uc_get_user_details(["Consultar Detalhes do Perfil do Usuário"])
         uc_list_banks(["Consultar Catálogo de Bancos"])
         uc_link_bank(["Vincular Conta Bancária"])
         uc_list_user_banks(["Listar Contas do Usuário"])
@@ -77,6 +78,7 @@ flowchart LR
         uc_link_user_card -.->|"<<include>>"| uc_list_bank_cards
     end
 
+    actor_user --- uc_get_user_details
     actor_user --- uc_list_banks
     actor_user --- uc_link_bank
     actor_user --- uc_list_user_banks
@@ -86,7 +88,24 @@ flowchart LR
     actor_admin --- uc_create_catalog_card
 ```
 
-### 2.3 Diagrama de Classes (`CoreUserService` e `UserBankCardModel`)
+### 2.3 Fluxo de Decisão (Decision Flow - `GET /api/public/v1/User/details`)
+
+```mermaid
+flowchart TD
+    start_node(["([Início: Frontend solicita detalhes do usuário])"]) --> input_req[/Recebe GET /api/public/v1/User/details com Header Authorization JWT/]
+    input_req --> extract_claim[Extrai claim 'email' via JsonWebTokenService]
+    extract_claim --> validate_dto{Claim 'email' preenchida e com formato válido no GetUserDetailsValidatorAsync?}
+
+    validate_dto -->|Não| err_400_dto(["([Fim: HTTP 400 Bad Request - EMPTY_EMAIL / INVALID_EMAIL])"])
+    validate_dto -->|Sim| query_db[(Consulta UserModel.GetUserDetailsByEmail em user_details.user INNER JOIN user_status)]
+
+    query_db --> check_user{Usuário encontrado com status ACTIVE?}
+    check_user -->|Não| err_404_user(["([Fim: HTTP 404 Not Found - GETUSERDETAILSYASYNC_CORESERVICE_404_USER_NOT_FOUND])"])
+    check_user -->|Sim| map_response[Mapeia UserDetailsViews para GetUserDetailsResponse]
+    map_response --> end_ok(["([Fim: HTTP 200 OK - Retorna email, name, phone, status])"])
+```
+
+### 2.4 Diagrama de Classes (`CoreUserService`, `UserModel` e `UserBankCardModel`)
 
 ```mermaid
 classDiagram
@@ -100,6 +119,7 @@ classDiagram
         +GetUserBanks(authorization: string, request: GetUserBanksRequest) Task~IActionResult~
         +GetUserCard(authorization: string, request: GetUserCardRequest) Task~IActionResult~
         +PostUserCard(authorization: string, request: PostUserCardRequest) Task~IActionResult~
+        +GetUserDetails(authorization: string, request: GetUserDetailsRequest) Task~IActionResult~
     }
 
     class ICoreUserService {
@@ -112,6 +132,7 @@ classDiagram
         +GetUserGoal(request: GetUserGoalRequest) Task~IActionResult~
         +PostUserCategory(request: PostUserCategoryRequest) Task~IActionResult~
         +GetUserCategory(request: GetUserCategoryRequest) Task~IActionResult~
+        +GetUserDetails(request: GetUserDetailsRequest) Task~IActionResult~
     }
 
     class CoreUserService {
@@ -123,6 +144,39 @@ classDiagram
         -BankCardModel _bankCardModel
         +PostUserCard(request: PostUserCardRequest) Task~IActionResult~
         +GetUserCard(request: GetUserCardRequest) Task~IActionResult~
+        +GetUserDetails(request: GetUserDetailsRequest) Task~IActionResult~
+    }
+
+    class UserModel {
+        <<repository>>
+        -AuthOrigin _AuthMainNodeDatabase
+        -AuthReplica _AuthReplicaNodeDatabase
+        +GetUserByEmailAsync(email: string, statusId: int) Task~UserEntity~
+        +GetUserDetailsByEmail(email: string, userStatus: EnumUserStatus) Task~UserDetailsViews~
+    }
+
+    class UserDetailsViews {
+        <<value_object>>
+        +string Email
+        +string Name
+        +int? Phone
+        +string UserStatus
+    }
+
+    class GetUserDetailsRequest {
+        +GetEmail() string
+        +SetEmail(email: string) void
+    }
+
+    class GetUserDetailsResponse {
+        +string Email
+        +string Name
+        +int? Phone
+        +string UserStatus
+    }
+
+    class GetUserDetailsValidatorAsync {
+        +ValidateAsync(request: GetUserDetailsRequest) Task~ValidationResult~
     }
 
     class UserBankCardModel {
@@ -161,7 +215,13 @@ classDiagram
 
     UserController --> ICoreUserService : delegates
     CoreUserService ..|> ICoreUserService : implements
+    CoreUserService --> UserModel : uses
     CoreUserService --> UserBankCardModel : uses
+    CoreUserService ..> GetUserDetailsRequest : receives
+    CoreUserService ..> GetUserDetailsValidatorAsync : validates with
+    CoreUserService ..> GetUserDetailsResponse : returns
+    UserModel ..> UserDetailsViews : projects
+    GetUserDetailsResponse ..> UserDetailsViews : maps from
     CoreUserService ..> PostUserCardRequest : receives
     CoreUserService ..> PostUserCardValidatorAsync : validates with
     UserBankCardEntity <|-- UserBankCardModel : inherits

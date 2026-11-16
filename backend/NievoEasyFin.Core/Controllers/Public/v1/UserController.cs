@@ -149,4 +149,22 @@ public class UserController : Controller
        );
         return await _userService.GetUserCategory(request);
     }
+
+    /// <summary>
+    /// Retrieves profile details for the authenticated user.
+    /// </summary>
+    /// <param name="authorization">Token JWT</param>
+    /// <param name="request">GetUserDetailsRequest</param>
+    /// <returns>IActionResult</returns>
+    [HttpGet("details")]
+    [Authorize]
+    [ProducesResponseType(typeof(ResponseApiSucess), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseApiError), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetUserDetails([FromHeader] string authorization, [FromQuery] GetUserDetailsRequest request)
+    {
+        request.SetEmail(
+           await _jsonWebTokenService.GetClaimValue(authorization, "email")
+       );
+        return await _userService.GetUserDetails(request);
+    }
 }

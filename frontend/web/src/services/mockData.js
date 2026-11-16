@@ -1,7 +1,7 @@
 // This file intercepts the Axios requests when VITE_USE_MOCK is true.
 
 let mockUsers = [
-  { id: 1, name: 'Mock User', email: 'demo@nievo.com', password: 'password123' }
+  { id: 1, name: 'Mock User', email: 'demo@nievo.com', phone: 119876543, status: 'ACTIVE', password: 'password123' }
 ];
 
 let mockCatalogBanks = [
@@ -311,7 +311,14 @@ export const setupMockAdapter = (apiClient) => {
       if (exists) {
         error.mockData = { status: 400, data: { success: false, messages: ["Email already in use."] } };
       } else {
-        const newUser = { id: mockUsers.length + 1, name: body.name || body.fullName || 'New User', email: body.email, password: body.password };
+        const newUser = {
+          id: mockUsers.length + 1,
+          name: body.name || body.fullName || 'New User',
+          email: body.email,
+          phone: body.phone ? Number(body.phone) : null,
+          status: 'ACTIVE',
+          password: body.password
+        };
         mockUsers.push(newUser);
         error.mockData = { status: 201, data: mockResponses.loginSuccess(newUser) };
       }
@@ -347,6 +354,32 @@ export const setupMockAdapter = (apiClient) => {
     // --- DASHBOARD (kept intact per instructions) ---
     } else if (url.includes('/dashboard')) {
       error.mockData = { status: 200, data: mockResponses.dashboard };
+
+    // --- CORE: USER DETAILS (/api/public/v1/User/details) ---
+    } else if (url.includes('/User/details')) {
+      const currentUser = mockUsers[mockUsers.length - 1] || mockUsers[0];
+      if (!currentUser) {
+        error.mockData = {
+          status: 404,
+          data: {
+            success: false,
+            messages: ['Please validate the user.'],
+          },
+        };
+      } else {
+        error.mockData = {
+          status: 200,
+          data: {
+            success: true,
+            data: {
+              email: currentUser.email,
+              name: currentUser.name,
+              phone: currentUser.phone ?? null,
+              status: currentUser.status || 'ACTIVE',
+            },
+          },
+        };
+      }
 
     // --- CORE: USER BANKS (/api/public/v1/User/banks) ---
     } else if (url.includes('/User/banks')) {

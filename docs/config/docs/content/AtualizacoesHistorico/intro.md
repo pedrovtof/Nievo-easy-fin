@@ -29,7 +29,13 @@ timeline
 
 ## 📜 Histórico Detalhado por Milestones e Pull Requests
 
-### 📅 Novembro / 2026 — Valores Decimais em Transações (#66), Situação de Transações (#65), Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+### 📅 Novembro / 2026 — Detalhes do Usuário (#69), Valores Decimais em Transações (#66), Situação de Transações (#65), Integração Web Core API, Submódulo Nievo-AI e Correção de Unicidade de Cartões (#55)
+* **Issue #69 — Branch `feature/card-69-user-details`:**
+  - **Endpoint de Detalhes do Usuário (`GET /api/public/v1/User/details`) e Exibição no Frontend:**
+    - Implementação de `UserDetailsViews`, `GetUserDetailsRequest`, `GetUserDetailsResponse`, `GetUserDetailsValidatorAsync`, `UserModel.GetUserDetailsByEmail` (consulta com `INNER JOIN` entre `user_details."user"` e `user_details.user_status`), `CoreUserService.GetUserDetails` e rota `GET /api/public/v1/User/details` no `UserController`.
+    - Integração no Frontend em `Header` (`frontend/web/src/components/Header/`) e `Settings` (`frontend/web/src/pages/Settings/`) sob o Design System *"The Silent Navigator"*, exibindo nome, e-mail, telefone e status do usuário autenticado, além de suporte ao endpoint em `mockData.js`.
+    - Criação de testes unitários e de integração no Backend (`GetUserDetailsAsyncTest`, `UserServiceDirectTest`, `GetUserDetailsRequestBuilder`) e no Frontend (`Settings.test.js`).
+
 * **Issue #66 — Branch `feature/card-66-transaction-decimal`:**
   - **Suporte a Valores Monetários Decimais (`Decimal` / `DECIMAL`) em Transações (`payment.transaction`):**
     - Alteração do tipo da propriedade `Amount` de `long`/`BIGINT` para `Decimal`/`DECIMAL` em `TransactionEntity`, `TransactionView`, `PostPaymentTransactionRequest`, `GetPaymentTransactionAsyncResponse`, `TransactionModel`, `PostPaymentTransactionValidatorAsync` (`GreaterThan(0.00m)`) e migração Alembic `05dfe2dffece_create_payment_tables.py`.

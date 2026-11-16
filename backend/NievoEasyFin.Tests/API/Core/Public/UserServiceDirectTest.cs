@@ -250,4 +250,118 @@ public class UserServiceDirectTest : AccountsServiceTestBase
         createdInDb.Should().NotBeNull();
         createdInDb!.Name.Should().Be(request.CardUserName);
     }
+
+    /// <summary>
+    /// Verifies that GetUserDetails returns BadRequest when email is empty.
+    /// </summary>
+    [Fact(DisplayName = "GetUserDetails When Email Is Empty Returns BadRequest")]
+    public async Task GetUserDetails_WhenEmailIsEmpty_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new GetUserDetailsRequestBuilder().WithEmail("");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetUserDetails(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that GetUserDetails returns BadRequest when email format is invalid.
+    /// </summary>
+    [Fact(DisplayName = "GetUserDetails When Email Is Invalid Returns BadRequest")]
+    public async Task GetUserDetails_WhenEmailIsInvalid_ReturnsBadRequest()
+    {
+        // Arrange
+        var request = new GetUserDetailsRequestBuilder().WithEmail("invalid-email");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetUserDetails(request);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequest = (BadRequestObjectResult)result;
+        var response = (ResponseApiError)badRequest.Value!;
+        response.Messages.Should().NotBeEmpty();
+    }
+
+    /// <summary>
+    /// Verifies that GetUserDetails returns NotFound when the user is not found or not active.
+    /// </summary>
+    [Fact(DisplayName = "GetUserDetails When User Not Found Returns NotFound")]
+    public async Task GetUserDetails_WhenUserNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        var request = new GetUserDetailsRequestBuilder().WithEmail("missing@nievo.com");
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetUserDetails(request);
+
+        // Assert
+        result.Should().BeOfType<NotFoundObjectResult>();
+        var notFound = (NotFoundObjectResult)result;
+        var response = (ResponseApiError)notFound.Value!;
+        response.Messages.Should().Contain(EnumErrosApi.GETUSERDETAILSYASYNC_CORESERVICE_404_USER_NOT_FOUND.GetDescription());
+    }
+
+    /// <summary>
+    /// Verifies that GetUserDetails returns Ok with GetUserDetailsResponse when the active user and status exist in the database.
+    /// </summary>
+    [Fact(DisplayName = "GetUserDetails With Valid Active User Returns Ok With Details")]
+    public async Task GetUserDetails_WithValidActiveUser_ReturnsOk()
+    {
+        // Arrange
+        var (origin, replica) = CreateSharedCoreContexts();
+        var (authOrigin, authReplica) = DbContextMockFactory.CreateSharedAuthContexts();
+
+        var activeStatus = new NievoEasyFin.Application.Data.Entities.UserStatusEntity
+        {
+            Id = (int)EnumUserStatus.ACTIVE,
+            Name = "ACTIVE",
+            Description = "Active user status",
+            Active = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        authOrigin.UserStatuses.Add(activeStatus);
+
+        var existingUser = UserEntityFaker.Create().Generate();
+        existingUser.Email = "userdetails@nievo.com";
+        existingUser.Name = "Pedro Nievo";
+        existingUser.Phone = 119999999;
+        existingUser.StatusId = (int)EnumUserStatus.ACTIVE;
+        authOrigin.Users.Add(existingUser);
+
+        await authOrigin.SaveChangesAsync();
+        await DbContextMockFactory.SyncToAttachedDatabasesAsync(authOrigin);
+
+        var request = new GetUserDetailsRequestBuilder().WithEmail(existingUser.Email);
+        var service = CreateUserService(origin, replica, authOrigin, authReplica);
+
+        // Act
+        var result = await service.GetUserDetails(request);
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var okResult = (OkObjectResult)result;
+        var response = (ResponseApiSucess)okResult.Value!;
+        var details = response.Data.Should().BeOfType<GetUserDetailsResponse>().Subject;
+        details.Name.Should().Be(existingUser.Name);
+        details.Email.Should().Be(existingUser.Email);
+        details.Phone.Should().Be(existingUser.Phone);
+        details.UserStatus.Should().Be("ACTIVE");
+    }
 }

@@ -49,5 +49,10 @@ namespace NievoEasyFin.Application.Interfaces.Services
         /// Get user category
         /// </summary>
         Task<IActionResult> GetUserCategory([FromBody] GetUserCategoryRequest request);
+
+        /// <summary>
+        /// Get user details
+        /// </summary>
+        Task<IActionResult> GetUserDetails([FromBody] GetUserDetailsRequest request);
     }
 }

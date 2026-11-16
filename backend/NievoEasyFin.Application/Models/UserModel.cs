@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Dapper;
 using NievoEasyFin.Application.Interfaces.Enum;
+using NievoEasyFin.Application.Data.Views;
 
 namespace NievoEasyFin.Application.Models;
 
@@ -166,5 +167,42 @@ public class UserModel : UserEntity
             );
 
         return rowsAffected > 0 ? true : false; ;
+    }
+
+    /// <summary>
+    /// Retrieves user profile details and status name by email.
+    /// </summary>
+    /// <param name="email">User email address</param>
+    /// <param name="userStatus">Target user status filter</param>
+    /// <returns>UserDetailsViews</returns>
+    public async Task<UserDetailsViews> GetUserDetailsByEmail(string email, EnumUserStatus userStatus = EnumUserStatus.ACTIVE)
+    {
+        var query = new StringBuilder();
+        var parameters = new DynamicParameters();
+
+        query.Append($"""
+            select
+                u.name as Name,
+                u.email as Email,
+                u.phone as Phone,
+                us.name as UserStatus
+            from user_details."user" u 
+                inner join user_details.user_status us 
+                    on u.status_id  = us.id 
+            where u.status_id = @userStatus
+            and u.email = @email
+        """);
+
+        parameters.Add("email", email);
+        parameters.Add("userStatus", (int)userStatus);
+
+        var connection = _AuthReplicaNodeDatabase.Database.GetDbConnection();
+
+        var dataFrame = await connection.QueryFirstOrDefaultAsync<UserDetailsViews>(
+            query.ToString(),
+            parameters
+        );
+
+        return dataFrame;
     }
 }
