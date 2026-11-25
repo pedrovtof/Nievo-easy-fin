@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changelog
 
+2026-11-25 - [BUILD] - Update Nievo-AI submodule to develop and link new backend generation skills
+
+Detalhes:
+
+- Configure Nievo-AI submodule in .gitmodules to track develop, update pointer to 116260a, and create relative symbolic links in .agents/skills/ for dotnet-gen-controller, dotnet-gen-entity, dotnet-gen-service, dotnet-gen-test, and python-alembic-gen-entity - pedrovotf - 2026-11-25 - N/A - PENDING
+
 2026-11-16 - [NEW] - Add GET /api/public/v1/User/details endpoint and integrate user details in frontend Header and Settings (#69)
 
 Detalhes:
